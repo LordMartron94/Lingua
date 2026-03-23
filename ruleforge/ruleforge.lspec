@@ -1,0 +1,828 @@
+--- "Ruleforge DSL" v0.0.0 | lspec v1.0.0 ---
+
+PRAGMA {
+	tool.sublime {
+		enable = true;
+		output-path = [
+			"libs/lingua/ruleforge/artifacts/ruleforge.sublime-syntax",
+			"/home/user/.config/sublime-text/Packages/User/ruleforge.sublime-syntax"
+		];
+	}
+
+	tool.go_bindings {
+		enable = true;
+		output-path = "libs/lingua/ruleforge/artifacts/go_bindings.go";
+		package-name = "artifacts";
+	}
+};
+
+PATTERN {
+	// --- Infrastructure ---
+	pat_TokEOF              : [];
+	pat_TokWhitespace       : (['\t', '\n', '\r', ' '])+;
+	pat_TokLineComment      : "/" "/" (!['\n', '\r'])*;
+	pat_TokBlockComment     : "/" "*" ((!'*' | ("*")+ !['*', '/']))* ("*")+ "/";
+
+	// --- Literals & Identifiers ---
+	pat_TokStringLiteral : "\"" ((!['\n', '\r', '"', '\\'] | ("\\" ['"', '\\', 'n', 'r', 't'] | ("\\u" (['0'..'9', 'A'..'F', 'a'..'f']){4,4} | "\\U" (['0'..'9', 'A'..'F', 'a'..'f']){8,8}))))* "\"";
+	pat_TokIdentifier       : ['A'..'Z', '_', 'a'..'z'] (['-', '0'..'9', 'A'..'Z', '_', 'a'..'z'])*;
+	pat_TokVersion          : "v" ('0'..'9')+ "." ('0'..'9')+ "." ('0'..'9')+;
+	pat_TokKWTrue           : "true";
+	pat_TokKWFalse          : "false";
+	pat_TokInteger 			: ('0'..'9')+;
+	pat_TokFloat            : ('0'..'9')+ '.' ('0'..'9')+;
+	pat_TokPercentage    	: ('0'..'9')+ ('.' ('0'..'9')+)? '%';
+
+	// --- Structural Symbols ---
+	pat_TokSemi             : ';';
+	pat_TokDot              : '.';
+	pat_BraceOpen           : '{';
+	pat_BraceClose          : '}';
+	pat_BracketOpen         : '[';
+	pat_BracketClose        : ']';
+	pat_Equals              : '=';
+	pat_At 					: '@';
+	pat_Dollar				: '$';
+
+	// --- Infrastructure & Grouping ---
+	pat_ParenOpen           : '(';
+	pat_ParenClose          : ')';
+	pat_Comma               : ',';
+
+	// --- Relational Operators ---
+	pat_OpEq                : "==";
+	pat_OpNeq               : "!=";
+	pat_OpGte               : ">=";
+	pat_OpLte               : "<=";
+	pat_OpGt                : '>';
+	pat_OpLt                : '<';
+
+	// --- Module & Metadata Keywords ---
+	pat_TokKWVersion        : "version";
+	pat_TokKWModule         : "module";
+	pat_TokKWExport         : "export";
+	pat_TokKWPrivate        : "private";
+	pat_TokKWImplements     : "implements";
+	pat_TokKWExtends        : "extends";
+	pat_TokKWOverride       : "override";
+	pat_TokKWInherit        : "inherit";
+
+	// --- Types ---
+	pat_TokKWThemeSchema    : "themeSchema";
+	pat_TokKWColorSet       : "colorSet";
+	pat_Template			: "template";
+	pat_TokKWTheme          : "theme";
+	pat_TokKWStyle			: "style";
+
+	// --- Theme & Schema Keywords ---
+	pat_TokKWScope 			: "scope";
+	pat_TokKWAction			: "action";
+	pat_TokKWBaseLine 		: "baseline";
+	pat_TokKWWhen 			: "when";
+	pat_TokKWVariants		: "variants";
+
+	// --- Component & Property Keywords ---
+	pat_TokKWOnShow         : "onShow";
+	pat_TokKWOnHide         : "onHide";
+	pat_TokKWBackground     : "Background";
+	pat_TokKWBorder         : "Border";
+	pat_TokKWFontSize       : "FontSize";
+	pat_TokKWTextColor      : "TextColor";
+	pat_TokKWSize           : "Size";
+	pat_TokKWColor          : "Color";
+	pat_TokKWShape          : "Shape";
+	pat_TokKWEffectColor    : "EffectColor";
+	pat_TokKWEffectTemporary: "EffectTemporary";
+
+	pat_TokKWHSV            : "hsv";
+	pat_TokKWHSVA           : "hsva";
+	pat_TokKWHSL            : "hsl";
+	pat_TokKWHSLA           : "hsla";
+	pat_TokKWRGB  			: "rgb";
+	pat_TokKWRGBA 			: "rgba";
+
+	// --- Action Keywords ---
+	pat_TokKWShow 			: "show";
+	pat_TokKWHide 			: "hide";
+
+	// --- Sound & Minimap Keywords ---
+	pat_TokKWSound          : "Sound";
+	pat_TokKWMinimap        : "Minimap";
+	pat_TokKWSoundID        : "ID";
+	pat_TokKWSoundPath      : "Path";
+	pat_TokKWSoundVolume    : "Volume";
+	pat_TokKWPositionalSound: "Positional";
+	pat_TokKWDropSoundEnabled: "Enabled";
+
+	pat_HexDigit        : ['0'..'9', 'A'..'F', 'a'..'f'];
+	pat_TokHexColor     : "#" ( 
+		(pat_HexDigit){8,8} | 
+		(pat_HexDigit){6,6} | 
+		(pat_HexDigit){4,4} | 
+		(pat_HexDigit){3,3} 
+	);
+
+	// --- Color Components ---
+	pat_RGBRed              : 'r' ('0'..'9')+ ('.' ('0'..'9')+)?;
+	pat_RGBGreen            : 'g' ('0'..'9')+ ('.' ('0'..'9')+)?;
+	pat_RGBBlue             : 'b' ('0'..'9')+ ('.' ('0'..'9')+)?;
+	pat_RGBAlpha            : 'a' ('0'..'9')+ ('.' ('0'..'9')+)?;
+	pat_Hue                 : 'h' ('0'..'9')+ ('.' ('0'..'9')+)?;
+	pat_Saturation       	: 's' ('0'..'9')+ ('.' ('0'..'9')+)? '%'?;
+    pat_Value            	: 'v' ('0'..'9')+ ('.' ('0'..'9')+)? '%'?;
+    pat_Lightness        	: 'l' ('0'..'9')+ ('.' ('0'..'9')+)? '%'?;
+};
+
+LEX {
+    // ========================================================================
+    // 1. METADATA & MODULE SYSTEM (Priority 2)
+    // ========================================================================
+    2 TokKWVersion          -> RULEFORGE_STRUCTURAL_ROLE : pat_TokKWVersion;
+    2 TokKWModule           -> RULEFORGE_STRUCTURAL_ROLE : pat_TokKWModule;
+    2 TokKWExport           -> RULEFORGE_STRUCTURAL_ROLE : pat_TokKWExport;
+    2 TokKWPrivate          -> RULEFORGE_STRUCTURAL_ROLE : pat_TokKWPrivate;
+    2 TokKWExtends          -> RULEFORGE_STRUCTURAL_ROLE : pat_TokKWExtends;
+    2 TokKWImplements       -> RULEFORGE_STRUCTURAL_ROLE : pat_TokKWImplements;
+    2 TokKWOverride         -> RULEFORGE_STRUCTURAL_ROLE : pat_TokKWOverride;
+
+    // ========================================================================
+	// RULE & TEMPLATE KEYWORDS (Priority 2)
+	// ========================================================================
+	2 TokKWTemplate         -> RULEFORGE_STRUCTURAL_ROLE : pat_Template;
+	2 TokKWScope            -> RULEFORGE_STRUCTURAL_ROLE : pat_TokKWScope;
+	2 TokKWBaseLine         -> RULEFORGE_STRUCTURAL_ROLE : pat_TokKWBaseLine;
+	2 TokKWVariants         -> RULEFORGE_STRUCTURAL_ROLE : pat_TokKWVariants;
+	2 TokKWWhen             -> RULEFORGE_STRUCTURAL_ROLE : pat_TokKWWhen;
+	2 TokKWAction           -> RULEFORGE_STRUCTURAL_ROLE : pat_TokKWAction;
+	2 TokKWInherit          -> RULEFORGE_STRUCTURAL_ROLE : pat_TokKWInherit;
+	2 TokKWStyle            -> RULEFORGE_STRUCTURAL_ROLE : pat_TokKWStyle;
+	2 TokKWShow             -> RULEFORGE_STRUCTURAL_ROLE : pat_TokKWShow;
+	2 TokKWHide             -> RULEFORGE_STRUCTURAL_ROLE : pat_TokKWHide;
+
+    // ========================================================================
+    // 2. THEME & STYLING DEFINITIONS (Priority 2)
+    // ========================================================================
+    2 TokKWThemeSchema      -> RULEFORGE_STRUCTURAL_ROLE : pat_TokKWThemeSchema;
+    2 TokKWTheme            -> RULEFORGE_STRUCTURAL_ROLE : pat_TokKWTheme;
+    2 TokKWColorSet         -> RULEFORGE_STRUCTURAL_ROLE : pat_TokKWColorSet;
+    
+    // Property Keywords
+    2 TokKWBackground       -> RULEFORGE_STRUCTURAL_ROLE : pat_TokKWBackground;
+    2 TokKWBorder           -> RULEFORGE_STRUCTURAL_ROLE : pat_TokKWBorder;
+    2 TokKWFontSize         -> RULEFORGE_STRUCTURAL_ROLE : pat_TokKWFontSize;
+    2 TokKWTextColor        -> RULEFORGE_STRUCTURAL_ROLE : pat_TokKWTextColor;
+    2 TokKWSize             -> RULEFORGE_STRUCTURAL_ROLE : pat_TokKWSize;
+    2 TokKWColor            -> RULEFORGE_STRUCTURAL_ROLE : pat_TokKWColor;
+    2 TokKWShape            -> RULEFORGE_STRUCTURAL_ROLE : pat_TokKWShape;
+
+    // ========================================================================
+    // 3. SYSTEM & MULTIMEDIA (Priority 2)
+    // ========================================================================
+    2 TokKWSound            -> RULEFORGE_STRUCTURAL_ROLE : pat_TokKWSound;
+    2 TokKWMinimap          -> RULEFORGE_STRUCTURAL_ROLE : pat_TokKWMinimap;
+    2 TokKWOnShow           -> RULEFORGE_STRUCTURAL_ROLE : pat_TokKWOnShow;
+    2 TokKWOnHide           -> RULEFORGE_STRUCTURAL_ROLE : pat_TokKWOnHide;
+
+    // Sound Property Sub-Keywords
+    2 TokKWSoundID          -> RULEFORGE_STRUCTURAL_ROLE : pat_TokKWSoundID;
+    2 TokKWSoundPath        -> RULEFORGE_STRUCTURAL_ROLE : pat_TokKWSoundPath;
+    2 TokKWSoundVolume      -> RULEFORGE_STRUCTURAL_ROLE : pat_TokKWSoundVolume;
+    2 TokKWPositional       -> RULEFORGE_STRUCTURAL_ROLE : pat_TokKWPositionalSound;
+    2 TokKWDropSoundEnabled -> RULEFORGE_STRUCTURAL_ROLE : pat_TokKWDropSoundEnabled;
+
+    // Effects
+    2 TokKWEffectColor      -> RULEFORGE_STRUCTURAL_ROLE : pat_TokKWEffectColor;
+    2 TokKWEffectTemporary  -> RULEFORGE_STRUCTURAL_ROLE : pat_TokKWEffectTemporary;
+
+    // ========================================================================
+    // 4. LITERALS & DYNAMIC VALUES (Priority 2 & 1)
+    // ========================================================================
+    // Booleans (Priority 2 to beat Identifier)
+    2 TokKWTrue             -> RULEFORGE_STRUCTURAL_ROLE : pat_TokKWTrue;
+    2 TokKWFalse            -> RULEFORGE_STRUCTURAL_ROLE : pat_TokKWFalse;
+
+	2 TokKWHSVA             -> RULEFORGE_STRUCTURAL_ROLE : pat_TokKWHSVA;
+	2 TokKWHSV              -> RULEFORGE_STRUCTURAL_ROLE : pat_TokKWHSV;
+    2 TokKWHSLA             -> RULEFORGE_STRUCTURAL_ROLE : pat_TokKWHSLA;
+    2 TokKWHSL              -> RULEFORGE_STRUCTURAL_ROLE : pat_TokKWHSL;
+    2 TokKWRGBA 			-> RULEFORGE_STRUCTURAL_ROLE : pat_TokKWRGBA;
+	2 TokKWRGB 				-> RULEFORGE_STRUCTURAL_ROLE : pat_TokKWRGB;
+
+    // Color Components
+    2 TokRGBRed             -> RULEFORGE_STRUCTURAL_ROLE : pat_RGBRed;
+    2 TokRGBBlue            -> RULEFORGE_STRUCTURAL_ROLE : pat_RGBBlue;
+    2 TokRGBGreen           -> RULEFORGE_STRUCTURAL_ROLE : pat_RGBGreen;
+    2 TokRGBAlpha           -> RULEFORGE_STRUCTURAL_ROLE : pat_RGBAlpha;
+	2 TokHue                -> RULEFORGE_STRUCTURAL_ROLE : pat_Hue;
+    2 TokSaturation         -> RULEFORGE_STRUCTURAL_ROLE : pat_Saturation;
+    2 TokValue              -> RULEFORGE_STRUCTURAL_ROLE : pat_Value;
+    2 TokLightness          -> RULEFORGE_STRUCTURAL_ROLE : pat_Lightness;
+    2 TokHexColor           -> RULEFORGE_STRUCTURAL_ROLE : pat_TokHexColor;
+
+    // Generic Identifiers (Priority 1 - Catch-all for names)
+    1 TokIdentifier         -> RULEFORGE_STRUCTURAL_ROLE : pat_TokIdentifier;
+    1 TokVersionIndicator   -> RULEFORGE_STRUCTURAL_ROLE : pat_TokVersion;
+    1 TokPercentage 		-> RULEFORGE_STRUCTURAL_ROLE : pat_TokPercentage;
+    1 TokFloat              -> RULEFORGE_STRUCTURAL_ROLE : pat_TokFloat;
+    1 TokInteger 			-> RULEFORGE_STRUCTURAL_ROLE : pat_TokInteger;
+    1 TokStringLiteral 		-> RULEFORGE_STRUCTURAL_ROLE : pat_TokStringLiteral;
+
+    // ========================================================================
+    // 5. SYNTAX, OPERATORS & TRIVIA (Priority 0)
+    // ========================================================================
+    0 TokSemi               -> RULEFORGE_STRUCTURAL_ROLE : pat_TokSemi;
+    0 TokDot                -> RULEFORGE_STRUCTURAL_ROLE : pat_TokDot;
+    0 TokBraceOpen          -> RULEFORGE_STRUCTURAL_ROLE : pat_BraceOpen;
+    0 TokBraceClose         -> RULEFORGE_STRUCTURAL_ROLE : pat_BraceClose;
+    0 TokBracketOpen        -> RULEFORGE_STRUCTURAL_ROLE : pat_BracketOpen;
+    0 TokBracketClose       -> RULEFORGE_STRUCTURAL_ROLE : pat_BracketClose;
+    0 TokEquals             -> RULEFORGE_STRUCTURAL_ROLE : pat_Equals;
+
+	0 TokAt                 -> RULEFORGE_STRUCTURAL_ROLE : pat_At;
+	0 TokDollar             -> RULEFORGE_STRUCTURAL_ROLE : pat_Dollar;
+	0 TokParenOpen          -> RULEFORGE_STRUCTURAL_ROLE : pat_ParenOpen;
+	0 TokParenClose         -> RULEFORGE_STRUCTURAL_ROLE : pat_ParenClose;
+	0 TokComma              -> RULEFORGE_STRUCTURAL_ROLE : pat_Comma;
+
+	// Operators
+	0 TokOpEq               -> RULEFORGE_STRUCTURAL_ROLE : pat_OpEq;
+	0 TokOpNeq              -> RULEFORGE_STRUCTURAL_ROLE : pat_OpNeq;
+	0 TokOpGte              -> RULEFORGE_STRUCTURAL_ROLE : pat_OpGte;
+	0 TokOpLte              -> RULEFORGE_STRUCTURAL_ROLE : pat_OpLte;
+	0 TokOpGt               -> RULEFORGE_STRUCTURAL_ROLE : pat_OpGt;
+	0 TokOpLt               -> RULEFORGE_STRUCTURAL_ROLE : pat_OpLt;
+
+    // Hidden/Whitespace
+    0 TokWhitespace         -> RULEFORGE_WHITESPACE_ROLE : pat_TokWhitespace;
+    0 TokBlockComment       -> RULEFORGE_COMMENT_ROLE    : pat_TokBlockComment;
+    0 TokLineComment        -> RULEFORGE_COMMENT_ROLE    : pat_TokLineComment;
+
+    // End of File
+    0 TokEOF                -> RULEFORGE_STRUCTURAL_ROLE : pat_TokEOF %% EOF=true %%;
+};
+
+PARSE {
+	IGNORE {
+		RULEFORGE_WHITESPACE_ROLE RULEFORGE_COMMENT_ROLE
+	};
+
+	PROGRAM -> NodeProgram {
+		VERSION_STATEMENT
+		MODULE_STATEMENT
+		MAIN_BLOCK_LIST
+		virtual TokEOF
+	}
+
+	VERSION_STATEMENT -> transparent gr_VSTMT sync (TokSemi) {
+		virtual TokKWVersion
+		NodeVersionIndicator : TokVersionIndicator
+		virtual TokSemi
+	}
+
+	MODULE_STATEMENT -> transparent gr_MSTMT sync (TokSemi) {
+		virtual TokKWModule
+		MODULE_PATH
+		virtual TokSemi
+	}
+
+	MODULE_PATH -> NodeModulePath {
+		NodePathSegment : TokIdentifier
+		(
+			virtual TokDot 
+			NodePathSegment : TokIdentifier
+		)*
+	}
+
+	// ---------------------------------------------------------
+	// TOP LEVEL
+	// ---------------------------------------------------------
+
+	MAIN_BLOCK_LIST -> transparent gr_MAIN_BLOCK_LIST {
+		MAIN_BLOCK*
+	}
+
+	MAIN_BLOCK -> NodeMainBlock {
+		(	
+			NodeExportKeyword : TokKWExport
+			| NodePrivateKeyword : TokKWPrivate
+		)?
+		(
+			THEME_SCHEMA 
+			| COLORSET
+			| THEME
+			| TEMPLATE
+		)
+	}
+
+	// ---------------------------------------------------------
+	// THEME SCHEMA
+	// ---------------------------------------------------------
+
+	THEME_SCHEMA -> NodeThemeSchema {
+		virtual TokKWThemeSchema
+		NodeThemeSchemaName : TokIdentifier
+		nest TokBraceOpen TokBraceClose {
+			THEME_SCHEMA_STYLE_LIST
+		}
+	}
+
+	THEME_SCHEMA_STYLE_LIST -> transparent gr_THEME_SCHEMA_STYLE_LIST {
+		THEME_SCHEMA_STYLE_ENTRY*
+	}
+
+	THEME_SCHEMA_STYLE_ENTRY -> transparent gr_THEME_SCHEMA_STYLE_ENTRY sync (TokSemi) {
+		NodeStyleKey : TokIdentifier
+		virtual TokSemi
+	}
+
+	// ---------------------------------------------------------
+	// COLORSET
+	// ---------------------------------------------------------
+
+	COLORSET -> NodeColorSet {
+		virtual TokKWColorSet
+		NodeColorSetName : TokIdentifier
+		nest TokBraceOpen TokBraceClose {
+			COLORSET_ITEM_LIST
+		}		
+	}
+
+	COLORSET_ITEM_LIST -> transparent gr_COLORSET_ITEM_LIST {
+		COLORSET_ITEM*
+	}
+
+	COLORSET_ITEM -> NodeColorSetEntry sync (TokSemi) {
+		NodeColorKey : TokIdentifier
+		virtual TokEquals
+		COLOR_CONFIG
+		virtual TokSemi
+	}
+
+	COLOR_CONFIG -> transparent gr_COLOR_CONFIG {
+		RGB_SHORTHAND 
+		| HUE_SHORTHAND 
+		| RGB_LITERAL | RGBA_LITERAL
+		| HSV_LITERAL | HSVA_LITERAL
+		| HSL_LITERAL | HSLA_LITERAL
+		| HEX_LITERAL
+	}
+
+	RGB_SHORTHAND -> transparent gr_RGB_SHORTHAND {
+		NodeRGBRed   : TokRGBRed
+		NodeRGBGreen : TokRGBGreen
+		NodeRGBBlue  : TokRGBBlue
+		NodeRGBAlpha : TokRGBAlpha?
+	}
+
+	HUE_SHORTHAND -> transparent gr_HUE_SHORTHAND {
+		NodeHue        : TokHue
+		NodeSaturation : TokSaturation
+		(
+			NodeValue : TokValue          
+			| NodeLightness : TokLightness 
+		)
+		NodeRGBAlpha : TokRGBAlpha?
+	}
+
+	HEX_LITERAL -> transparent gr_HEX_LITERAL {
+		NodeHexColor : TokHexColor
+	}
+
+	RGB_LITERAL -> transparent gr_RGB_LITERAL {
+		virtual TokKWRGB
+		nest TokParenOpen TokParenClose {
+			(NodeRGBRed : TokInteger | NodeRGBRed : TokFloat)
+			virtual TokComma
+			(NodeRGBGreen : TokInteger | NodeRGBGreen : TokFloat)
+			virtual TokComma
+			(NodeRGBBlue : TokInteger | NodeRGBBlue : TokFloat)
+		}
+	}
+
+	RGBA_LITERAL -> transparent gr_RGBA_LITERAL {
+		virtual TokKWRGBA
+		nest TokParenOpen TokParenClose {
+			(NodeRGBRed : TokInteger | NodeRGBRed : TokFloat)
+			virtual TokComma
+			(NodeRGBGreen : TokInteger | NodeRGBGreen : TokFloat)
+			virtual TokComma
+			(NodeRGBBlue : TokInteger | NodeRGBBlue : TokFloat)
+			virtual TokComma
+			(NodeRGBAlpha : TokInteger | NodeRGBAlpha : TokFloat)
+		}
+	}
+
+	HSV_LITERAL -> transparent gr_HSV_LITERAL {
+		virtual TokKWHSV
+		nest TokParenOpen TokParenClose {
+			(NodeHue : TokInteger | NodeHue : TokFloat)
+			virtual TokComma
+			(NodeSaturation : TokInteger | NodeSaturation : TokFloat | NodeSaturation : TokPercentage)
+			virtual TokComma
+			(NodeValue : TokInteger | NodeValue : TokFloat | NodeValue : TokPercentage)
+		}
+	}
+
+	HSVA_LITERAL -> transparent gr_HSVA_LITERAL {
+		virtual TokKWHSVA
+		nest TokParenOpen TokParenClose {
+			(NodeHue : TokInteger | NodeHue : TokFloat)
+			virtual TokComma
+			(NodeSaturation : TokInteger | NodeSaturation : TokFloat | NodeSaturation : TokPercentage)
+			virtual TokComma
+			(NodeValue : TokInteger | NodeValue : TokFloat | NodeValue : TokPercentage)
+			virtual TokComma
+			(NodeAlpha : TokInteger | NodeAlpha : TokFloat)
+		}
+	}
+
+	HSL_LITERAL -> transparent gr_HSL_LITERAL {
+		virtual TokKWHSL
+		nest TokParenOpen TokParenClose {
+			(NodeHue : TokInteger | NodeHue : TokFloat)
+			virtual TokComma
+			(NodeSaturation : TokInteger | NodeSaturation : TokFloat | NodeSaturation : TokPercentage)
+			virtual TokComma
+			(NodeLightness : TokInteger | NodeLightness : TokFloat | NodeLightness : TokPercentage)
+		}
+	}
+
+	HSLA_LITERAL -> transparent gr_HSLA_LITERAL {
+		virtual TokKWHSLA
+		nest TokParenOpen TokParenClose {
+			(NodeHue : TokInteger | NodeHue : TokFloat)
+			virtual TokComma
+			(NodeSaturation : TokInteger | NodeSaturation : TokFloat | NodeSaturation : TokPercentage)
+			virtual TokComma 
+			(NodeLightness : TokInteger | NodeLightness : TokFloat  | NodeLightness : TokPercentage)
+			virtual TokComma
+			(NodeAlpha : TokInteger | NodeAlpha : TokFloat)
+		}
+	}
+
+	// ---------------------------------------------------------
+	// THEME
+	// ---------------------------------------------------------
+
+	THEME -> NodeTheme {
+		virtual TokKWTheme
+		NodeThemeName : TokIdentifier
+		(
+			EXTEND_SEQUENCE | IMPLEMENT_SEQUENCE
+		)?
+		nest TokBraceOpen TokBraceClose {
+			THEME_STYLE_LIST
+		}
+	}
+
+	EXTEND_SEQUENCE -> transparent gr_THEME_EXTEND {
+		NodeExtends : TokKWExtends
+		NodeThemeReference : TokIdentifier
+	}
+
+	IMPLEMENT_SEQUENCE -> transparent gr_THEME_IMPLEMENT {
+		NodeImplements : TokKWImplements
+		NodeThemeSchemaReference : TokIdentifier
+	}
+
+	THEME_STYLE_LIST -> transparent gr_THEME_STYLE_LIST {
+		(
+			NodeOverride : TokKWOverride?
+			NodeThemeStyleName : TokIdentifier
+			nest TokBraceOpen TokBraceClose {
+				THEME_STYLE_ENTRY
+			}
+		)*
+	}
+
+	THEME_STYLE_ENTRY -> transparent gr_THEME_STYLE_ENTRY {
+		ON_SHOW_ACTION
+		ON_HIDE_ACTION?
+	}
+
+	ON_SHOW_ACTION -> NodeOnShow {
+		virtual TokKWOnShow
+		STYLE_CONFIG_WRAP
+	}
+
+	ON_HIDE_ACTION -> NodeOnHide {
+		virtual TokKWOnHide
+		STYLE_CONFIG_WRAP
+	}
+
+	STYLE_CONFIG_WRAP -> transparent gr_STYLE_CONFIG_WRAP {
+		nest TokBraceOpen TokBraceClose {
+			STYLE_CONFIGURATION_LIST
+		}		
+	}
+
+	STYLE_CONFIGURATION_LIST -> transparent gr_STYLE_CONFIG_LIST {
+		STYLE_CONFIGURATION*
+	}
+
+	STYLE_CONFIGURATION -> transparent gr_STYLE_CONFIG {
+		BACKGROUND | BORDER | TEXT_COLOR | TEXT_SIZE | EFFECT | SOUND | MINIMAP
+	}
+
+	BACKGROUND -> NodeBackground sync (TokSemi) {
+		virtual TokKWBackground
+		(COLOR_CONFIG | COLOR_REF)
+		virtual TokSemi
+	}
+
+	BORDER -> NodeBorder sync (TokSemi) {
+		virtual TokKWBorder
+		(COLOR_CONFIG | COLOR_REF)
+		virtual TokSemi
+	}
+
+	TEXT_COLOR -> NodeTextColor sync (TokSemi) {
+		virtual TokKWTextColor
+		(COLOR_CONFIG | COLOR_REF)
+		virtual TokSemi
+	}
+
+	TEXT_SIZE -> transparent gr_TextSize sync (TokSemi) {
+		virtual TokKWFontSize
+		NodeTextSize : TokInteger
+		virtual TokSemi
+	}
+
+	COLOR_REF -> NodeColorReference {
+		NodeColorSetReference : TokIdentifier
+		virtual TokDot
+		NodeColorKeyReference : TokIdentifier
+		COLOR_OVERRIDE?
+	}
+
+	COLOR_OVERRIDE -> NodeColorOverride {
+		virtual TokKWOverride
+		(
+			NodeRGBRed       : TokRGBRed
+			| NodeRGBGreen   : TokRGBGreen
+			| NodeRGBBlue    : TokRGBBlue
+			| NodeRGBAlpha   : TokRGBAlpha
+			| NodeHue        : TokHue
+			| NodeSaturation : TokSaturation
+			| NodeValue      : TokValue
+			| NodeLightness  : TokLightness
+		){1,4} 
+	}
+
+	EFFECT -> NodeEffect sync (TokSemi) {
+		( 
+			( 
+				virtual TokKWEffectColor 
+				NodeEffectColor : TokStringLiteral 
+			)
+			|
+			( 
+				virtual TokKWEffectTemporary
+				(
+					NodeEffectTemporary : TokKWTrue
+					| NodeEffectTemporary : TokKWFalse
+				)
+			)
+		)
+		virtual TokSemi	
+	}
+
+	SOUND -> NodeSound {
+		virtual TokKWSound
+		nest TokBraceOpen TokBraceClose {
+			SOUND_CONFIGURATION_LIST
+		}
+	}
+
+	SOUND_CONFIGURATION_LIST -> transparent gr_SOUND_CONFIG_LIST {
+		SOUND_CONFIGURATION*
+	}
+
+	SOUND_CONFIGURATION -> transparent gr_SOUND_CONFIG sync (TokSemi) {
+		(
+			(
+				virtual TokKWSoundID
+				NodeSoundID : TokInteger
+			) 
+			|
+			(
+				virtual TokKWSoundPath
+				NodeSoundPath : TokStringLiteral
+			)
+			| 
+			(
+				virtual TokKWSoundVolume
+				NodeSoundVolume : TokInteger
+			) 			
+			| 
+			(
+				virtual TokKWDropSoundEnabled
+				(	
+					NodeSoundEnabled : TokKWTrue
+					| NodeSoundEnabled : TokKWFalse
+				)
+			)
+			| 
+			(
+				virtual TokKWPositional
+				(
+					NodeSoundPositional : TokKWTrue
+					| NodeSoundPositional : TokKWFalse
+				)
+			)  
+		)
+		virtual TokSemi  
+	}
+
+	MINIMAP -> NodeMinimap {
+		virtual TokKWMinimap
+		nest TokBraceOpen TokBraceClose {
+			MINIMAP_CONFIGURATION_LIST
+		}	
+	}
+
+	MINIMAP_CONFIGURATION_LIST -> transparent gr_MINIMAP_CONFIG_LIST {
+		MINIMAP_CONFIGURATION*
+	}
+
+	MINIMAP_CONFIGURATION -> transparent gr_MINIMAP_CONFIG sync (TokSemi) {
+		(
+			(
+				virtual TokKWColor
+				NodeMinimapColor : TokStringLiteral
+			)
+			|
+			(
+				virtual TokKWShape
+				NodeMinimapShape : TokStringLiteral
+			)
+			|
+			(
+				virtual TokKWSize
+				NodeMinimapSize : TokInteger
+			)
+		)
+		virtual TokSemi
+	}
+
+	// ---------------------------------------------------------
+	// TEMPLATE
+	// ---------------------------------------------------------
+
+	TEMPLATE -> NodeTemplate {
+		virtual TokKWTemplate
+		NodeTemplateName : TokIdentifier
+		nest TokParenOpen TokParenClose {
+			TEMPLATE_SIGNATURE
+		}
+		nest TokBraceOpen TokBraceClose {
+			TEMPLATE_BODY
+		}
+	}
+
+	TEMPLATE_SIGNATURE -> NodeTemplateSignature {
+		(
+			TEMPLATE_ARGUMENT
+			(
+				virtual TokComma
+				TEMPLATE_ARGUMENT
+			)*
+		)?
+	}
+
+	TEMPLATE_ARGUMENT -> NodeTemplateArgument {
+		NodeArgumentName : TokIdentifier
+		(
+			NodeArgumentType : TokIdentifier
+			| NodeArgumentType : TokKWStyle
+			| NodeArgumentType : TokKWTheme
+			| NodeArgumentType : TokKWColorSet
+		)
+	}
+
+	TEMPLATE_BODY -> transparent gr_TEMPLATE_BODY {
+		SCOPE_BLOCK?
+		BASELINE_BLOCK
+		VARIANTS_BLOCK?
+	}
+
+	// --- Scope ---
+	SCOPE_BLOCK -> NodeScopeBlock {
+		virtual TokKWScope
+		nest TokBraceOpen TokBraceClose {
+			SCOPE_ASSIGNMENT*
+		}
+	}
+
+	SCOPE_ASSIGNMENT -> NodeScopeAssignment sync (TokSemi) {
+		NodeAssignTarget : TokIdentifier
+		virtual TokEquals
+		(
+			NodeAssignmentValue : TokStringLiteral 
+			| NodeAssignmentValue : TokInteger 
+			| VARIABLE_REF 
+			| NodeAssignmentValue : TokIdentifier
+		)
+		virtual TokSemi
+	}
+
+	// --- Baseline ---
+	BASELINE_BLOCK -> NodeBaselineBlock {
+		virtual TokKWBaseLine
+		nest TokBraceOpen TokBraceClose {
+			BASELINE_PROPERTY*
+		}
+	}
+
+	BASELINE_PROPERTY -> transparent gr_BASELINE_PROPERTY {
+		ACTION_DEF | STYLE_DEF
+	}
+
+	ACTION_DEF -> NodeActionDef sync (TokSemi) {
+		virtual TokKWAction
+		(NodeActionType : TokKWShow | NodeActionType : TokKWHide)
+		virtual TokSemi
+	}
+
+	STYLE_DEF -> NodeStyleDef sync (TokSemi) {
+		virtual TokKWStyle
+		VARIABLE_REF
+		virtual TokSemi
+	}
+
+	INHERIT_DEF -> NodeInheritDef sync (TokSemi) {
+		virtual TokKWInherit
+		(NodeInheritTarget : TokKWAction | NodeInheritTarget : TokKWStyle)
+		virtual TokSemi
+	}
+
+	// --- Variants & Conditions ---
+	VARIANTS_BLOCK -> NodeVariantsBlock {
+		virtual TokKWVariants
+		nest TokBraceOpen TokBraceClose {
+			VARIANT_CONDITION*
+		}
+	}
+
+	VARIANT_CONDITION -> NodeVariantCondition {
+		virtual TokKWWhen
+		CONDITION_EXPR
+		nest TokBraceOpen TokBraceClose {
+			VARIANT_CONDITION*
+			RULE_PROPERTY*
+		}
+	}
+
+	RULE_PROPERTY -> transparent gr_RULE_PROPERTY {
+		BASELINE_PROPERTY | INHERIT_DEF
+	}
+
+	CONDITION_EXPR -> NodeConditionExpr {
+		CONDITION_LEFT
+		CONDITION_OPERATOR
+		CONDITION_RIGHT
+	}
+
+	CONDITION_LEFT -> transparent gr_COND_LEFT {
+		ENGINE_DIRECTIVE 
+		| NodeConditionTarget : TokIdentifier
+	}
+
+	ENGINE_DIRECTIVE -> transparent gr_ENGINE_DIRECTIVE {
+		virtual TokAt
+		NodeEngineDirective : TokIdentifier
+	}
+
+	CONDITION_OPERATOR -> transparent gr_COND_OP {
+		NodeOp : TokOpEq 
+		| NodeOp : TokOpNeq 
+		| NodeOp : TokOpGte 
+		| NodeOp : TokOpLte 
+		| NodeOp : TokOpGt 
+		| NodeOp : TokOpLt
+	}
+
+	CONDITION_RIGHT -> NodeConditionValue {
+		NodeIntLiteral : TokInteger 
+		| STRING_ARRAY
+		| NodeStringLiteral : TokStringLiteral
+		| NodeIdentifier : TokIdentifier 
+		| NodeBooleanLiteral : TokKWTrue 
+		| NodeBooleanLiteral : TokKWFalse
+	}
+
+	STRING_ARRAY -> NodeStringArray {
+		nest TokBracketOpen TokBracketClose {
+			NodeStringLiteral : TokStringLiteral
+			(
+				virtual TokComma
+				NodeStringLiteral : TokStringLiteral
+			)*
+		}
+	}
+
+	VARIABLE_REF -> NodeVariableRef {
+		virtual TokDollar
+		NodeVariableName : TokIdentifier
+	}
+};
