@@ -73,6 +73,7 @@ PATTERN {
 	pat_Template			: "template";
 	pat_TokKWTheme          : "theme";
 	pat_TokKWStyle			: "style";
+	pat_TokKWRuleset		: "ruleset";
 
 	// --- Theme & Schema Keywords ---
 	pat_TokKWScope 			: "scope";
@@ -93,6 +94,9 @@ PATTERN {
 	pat_TokKWShape          : "Shape";
 	pat_TokKWEffectColor    : "EffectColor";
 	pat_TokKWEffectTemporary: "EffectTemporary";
+	pat_TokKWDescription    : "description";
+	pat_TokKWCoreConditions : "coreConditions";
+	pat_TokKWRule 			: "rule";
 
 	pat_TokKWHSV            : "hsv";
 	pat_TokKWHSVA           : "hsva";
@@ -158,6 +162,10 @@ LEX {
 	2 TokKWStyle            -> RULEFORGE_STRUCTURAL_ROLE : pat_TokKWStyle;
 	2 TokKWShow             -> RULEFORGE_STRUCTURAL_ROLE : pat_TokKWShow;
 	2 TokKWHide             -> RULEFORGE_STRUCTURAL_ROLE : pat_TokKWHide;
+	2 TokKWRuleset 			-> RULEFORGE_STRUCTURAL_ROLE : pat_TokKWRuleset;
+	2 TokKWDescription		-> RULEFORGE_STRUCTURAL_ROLE : pat_TokKWDescription;
+	2 TokKWCoreConditions	-> RULEFORGE_STRUCTURAL_ROLE : pat_TokKWCoreConditions;
+	2 TokKWRule 			-> RULEFORGE_STRUCTURAL_ROLE : pat_TokKWRule;
 
     // ========================================================================
     // 2. THEME & STYLING DEFINITIONS (Priority 2)
@@ -311,6 +319,7 @@ PARSE {
 			| COLORSET
 			| THEME
 			| TEMPLATE
+			| RULESET
 		)
 	}
 
@@ -676,7 +685,7 @@ PARSE {
 			TEMPLATE_SIGNATURE
 		}
 		nest TokBraceOpen TokBraceClose {
-			TEMPLATE_BODY
+			RULE_BODY
 		}
 	}
 
@@ -700,7 +709,7 @@ PARSE {
 		)
 	}
 
-	TEMPLATE_BODY -> transparent gr_TEMPLATE_BODY {
+	RULE_BODY -> transparent gr_RULE_BODY {
 		SCOPE_BLOCK?
 		BASELINE_BLOCK
 		VARIANTS_BLOCK?
@@ -746,7 +755,7 @@ PARSE {
 
 	STYLE_DEF -> NodeStyleDef sync (TokSemi) {
 		virtual TokKWStyle
-		VARIABLE_REF
+		(VARIABLE_REF | STYLE_REF)
 		virtual TokSemi
 	}
 
@@ -810,6 +819,93 @@ PARSE {
 		| NodeBooleanLiteral : TokKWTrue 
 		| NodeBooleanLiteral : TokKWFalse
 	}
+
+	// ---------------------------------------------------------
+	// RULESET
+	// ---------------------------------------------------------
+
+	RULESET -> NodeRuleset {
+		virtual TokKWRuleset
+		NodeRulesetName : TokIdentifier
+		nest TokBraceOpen TokBraceClose {
+			RULESET_BODY
+		}
+	}
+
+	RULESET_BODY -> transparent gr_RULESET_BODY {
+		DESCRIPTION_STMT
+		CORE_CONDITIONS?
+		RULES
+	}
+
+	DESCRIPTION_STMT -> transparent gr_DESCRIPTION_STMT sync (TokSemi) {
+		virtual TokKWDescription
+		NodeRulesetDescription : TokStringLiteral
+		virtual TokSemi
+	}
+
+	CORE_CONDITIONS -> NodeCoreConditions {
+		virtual TokKWCoreConditions
+		nest TokBraceOpen TokBraceClose {
+			CORE_CONDITION_STMT
+		}
+	}
+
+	CORE_CONDITION_STMT -> transparent gr_CORE_CONDITION_STMT sync (TokSemi) {
+		(virtual TokKWWhen CONDITION_EXPR virtual TokSemi)*
+	}
+
+	RULES -> NodeRules {
+		(
+			virtual TokKWRule
+			RULE
+		)+
+	}
+
+	RULE -> NodeRule {
+		NodeRuleName : TokIdentifier
+		(
+			TEMPLATE_USAGE | RULE_BLOCK
+		)
+	}
+
+	TEMPLATE_USAGE -> NodeTemplateUsage sync (TokSemi) {
+		virtual TokEquals
+		NodeTemplateReferenceTarget : TokIdentifier
+		nest TokParenOpen TokParenClose {
+			TEMPLATE_CALL_ARGS?
+		}
+		virtual TokSemi
+	}
+
+	TEMPLATE_CALL_ARGS -> NodeTemplateArguments {
+		TEMPLATE_CALL_ARG
+		(
+			virtual TokComma
+			TEMPLATE_CALL_ARG
+		)*
+	}
+
+	TEMPLATE_CALL_ARG -> transparent gr_TEMPLATE_CALL_ARG {
+		NodeStringLiteral : TokStringLiteral 
+		| STYLE_REF
+	}
+
+	STYLE_REF -> NodeStyleRef {
+		NodeSchemaUsageTarget : TokIdentifier  
+		virtual TokDot
+		NodeStyleKeyRef : TokIdentifier
+	}
+
+	RULE_BLOCK -> NodeRuleBlock {
+		nest TokBraceOpen TokBraceClose {
+			RULE_BODY
+		}
+	}
+
+	// ---------------------------------------------------------
+	// GENERAL
+	// ---------------------------------------------------------
 
 	STRING_ARRAY -> NodeStringArray {
 		nest TokBracketOpen TokBracketClose {

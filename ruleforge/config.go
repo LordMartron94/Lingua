@@ -20,8 +20,8 @@ var runeFactory = pattern.RegulaASTFactoryCreate(domain.DiscreteDomainRuneCreate
 func Config() generation.RunnerConfig[Token, Node] {
 	return generation.RunnerConfig[Token, Node]{
 		SpecPath:        "ruleforge.lspec",
-		FileExtensions:  []string{".lspec"},
-		ScopeExtension:  ".lspec",
+		FileExtensions:  []string{".rf"},
+		ScopeExtension:  ".rf",
 		Manifest:        ruleForgeSemanticManifest,
 		OverrideFactory: ruleforgeOverrideProducer,
 	}
@@ -54,6 +54,15 @@ var ruleForgeSemanticManifest = toolchain.SemanticManifest[Token, Node]{
 		TokKWInherit:    "keyword.control.inherit",
 
 		TokKWTemplate: "storage.type.function.template keyword.declaration.function.template",
+
+		// ------------------------------------------------
+		// Ruleset & Rule Structural Declarations
+		// ------------------------------------------------
+		TokKWRuleset: "storage.type.class.ruleset keyword.declaration.class.ruleset",
+		TokKWRule:    "storage.type.function.rule keyword.declaration.function.rule",
+
+		TokKWDescription:    "support.type.property-name.description",
+		TokKWCoreConditions: "keyword.control.block.core-conditions",
 
 		// ------------------------------------------------
 		// Theme DSL declarations
@@ -241,17 +250,16 @@ var ruleForgeSemanticManifest = toolchain.SemanticManifest[Token, Node]{
 		// ------------------------------------------------
 		// Templates & Functions
 		// ------------------------------------------------
-		NodeTemplate:          {Scopes: []string{"meta.template"}},
-		NodeTemplateName:      {Scopes: []string{"entity.name.function.template"}},
-		NodeTemplateSignature: {Scopes: []string{"meta.template.signature"}},
-		NodeTemplateArgument:  {Scopes: []string{"variable.parameter.template"}},
+		NodeTemplateName:     {Scopes: []string{"entity.name.function.template"}},
+		NodeTemplateArgument: {Scopes: []string{"variable.parameter.template"}},
 
 		// ------------------------------------------------
 		// Variables
 		// ------------------------------------------------
-		NodeVariableName: {Scopes: []string{"variable.other.readwrite"}},
-		NodeVariableRef:  {Scopes: []string{"variable.other.readwrite"}},
-		NodeAssignTarget: {Scopes: []string{"variable.other.assignment"}},
+		NodeVariableName:      {Scopes: []string{"variable.other.readwrite"}},
+		NodeVariableRef:       {Scopes: []string{"variable.other.readwrite"}},
+		NodeAssignTarget:      {Scopes: []string{"variable.other.assignment"}},
+		NodeSchemaUsageTarget: {Scopes: []string{"support.class.schema"}},
 
 		// Arguments
 		NodeArgumentName: {Scopes: []string{"variable.parameter"}},
@@ -271,10 +279,6 @@ var ruleForgeSemanticManifest = toolchain.SemanticManifest[Token, Node]{
 		// ------------------------------------------------
 		// Structural Block Metas
 		// ------------------------------------------------
-		NodeVariantsBlock:   {Scopes: []string{"meta.block.variants"}},
-		NodeScopeBlock:      {Scopes: []string{"meta.block.scope"}},
-		NodeBaselineBlock:   {Scopes: []string{"meta.block.baseline"}},
-		NodeScopeAssignment: {Scopes: []string{"meta.assignment.scope"}},
 		NodeStringArray: {MetaScope: "meta.sequence.list.string", TokenScopes: map[Token][]string{
 			TokBracketOpen: {"punctuation.section.brackets.begin"},
 		}},
@@ -282,7 +286,6 @@ var ruleForgeSemanticManifest = toolchain.SemanticManifest[Token, Node]{
 		// ------------------------------------------------
 		// Inheritance
 		// ------------------------------------------------
-		NodeInheritDef:    {Scopes: []string{"meta.inheritance.definition"}},
 		NodeInheritTarget: {Scopes: []string{"support.type.property-name"}},
 
 		// ------------------------------------------------
@@ -296,9 +299,31 @@ var ruleForgeSemanticManifest = toolchain.SemanticManifest[Token, Node]{
 		NodeColorSetEntry: {Scopes: []string{"meta.mapping.entry.colorset"}},
 
 		// ------------------------------------------------
+		// Ruleset Architecture
+		// ------------------------------------------------
+		NodeRulesetName: {Scopes: []string{"entity.name.class.ruleset"}},
+		NodeRulesetDescription: {
+			Scopes: []string{"meta.property.description", "string.quoted.double"},
+		},
+
+		// ------------------------------------------------
+		// Rules & Template Invocations
+		// ------------------------------------------------
+		NodeRule:     {Scopes: []string{"meta.function.rule"}},
+		NodeRuleName: {Scopes: []string{"entity.name.function.rule"}},
+		NodeRuleBlock: {MetaScope: "meta.block.rule", TokenScopes: map[Token][]string{
+			TokBraceOpen: {"punctuation.section.brace.begin"},
+		}},
+
+		NodeTemplateReferenceTarget: {Scopes: []string{"meta.function-call entity.name.function.template"}},
+		NodeStyleKeyRef:             {Scopes: []string{"variable.other.constant.property"}},
+
+		// ------------------------------------------------
 		// Literal / value abstraction
 		// ------------------------------------------------
-		NodeAssignmentValue: {Scopes: []string{"meta.value"}},
+		NodeAssignmentValue: {MetaScope: "meta.value", TokenScopes: map[Token][]string{
+			TokStringLiteral: {"string.quoted.double"},
+		}},
 	},
 }
 
