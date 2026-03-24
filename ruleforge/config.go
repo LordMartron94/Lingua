@@ -59,6 +59,9 @@ var ruleForgeSemanticManifest = toolchain.SemanticManifest[Token, Node]{
 
 		TokKWConfiguration: "storage.type.class.configuration keyword.declaration.configuration",
 		TokKWAdapter:       "storage.type.class.adapter keyword.declaration.adapter",
+		TokKWFunc:          "storage.type.function keyword.declaration.function",
+		TokKWInclude:       "keyword.control.include",
+		TokKWWith:          "keyword.control.with",
 
 		// ------------------------------------------------
 		// Ruleset & Rule Structural Declarations
@@ -133,6 +136,7 @@ var ruleForgeSemanticManifest = toolchain.SemanticManifest[Token, Node]{
 		TokBracketOpen:  "punctuation.section.brackets.begin",
 		TokBracketClose: "punctuation.section.brackets.end",
 		TokArrow:        "keyword.operator.arrow.conversion",
+		TokColon:        "punctuation.separator.key-value",
 
 		// ------------------------------------------------
 		// Literals & Domain Constants
@@ -187,10 +191,12 @@ var ruleForgeSemanticManifest = toolchain.SemanticManifest[Token, Node]{
 		// ------------------------------------------------
 		// Module system
 		// ------------------------------------------------
-		"NodeNamespaceSegment": {Scopes: []string{"entity.name.namespace"}},
-		"NodeModuleSegment":    {Scopes: []string{"entity.name.module"}},
-		"NodeEntityReference":  {Scopes: []string{"support.class.reference.configuration"}},
-		NodeModuleAlias:        {Scopes: []string{"entity.name.module.alias"}},
+		"NodeNamespaceSegment":         {Scopes: []string{"entity.name.namespace"}},
+		"NodeModuleSegment":            {Scopes: []string{"entity.name.module"}},
+		"NodeEntityReference":          {Scopes: []string{"support.class.reference.configuration"}},
+		"NodeRulesetReferenceTerminal": {Scopes: []string{"support.class.ruleset"}},
+		"NodeModuleReferenceSegment":   {Scopes: []string{"support.other.module"}},
+		NodeModuleAlias:                {Scopes: []string{"entity.name.module.alias"}},
 
 		// ------------------------------------------------
 		// Theme / schema types (The Entities)
@@ -259,8 +265,10 @@ var ruleForgeSemanticManifest = toolchain.SemanticManifest[Token, Node]{
 		// ------------------------------------------------
 		// Templates & Functions
 		// ------------------------------------------------
-		NodeTemplateName:     {Scopes: []string{"entity.name.function.template"}},
-		NodeTemplateArgument: {Scopes: []string{"variable.parameter.template"}},
+		NodeTemplateName:       {Scopes: []string{"entity.name.function.template"}},
+		NodeFunctionArgument:   {Scopes: []string{"variable.parameter.function"}},
+		NodeFunctionName:       {Scopes: []string{"entity.name.function"}},
+		NodeRulesetOverrideKey: {Scopes: []string{"support.type.property-name.override"}},
 
 		// ------------------------------------------------
 		// Variables
@@ -391,20 +399,27 @@ func identifierOverride(
 	prefixRegex := fmt.Sprintf(`%s(?=\s*%s)`, identRegex, dotRegex)
 	terminalRegex := fmt.Sprintf(`%s(?!\s*%s)`, identRegex, dotRegex)
 
-	// Contexts for MODULE_PATH (import core.test)
+	// 1. Contexts for MODULE_PATH (Declarations & Imports: e.g., 'import core.test')
 	nsNode := string(Node("NodeNamespaceSegment"))
 	modNode := string(Node("NodeModuleSegment"))
 	pathPrefixCtx := ctxProducer(&EditorCtx{NodeKind: &nsNode})
 	pathTerminalCtx := ctxProducer(&EditorCtx{NodeKind: &modNode})
 
-	// Contexts for ENTITY_REF_WRAP (core.BaseTiering)
+	// 2. Contexts for ENTITY_REF_WRAP (Pointers: e.g., 'core.BaseTiering')
+	modRefNode := "NodeModuleReferenceSegment" // Synthetic node for pointers
 	entityRefNode := string(Node("NodeEntityReference"))
-	refPrefixCtx := ctxProducer(&EditorCtx{NodeKind: &modNode})
+	refPrefixCtx := ctxProducer(&EditorCtx{NodeKind: &modRefNode})
 	refTerminalCtx := ctxProducer(&EditorCtx{NodeKind: &entityRefNode})
 
-	// Target nodes we care about
+	// 3. Contexts for RULESET_REFERENCE (Pointers: e.g., 'include core.Currency')
+	rulesetRefTerminalNode := "NodeRulesetReferenceTerminal"
+	rulesetPrefixCtx := ctxProducer(&EditorCtx{NodeKind: &modRefNode}) // Uses the same pointer node
+	rulesetTerminalCtx := ctxProducer(&EditorCtx{NodeKind: &rulesetRefTerminalNode})
+
+	// Target AST groups we are overriding
 	pathSeg := string(NodePathSegment)
 	refSeg := string(NodeReferenceSegment)
+	rulesetSeg := string(NodeRulesetReferenceSegment)
 
 	return func(ctx *EditorCtx) []*EditorOverride {
 		if ctx.NodeKind == nil {
@@ -421,6 +436,11 @@ func identifierOverride(
 			return []*EditorOverride{
 				{PatternRegex: &prefixRegex, MatchContext: &refPrefixCtx},
 				{PatternRegex: &terminalRegex, MatchContext: &refTerminalCtx},
+			}
+		case rulesetSeg:
+			return []*EditorOverride{
+				{PatternRegex: &prefixRegex, MatchContext: &rulesetPrefixCtx},
+				{PatternRegex: &terminalRegex, MatchContext: &rulesetTerminalCtx},
 			}
 		default:
 			return nil

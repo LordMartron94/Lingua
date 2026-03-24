@@ -44,6 +44,7 @@ PATTERN {
 	pat_At 					: '@';
 	pat_Dollar				: '$';
 	pat_Arrow 				: "->";
+	pat_Colon				: ':';
 
 	// --- Infrastructure & Grouping ---
 	pat_ParenOpen           : '(';
@@ -69,6 +70,8 @@ PATTERN {
 	pat_TokKWInherit        : "inherit";
 	pat_TokKWImport 		: "import";
 	pat_TokKWAs 			: "as";
+	pat_TokKWInclude		: "include";
+	pat_TokKWWith			: "with";
 
 	// --- Types ---
 	pat_TokKWThemeSchema    : "themeSchema";
@@ -79,6 +82,7 @@ PATTERN {
 	pat_TokKWRuleset		: "ruleset";
 	pat_TokKWConfiguration  : "configuration";
 	pat_TokKWAdapter		: "adapter";
+	pat_TokKWFunc			: "func";
 
 	// --- Theme & Schema Keywords ---
 	pat_TokKWScope 			: "scope";
@@ -155,6 +159,9 @@ LEX {
     2 TokKWOverride         -> RULEFORGE_STRUCTURAL_ROLE : pat_TokKWOverride;
     2 TokKWImport           -> RULEFORGE_STRUCTURAL_ROLE : pat_TokKWImport;
     2 TokKWAs 		        -> RULEFORGE_STRUCTURAL_ROLE : pat_TokKWAs;
+    2 TokKWInclude 		    -> RULEFORGE_STRUCTURAL_ROLE : pat_TokKWInclude;
+    2 TokKWWith 		    -> RULEFORGE_STRUCTURAL_ROLE : pat_TokKWWith;
+    2 TokKWFunc 		    -> RULEFORGE_STRUCTURAL_ROLE : pat_TokKWFunc;
 
     // ========================================================================
 	// RULE & TEMPLATE KEYWORDS (Priority 2)
@@ -255,6 +262,7 @@ LEX {
     0 TokBracketClose       -> RULEFORGE_STRUCTURAL_ROLE : pat_BracketClose;
     0 TokEquals             -> RULEFORGE_STRUCTURAL_ROLE : pat_Equals;
     0 TokArrow				-> RULEFORGE_STRUCTURAL_ROLE : pat_Arrow;
+    0 TokColon				-> RULEFORGE_STRUCTURAL_ROLE : pat_Colon;
 
 	0 TokAt                 -> RULEFORGE_STRUCTURAL_ROLE : pat_At;
 	0 TokDollar             -> RULEFORGE_STRUCTURAL_ROLE : pat_Dollar;
@@ -332,6 +340,7 @@ PARSE {
 				| THEME
 				| TEMPLATE
 				| RULESET
+				| FUNCTION
 			)
 		) | CONFIGURATION 
 	}
@@ -755,14 +764,14 @@ PARSE {
 		virtual TokKWTemplate
 		NodeTemplateName : TokIdentifier
 		nest TokParenOpen TokParenClose {
-			TEMPLATE_SIGNATURE
+			FUNCTION_SIGNATURE
 		}
 		nest TokBraceOpen TokBraceClose {
 			RULE_BODY
 		}
 	}
 
-	TEMPLATE_SIGNATURE -> NodeTemplateSignature {
+	FUNCTION_SIGNATURE -> NodeFunctionSignature {
 		(
 			TEMPLATE_ARGUMENT
 			(
@@ -772,7 +781,7 @@ PARSE {
 		)?
 	}
 
-	TEMPLATE_ARGUMENT -> NodeTemplateArgument {
+	TEMPLATE_ARGUMENT -> NodeFunctionArgument {
 		NodeArgumentName : TokIdentifier
 		(
 			NodeArgumentType : TokIdentifier
@@ -974,6 +983,73 @@ PARSE {
 		nest TokBraceOpen TokBraceClose {
 			RULE_BODY
 		}
+	}
+
+	// ---------------------------------------------------------
+	// FUNCTION
+	// ---------------------------------------------------------
+
+	FUNCTION -> NodeFunction {
+		virtual TokKWFunc
+		NodeFunctionName : TokIdentifier
+		nest TokParenOpen TokParenClose {
+			FUNCTION_SIGNATURE
+		}
+		nest TokBraceOpen TokBraceClose {
+			FUNCTION_BODY
+		}
+	}
+
+	/* 
+	For now functions only can include rulesets...
+	Later, the function functionality will be extended with iteration over datasets, etc.
+	*/
+	FUNCTION_BODY -> transparent gr_FUNCTION_BODY {
+		INCLUDE_STMT*
+	}
+
+	INCLUDE_STMT -> NodeIncludeRuleset sync (TokSemi) {
+		virtual TokKWInclude
+		RULESET_REFERENCE
+		(
+			virtual TokKWWith
+			nest TokBraceOpen TokBraceClose {
+				RULESET_OVERRIDE
+			}
+		)?
+		virtual TokSemi
+	}
+
+	RULESET_REFERENCE -> NodeRulesetReference {
+		NodeRulesetReferenceSegment : TokIdentifier
+		(
+			virtual TokDot
+			NodeRulesetReferenceSegment : TokIdentifier
+		)?
+	}
+
+	RULESET_OVERRIDE -> NodeRulesetOverride {
+		RULESET_OVERRIDE_STMT
+		(
+			virtual TokComma
+			RULESET_OVERRIDE_STMT
+		)*
+	}
+
+	OVERRIDE_KEY -> transparent gr_OVERRIDE_KEY {
+		NodeRulesetOverrideKey : TokIdentifier
+		| NodeRulesetOverrideKey : TokKWTheme
+		| NodeRulesetOverrideKey : TokKWAdapter
+	}
+
+	RULESET_OVERRIDE_STMT -> NodeRulesetOverrideEntry {
+		OVERRIDE_KEY
+		virtual TokColon
+		RULESET_OVERRIDE_TARGET
+	}
+
+	RULESET_OVERRIDE_TARGET -> NodeRulesetOverrideTarget {
+		ENTITY_REF_WRAP
 	}
 
 	// ---------------------------------------------------------
