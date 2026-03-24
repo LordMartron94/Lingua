@@ -43,6 +43,7 @@ PATTERN {
 	pat_Equals              : '=';
 	pat_At 					: '@';
 	pat_Dollar				: '$';
+	pat_Arrow 				: "->";
 
 	// --- Infrastructure & Grouping ---
 	pat_ParenOpen           : '(';
@@ -76,6 +77,8 @@ PATTERN {
 	pat_TokKWTheme          : "theme";
 	pat_TokKWStyle			: "style";
 	pat_TokKWRuleset		: "ruleset";
+	pat_TokKWConfiguration  : "configuration";
+	pat_TokKWAdapter		: "adapter";
 
 	// --- Theme & Schema Keywords ---
 	pat_TokKWScope 			: "scope";
@@ -170,6 +173,8 @@ LEX {
 	2 TokKWDescription		-> RULEFORGE_STRUCTURAL_ROLE : pat_TokKWDescription;
 	2 TokKWCoreConditions	-> RULEFORGE_STRUCTURAL_ROLE : pat_TokKWCoreConditions;
 	2 TokKWRule 			-> RULEFORGE_STRUCTURAL_ROLE : pat_TokKWRule;
+	2 TokKWConfiguration 	-> RULEFORGE_STRUCTURAL_ROLE : pat_TokKWConfiguration;
+	2 TokKWAdapter 			-> RULEFORGE_STRUCTURAL_ROLE : pat_TokKWAdapter;
 
     // ========================================================================
     // 2. THEME & STYLING DEFINITIONS (Priority 2)
@@ -249,6 +254,7 @@ LEX {
     0 TokBracketOpen        -> RULEFORGE_STRUCTURAL_ROLE : pat_BracketOpen;
     0 TokBracketClose       -> RULEFORGE_STRUCTURAL_ROLE : pat_BracketClose;
     0 TokEquals             -> RULEFORGE_STRUCTURAL_ROLE : pat_Equals;
+    0 TokArrow				-> RULEFORGE_STRUCTURAL_ROLE : pat_Arrow;
 
 	0 TokAt                 -> RULEFORGE_STRUCTURAL_ROLE : pat_At;
 	0 TokDollar             -> RULEFORGE_STRUCTURAL_ROLE : pat_Dollar;
@@ -315,17 +321,79 @@ PARSE {
 	}
 
 	MAIN_BLOCK -> NodeMainBlock {
-		(	
-			NodeExportKeyword : TokKWExport
-			| NodePrivateKeyword : TokKWPrivate
-		)?
 		(
-			THEME_SCHEMA 
-			| COLORSET
-			| THEME
-			| TEMPLATE
-			| RULESET
-		)
+			(	
+				NodeExportKeyword : TokKWExport
+				| NodePrivateKeyword : TokKWPrivate
+			)?
+			(
+				THEME_SCHEMA 
+				| COLORSET
+				| THEME
+				| TEMPLATE
+				| RULESET
+			)
+		) | CONFIGURATION 
+	}
+
+	CONFIGURATION -> NodeConfiguration {
+		virtual TokKWConfiguration
+		nest TokBraceOpen TokBraceClose {
+			CONFIGURATION_BODY
+		}
+	}
+
+	CONFIGURATION_BODY -> transparent gr_CONFIGURATION_BODY {
+		CONFIGURATION_ASSIGNMENT*
+		ADAPTER_DEF*
+	}
+
+	CONFIGURATION_ASSIGNMENT -> NodeConfigurationEntry sync (TokSemi) {
+		NodeConfigurationKey : TokIdentifier
+		virtual TokEquals
+		CONFIGURATION_ASSIGNMENT_VALUE
+		virtual TokSemi
+	}
+
+	CONFIGURATION_ASSIGNMENT_VALUE -> NodeConfigurationValue {
+		ENTITY_REF_WRAP
+	}
+
+	ENTITY_REF_WRAP -> transparent gr_ENTITY_REF_WRAP {
+		NodeReferenceSegment : TokIdentifier
+		(
+			virtual TokDot
+			NodeReferenceSegment : TokIdentifier
+		)?
+	}
+
+	ADAPTER_DEF -> NodeAdapter {
+		virtual TokKWAdapter
+		ORIGINAL_SCHEMA_REF
+		virtual TokArrow
+		TARGET_SCHEMA_REF
+		nest TokBraceOpen TokBraceClose {
+			ADAPTER_BODY
+		}
+	}
+
+	ORIGINAL_SCHEMA_REF -> NodeOriginalSchemaReference {
+		ENTITY_REF_WRAP
+	}
+
+	TARGET_SCHEMA_REF -> NodeTargetSchemaReference {
+		ENTITY_REF_WRAP
+	}
+
+	ADAPTER_BODY -> transparent gr_ADAPTER_BODY {
+		SCHEMA_KEY_CONVERT_STMT*
+	}
+
+	SCHEMA_KEY_CONVERT_STMT -> NodeSchemaKeyAdapter sync (TokSemi) {
+		NodeOriginalSchemaKey : TokIdentifier
+		virtual TokArrow
+		NodeTargetSchemaKey : TokIdentifier
+		virtual TokSemi
 	}
 
 	// ---------------------------------------------------------

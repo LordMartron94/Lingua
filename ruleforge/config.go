@@ -57,6 +57,9 @@ var ruleForgeSemanticManifest = toolchain.SemanticManifest[Token, Node]{
 
 		TokKWTemplate: "storage.type.function.template keyword.declaration.function.template",
 
+		TokKWConfiguration: "storage.type.class.configuration keyword.declaration.configuration",
+		TokKWAdapter:       "storage.type.class.adapter keyword.declaration.adapter",
+
 		// ------------------------------------------------
 		// Ruleset & Rule Structural Declarations
 		// ------------------------------------------------
@@ -129,6 +132,7 @@ var ruleForgeSemanticManifest = toolchain.SemanticManifest[Token, Node]{
 		TokDollar:       "punctuation.definition.variable.parameter",
 		TokBracketOpen:  "punctuation.section.brackets.begin",
 		TokBracketClose: "punctuation.section.brackets.end",
+		TokArrow:        "keyword.operator.arrow.conversion",
 
 		// ------------------------------------------------
 		// Literals & Domain Constants
@@ -137,6 +141,7 @@ var ruleForgeSemanticManifest = toolchain.SemanticManifest[Token, Node]{
 		TokFloat:            "constant.numeric.float",
 		TokVersionIndicator: "constant.numeric.version",
 		TokStringLiteral:    "string.quoted.double",
+		TokPercentage:       "constant.numeric.percentage",
 
 		TokKWTrue:  "constant.language.boolean.true",
 		TokKWFalse: "constant.language.boolean.false",
@@ -184,6 +189,7 @@ var ruleForgeSemanticManifest = toolchain.SemanticManifest[Token, Node]{
 		// ------------------------------------------------
 		"NodeNamespaceSegment": {Scopes: []string{"entity.name.namespace"}},
 		"NodeModuleSegment":    {Scopes: []string{"entity.name.module"}},
+		"NodeEntityReference":  {Scopes: []string{"support.class.reference.configuration"}},
 		NodeModuleAlias:        {Scopes: []string{"entity.name.module.alias"}},
 
 		// ------------------------------------------------
@@ -322,6 +328,19 @@ var ruleForgeSemanticManifest = toolchain.SemanticManifest[Token, Node]{
 		NodeStyleKeyRef:             {Scopes: []string{"variable.other.constant.property"}},
 
 		// ------------------------------------------------
+		// Configuration & Adapters
+		// ------------------------------------------------
+		NodeConfigurationKey: {Scopes: []string{"support.type.property-name.configuration"}},
+
+		// References to external blueprints (e.g., FancySchema, core.BaseTiering)
+		NodeOriginalSchemaReference: {Scopes: []string{"support.class.schema.original"}},
+		NodeTargetSchemaReference:   {Scopes: []string{"support.class.schema.target"}},
+
+		// Mapping specific properties (e.g., fancyMythic = godTier)
+		NodeOriginalSchemaKey: {Scopes: []string{"variable.other.constant.property.original"}},
+		NodeTargetSchemaKey:   {Scopes: []string{"variable.other.constant.property.target"}},
+
+		// ------------------------------------------------
 		// Literal / value abstraction
 		// ------------------------------------------------
 		NodeAssignmentValue: {MetaScope: "meta.value", TokenScopes: map[Token][]string{
@@ -352,52 +371,59 @@ func ruleforgeOverrideProducer(
 		toolchain.SublimeContext{Scope: "punctuation.definition.comment.end"},
 	))
 
-	registry.Register(string(TokIdentifier), pathSegmentOverride(
+	registry.Register(string(TokIdentifier), identifierOverride(
 		ruleset,
 		ctxProducer,
-		string(TokIdentifier),
-		string(TokDot),
-		string(Node("NodeNamespaceSegment")),
-		string(Node("NodeModuleSegment")),
 	))
 
 	return registry.Producer()
 }
 
-func pathSegmentOverride(
+func identifierOverride(
 	ruleset *lexarch.LexingRuleset[rune, string, string],
 	ctxProducer func(ctx *EditorCtx) toolchain.SublimeContext,
-	identToken string,
-	dotToken string,
-	namespaceNode string,
-	moduleNode string,
 ) editor.OverrideHandler[rune, string, string, string, string, toolchain.SublimeContext] {
 
-	identRegex := getTokenRegex(ruleset, identToken)
-	dotRegex := getTokenRegex(ruleset, dotToken)
+	identRegex := getTokenRegex(ruleset, string(TokIdentifier))
+	dotRegex := getTokenRegex(ruleset, string(TokDot))
 
-	nsCtx := ctxProducer(&EditorCtx{NodeKind: &namespaceNode})
-	modCtx := ctxProducer(&EditorCtx{NodeKind: &moduleNode})
+	// The mechanical lookaheads
+	prefixRegex := fmt.Sprintf(`%s(?=\s*%s)`, identRegex, dotRegex)
+	terminalRegex := fmt.Sprintf(`%s(?!\s*%s)`, identRegex, dotRegex)
 
-	nsLookaheadRegex := fmt.Sprintf(`%s(?=\s*%s)`, identRegex, dotRegex)
-	modLookaheadRegex := fmt.Sprintf(`%s(?!\s*%s)`, identRegex, dotRegex)
+	// Contexts for MODULE_PATH (import core.test)
+	nsNode := string(Node("NodeNamespaceSegment"))
+	modNode := string(Node("NodeModuleSegment"))
+	pathPrefixCtx := ctxProducer(&EditorCtx{NodeKind: &nsNode})
+	pathTerminalCtx := ctxProducer(&EditorCtx{NodeKind: &modNode})
 
+	// Contexts for ENTITY_REF_WRAP (core.BaseTiering)
+	entityRefNode := string(Node("NodeEntityReference"))
+	refPrefixCtx := ctxProducer(&EditorCtx{NodeKind: &modNode})
+	refTerminalCtx := ctxProducer(&EditorCtx{NodeKind: &entityRefNode})
+
+	// Target nodes we care about
 	pathSeg := string(NodePathSegment)
+	refSeg := string(NodeReferenceSegment)
 
 	return func(ctx *EditorCtx) []*EditorOverride {
-		if ctx.NodeKind == nil || *ctx.NodeKind != pathSeg {
+		if ctx.NodeKind == nil {
 			return nil
 		}
 
-		return []*EditorOverride{
-			{
-				PatternRegex: &nsLookaheadRegex,
-				MatchContext: &nsCtx,
-			},
-			{
-				PatternRegex: &modLookaheadRegex,
-				MatchContext: &modCtx,
-			},
+		switch *ctx.NodeKind {
+		case pathSeg:
+			return []*EditorOverride{
+				{PatternRegex: &prefixRegex, MatchContext: &pathPrefixCtx},
+				{PatternRegex: &terminalRegex, MatchContext: &pathTerminalCtx},
+			}
+		case refSeg:
+			return []*EditorOverride{
+				{PatternRegex: &prefixRegex, MatchContext: &refPrefixCtx},
+				{PatternRegex: &terminalRegex, MatchContext: &refTerminalCtx},
+			}
+		default:
+			return nil
 		}
 	}
 }
