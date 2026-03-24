@@ -66,6 +66,8 @@ PATTERN {
 	pat_TokKWExtends        : "extends";
 	pat_TokKWOverride       : "override";
 	pat_TokKWInherit        : "inherit";
+	pat_TokKWImport 		: "import";
+	pat_TokKWAs 			: "as";
 
 	// --- Types ---
 	pat_TokKWThemeSchema    : "themeSchema";
@@ -148,6 +150,8 @@ LEX {
     2 TokKWExtends          -> RULEFORGE_STRUCTURAL_ROLE : pat_TokKWExtends;
     2 TokKWImplements       -> RULEFORGE_STRUCTURAL_ROLE : pat_TokKWImplements;
     2 TokKWOverride         -> RULEFORGE_STRUCTURAL_ROLE : pat_TokKWOverride;
+    2 TokKWImport           -> RULEFORGE_STRUCTURAL_ROLE : pat_TokKWImport;
+    2 TokKWAs 		        -> RULEFORGE_STRUCTURAL_ROLE : pat_TokKWAs;
 
     // ========================================================================
 	// RULE & TEMPLATE KEYWORDS (Priority 2)
@@ -277,6 +281,7 @@ PARSE {
 	PROGRAM -> NodeProgram {
 		VERSION_STATEMENT
 		MODULE_STATEMENT
+		IMPORT_STMT*
 		MAIN_BLOCK_LIST
 		virtual TokEOF
 	}
@@ -906,6 +911,16 @@ PARSE {
 	// ---------------------------------------------------------
 	// GENERAL
 	// ---------------------------------------------------------
+
+	IMPORT_STMT -> NodeImport sync (TokSemi) {
+		virtual TokKWImport
+		MODULE_PATH
+		(
+			virtual TokKWAs
+			NodeModuleAlias : TokIdentifier
+		)?
+		virtual TokSemi
+	}
 
 	STRING_ARRAY -> NodeStringArray {
 		nest TokBracketOpen TokBracketClose {

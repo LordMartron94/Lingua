@@ -52,6 +52,8 @@ var ruleForgeSemanticManifest = toolchain.SemanticManifest[Token, Node]{
 		TokKWImplements: "storage.modifier.implements",
 		TokKWOverride:   "keyword.control.override",
 		TokKWInherit:    "keyword.control.inherit",
+		TokKWImport:     "keyword.control.import",
+		TokKWAs:         "keyword.control.import.as",
 
 		TokKWTemplate: "storage.type.function.template keyword.declaration.function.template",
 
@@ -182,6 +184,7 @@ var ruleForgeSemanticManifest = toolchain.SemanticManifest[Token, Node]{
 		// ------------------------------------------------
 		"NodeNamespaceSegment": {Scopes: []string{"entity.name.namespace"}},
 		"NodeModuleSegment":    {Scopes: []string{"entity.name.module"}},
+		NodeModuleAlias:        {Scopes: []string{"entity.name.module.alias"}},
 
 		// ------------------------------------------------
 		// Theme / schema types (The Entities)
