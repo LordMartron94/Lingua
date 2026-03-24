@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"langspec/bootstrap"
 	"langspec/cliutil"
+	"langspec/dsl"
 	"os"
 )
 
@@ -23,6 +24,7 @@ func main() {
 	// Only run the bindings toolchain
 	opts := []bootstrap.Option{
 		bootstrap.WithToolchainFilter("go_bindings"),
+		bootstrap.WithDiagnosticSink(dsl.DefaultLangSpecDiagnosticSink()),
 	}
 
 	if err := g.RunToolchains(opts...); err != nil {
