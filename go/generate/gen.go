@@ -8,5 +8,6 @@ import (
 )
 
 func main() {
-	generation.ExecuteFull(goDef.Config())
+	generation.ExecuteFull(goDef.GoModConfig())
+	generation.ExecuteFull(goDef.GoWorkConfig())
 }

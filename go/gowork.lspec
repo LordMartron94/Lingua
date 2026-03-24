@@ -1,0 +1,138 @@
+--- "Go Work" v1.0.0 | lspec v1.0.0 ---
+
+PRAGMA {
+	tool.sublime {
+		enable = true;
+		output-path = [
+			"libs/lingua/go/artifacts/gowork.sublime-syntax",
+			"/home/user/.config/sublime-text/Packages/User/gowork.sublime-syntax"
+		];
+	}
+
+	tool.go_bindings {
+		enable = true;
+		output-path = "libs/lingua/go/artifacts/gowork_go_bindings.go";
+		package-name = "artifacts";
+		namespace-prefix = "GoWork";
+	}
+};
+
+PATTERN {
+	pat_TokEOF              : [];
+	pat_TokWhitespace       : (['\t', '\n', '\r', ' '])+;
+	pat_TokLineComment      : "/" "/" (!['\n', '\r'])*;
+
+	pat_TokModulePath       : (['A'..'Z', 'a'..'z', '0'..'9', '.']) (['A'..'Z', 'a'..'z', '0'..'9', '.', '-', '_', '~', '/'])*;
+	pat_TokFloat            : ('0'..'9')+ '.' ('0'..'9')+;
+	pat_TokVersion          : "v" ('0'..'9')+ (['-', '.', '+', 'A'..'Z', 'a'..'z', '0'..'9'])*;
+
+	pat_TokKWGo             : "go";
+	pat_TokKWToolchain      : "toolchain";
+	pat_TokKWGodebug        : "godebug";
+	pat_TokKWUse            : "use";
+	pat_TokKWReplace        : "replace";
+
+	pat_ParenOpen           : '(';
+	pat_ParenClose          : ')';
+	pat_Arrow               : "=" ">";
+	pat_Equals              : '=';
+}
+
+LEX {
+	2 TokKWGo               -> GOWORK_STRUCTURAL_ROLE : pat_TokKWGo;
+	2 TokKWToolchain        -> GOWORK_STRUCTURAL_ROLE : pat_TokKWToolchain;
+	2 TokKWGodebug          -> GOWORK_STRUCTURAL_ROLE : pat_TokKWGodebug;
+	2 TokKWUse              -> GOWORK_STRUCTURAL_ROLE : pat_TokKWUse;
+	2 TokKWReplace          -> GOWORK_STRUCTURAL_ROLE : pat_TokKWReplace;
+
+	1 TokVersion            -> GOWORK_STRUCTURAL_ROLE : pat_TokVersion;
+	1 TokModulePath         -> GOWORK_STRUCTURAL_ROLE : pat_TokModulePath;
+	1 TokFloat              -> GOWORK_STRUCTURAL_ROLE : pat_TokFloat;
+
+	0 TokWhitespace         -> GOWORK_WHITESPACE_ROLE : pat_TokWhitespace;
+	0 TokLineComment        -> GOWORK_COMMENT_ROLE    : pat_TokLineComment;
+
+	0 TokParenOpen          -> GOWORK_STRUCTURAL_ROLE : pat_ParenOpen;
+	0 TokParenClose         -> GOWORK_STRUCTURAL_ROLE : pat_ParenClose;
+	0 TokArrow              -> GOWORK_STRUCTURAL_ROLE : pat_Arrow;
+	0 TokEquals             -> GOWORK_STRUCTURAL_ROLE : pat_Equals;
+
+	0 TokEOF                -> GOWORK_STRUCTURAL_ROLE : pat_TokEOF %% EOF=true %%;
+}
+
+PARSE {
+	IGNORE {
+		GOWORK_WHITESPACE_ROLE GOWORK_COMMENT_ROLE
+	};
+
+	PROGRAM -> NodeProgram {
+		BLOCK*
+		virtual TokEOF
+	}
+
+	BLOCK -> transparent gr_BLOCK {
+		GO_DECLARATION | 
+		TOOLCHAIN_STATEMENT | 
+		GODEBUG_STATEMENT | 
+		USE_STATEMENT | 
+		REPLACE_STATEMENT
+	}
+
+	GO_DECLARATION -> NodeGoDecl {
+		virtual TokKWGo
+		NodeGoVersion : TokFloat
+	}
+
+	TOOLCHAIN_STATEMENT -> NodeToolchainStatement {
+		virtual TokKWToolchain
+		NodeToolchainName : TokModulePath
+	}
+
+	GODEBUG_STATEMENT -> NodeGodebugStatement {
+		virtual TokKWGodebug
+		(
+			GODEBUG_REFERENCE |
+			nest TokParenOpen TokParenClose {
+				GODEBUG_REFERENCE*
+			}
+		)
+	}
+
+	GODEBUG_REFERENCE -> NodeGodebugReference {
+		NodeGodebugKey : TokModulePath
+		virtual TokEquals
+		NodeGodebugValue : TokModulePath
+	}
+
+	USE_STATEMENT -> NodeUseStatement {
+		virtual TokKWUse
+		(
+			USE_REFERENCE |
+			nest TokParenOpen TokParenClose {
+				USE_REFERENCE*
+			}
+		)
+	}
+
+	USE_REFERENCE -> NodeUseReference {
+		NodeUsePath : TokModulePath
+	}
+
+	REPLACE_STATEMENT -> NodeReplaceStatement {
+		virtual TokKWReplace
+		(
+			REPLACE_REFERENCE |
+			nest TokParenOpen TokParenClose {
+				REPLACE_REFERENCE*
+			}
+		)
+	}
+
+	REPLACE_REFERENCE -> NodeReplaceReference {
+		NodeReplaceOriginal : TokModulePath
+		NodeReplaceOriginalVersion : TokVersion?
+		virtual TokArrow
+		NodeReplaceTarget : TokModulePath
+		NodeReplaceTargetVersion : TokVersion?
+	}
+}

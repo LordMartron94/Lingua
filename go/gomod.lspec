@@ -13,6 +13,7 @@ PRAGMA {
 		enable = true;
 		output-path = "libs/lingua/go/artifacts/gomod_go_bindings.go";
 		package-name = "artifacts";
+		namespace-prefix = "GoMod";
 	}
 };
 
