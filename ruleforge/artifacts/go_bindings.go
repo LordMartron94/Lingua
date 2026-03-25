@@ -221,6 +221,7 @@ const (
 	NodeThemeSchema Node = "NodeThemeSchema"
 	NodeThemeSchemaName Node = "NodeThemeSchemaName"
 	NodeThemeSchemaReference Node = "NodeThemeSchemaReference"
+	NodeThemeStyle Node = "NodeThemeStyle"
 	NodeThemeStyleName Node = "NodeThemeStyleName"
 	NodeValue Node = "NodeValue"
 	NodeVariableName Node = "NodeVariableName"

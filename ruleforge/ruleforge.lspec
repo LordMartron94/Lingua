@@ -578,12 +578,16 @@ PARSE {
 
 	THEME_STYLE_LIST -> transparent gr_THEME_STYLE_LIST {
 		(
-			NodeOverride : TokKWOverride?
-			NodeThemeStyleName : TokIdentifier
-			nest TokBraceOpen TokBraceClose {
-				THEME_STYLE_ENTRY
-			}
+			THEME_STYLE
 		)*
+	}
+
+	THEME_STYLE -> NodeThemeStyle {
+		NodeOverride : TokKWOverride?
+		NodeThemeStyleName : TokIdentifier
+		nest TokBraceOpen TokBraceClose {
+			THEME_STYLE_ENTRY
+		}
 	}
 
 	THEME_STYLE_ENTRY -> transparent gr_THEME_STYLE_ENTRY {
