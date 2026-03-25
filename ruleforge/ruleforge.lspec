@@ -1036,16 +1036,16 @@ PARSE {
 		)*
 	}
 
-	OVERRIDE_KEY -> transparent gr_OVERRIDE_KEY {
-		NodeRulesetOverrideKey : TokIdentifier
-		| NodeRulesetOverrideKey : TokKWTheme
-		| NodeRulesetOverrideKey : TokKWAdapter
-	}
-
 	RULESET_OVERRIDE_STMT -> NodeRulesetOverrideEntry {
-		OVERRIDE_KEY
+		SOFT_OVERRIDE_KEY
 		virtual TokColon
 		RULESET_OVERRIDE_TARGET
+	}
+
+	SOFT_OVERRIDE_KEY -> transparent gr_SOFT_OVERRIDE_KEY {
+	    NodeRulesetOverrideKey : TokIdentifier
+	    | NodeRulesetOverrideKey : TokKWTheme
+	    | NodeRulesetOverrideKey : TokKWAdapter
 	}
 
 	RULESET_OVERRIDE_TARGET -> NodeRulesetOverrideTarget {
