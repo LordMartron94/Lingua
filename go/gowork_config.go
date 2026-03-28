@@ -26,6 +26,7 @@ var goWorkSemanticManifest = toolchain.SemanticManifest[GoWorkToken, GoWorkNode]
 		// ------------------------------------------------
 		GoWork_TokLineComment: "comment.line.double-slash",
 		GoWork_TokWhitespace:  "",
+		GoWork_TokEOF:         "",
 
 		// ------------------------------------------------
 		// Keywords
@@ -91,13 +92,13 @@ var goWorkSemanticManifest = toolchain.SemanticManifest[GoWorkToken, GoWorkNode]
 }
 
 func goWorkOverrideProducer(
-	ruleset *lexarch.LexingRuleset[rune, string, string],
-	ctxProducer func(ctx *EditorCtx) toolchain.SublimeContext,
+	_ *lexarch.LexingRuleset[rune, uint32, uint32],
+	_ func(ctx *EditorCtx) toolchain.SublimeContext,
 ) func(ec *EditorCtx) []*EditorOverride {
-	registry := editor.NewOverrideRegistry[rune, string, string, string, string, toolchain.SublimeContext]()
-	patterns := editor.NewTextPatternBuilder[string, string, string, string, toolchain.SublimeContext](runeFactory)
+	registry := editor.NewOverrideRegistry[rune, uint32, uint32, string, uint32, toolchain.SublimeContext]()
+	patterns := editor.NewTextPatternBuilder[uint32, uint32, string, uint32, toolchain.SublimeContext](runeFactory)
 
-	registry.Register(string(GoWork_TokLineComment), patterns.LineComment(
+	registry.Register(uint32(GoWork_TokLineComment), patterns.LineComment(
 		"//",
 		toolchain.SublimeContext{Scope: "comment.line.double-slash"},
 		toolchain.SublimeContext{Scope: "punctuation.definition.comment"},

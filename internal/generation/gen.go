@@ -7,10 +7,31 @@ import (
 	"langspec/dsl"
 	"langspec/toolchain"
 	"os"
+	"reflect"
 )
 
-type TokenConstraint interface{ ~string }
-type NodeConstraint interface{ ~string }
+/*
+TokenConstraint and NodeConstraint are token/node key types from LangSpec go_bindings:
+either numeric IDs with String() (e.g. ruleforge) or string enums (e.g. gomod/gowork).
+*/
+type TokenConstraint interface {
+	comparable
+}
+
+type NodeConstraint interface {
+	comparable
+}
+
+func manifestKey[T comparable](k T) string {
+	if s, ok := any(k).(fmt.Stringer); ok {
+		return s.String()
+	}
+	v := reflect.ValueOf(k)
+	if v.Kind() == reflect.String {
+		return v.String()
+	}
+	return fmt.Sprint(k)
+}
 
 type RunnerConfig[T TokenConstraint, N NodeConstraint] struct {
 	SpecPath        string
@@ -52,7 +73,7 @@ func adaptManifest[T TokenConstraint, N NodeConstraint](in toolchain.SemanticMan
 	}
 
 	for k, v := range in.BaseTokenScopes {
-		out.BaseTokenScopes[string(k)] = v
+		out.BaseTokenScopes[manifestKey(k)] = v
 	}
 
 	for k, v := range in.NodeBindings {
@@ -62,9 +83,9 @@ func adaptManifest[T TokenConstraint, N NodeConstraint](in toolchain.SemanticMan
 			TokenScopes: make(map[string][]string),
 		}
 		for tk, tv := range v.TokenScopes {
-			binding.TokenScopes[string(tk)] = tv
+			binding.TokenScopes[manifestKey(tk)] = tv
 		}
-		out.NodeBindings[string(k)] = binding
+		out.NodeBindings[manifestKey(k)] = binding
 	}
 	return out
 }

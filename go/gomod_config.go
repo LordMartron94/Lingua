@@ -10,9 +10,9 @@ import (
 	"lingua/internal/generation"
 )
 
-type EditorCtx = editor.EditorCtx[rune, string, string, string, string]
+type EditorCtx = editor.EditorCtx[rune, uint32, uint32, string, uint32]
 
-type EditorOverride = editor.EditorOverride[rune, string, string, string, string, toolchain.SublimeContext]
+type EditorOverride = editor.EditorOverride[rune, uint32, uint32, string, uint32, toolchain.SublimeContext]
 
 var runeFactory = pattern.RegulaASTFactoryCreate(domain.DiscreteDomainRuneCreate())
 
@@ -34,6 +34,7 @@ var goModSemanticManifest = toolchain.SemanticManifest[GoModToken, GoModNode]{
 		// ------------------------------------------------
 		GoMod_TokLineComment: "comment.line.double-slash",
 		GoMod_TokWhitespace:  "",
+		GoMod_TokEOF:         "",
 
 		// ------------------------------------------------
 		// Keywords
@@ -135,13 +136,13 @@ var goModSemanticManifest = toolchain.SemanticManifest[GoModToken, GoModNode]{
 }
 
 func goModOverrideProducer(
-	ruleset *lexarch.LexingRuleset[rune, string, string],
-	ctxProducer func(ctx *EditorCtx) toolchain.SublimeContext,
+	_ *lexarch.LexingRuleset[rune, uint32, uint32],
+	_ func(ctx *EditorCtx) toolchain.SublimeContext,
 ) func(ec *EditorCtx) []*EditorOverride {
-	registry := editor.NewOverrideRegistry[rune, string, string, string, string, toolchain.SublimeContext]()
-	patterns := editor.NewTextPatternBuilder[string, string, string, string, toolchain.SublimeContext](runeFactory)
+	registry := editor.NewOverrideRegistry[rune, uint32, uint32, string, uint32, toolchain.SublimeContext]()
+	patterns := editor.NewTextPatternBuilder[uint32, uint32, string, uint32, toolchain.SublimeContext](runeFactory)
 
-	registry.Register(string(GoMod_TokLineComment), patterns.LineComment(
+	registry.Register(uint32(GoMod_TokLineComment), patterns.LineComment(
 		"//",
 		toolchain.SublimeContext{Scope: "comment.line.double-slash"},
 		toolchain.SublimeContext{Scope: "punctuation.definition.comment"},

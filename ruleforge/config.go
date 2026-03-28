@@ -11,9 +11,9 @@ import (
 	. "lingua/ruleforge/artifacts"
 )
 
-type EditorCtx = editor.EditorCtx[rune, string, string, string, string]
+type EditorCtx = editor.EditorCtx[rune, uint32, uint32, string, uint32]
 
-type EditorOverride = editor.EditorOverride[rune, string, string, string, string, toolchain.SublimeContext]
+type EditorOverride = editor.EditorOverride[rune, uint32, uint32, string, uint32, toolchain.SublimeContext]
 
 var runeFactory = pattern.RegulaASTFactoryCreate(domain.DiscreteDomainRuneCreate())
 
@@ -37,7 +37,7 @@ var ruleForgeSemanticManifest = toolchain.SemanticManifest[Token, Node]{
 		TokBlockComment: "comment.block",
 		TokLineComment:  "comment.line.double-slash",
 		TokWhitespace:   "",
-		"TokEOF":        "",
+		TokEOF:          "",
 
 		// ------------------------------------------------
 		// Core language declarations (The Blueprints)
@@ -191,12 +191,9 @@ var ruleForgeSemanticManifest = toolchain.SemanticManifest[Token, Node]{
 		// ------------------------------------------------
 		// Module system
 		// ------------------------------------------------
-		"NodeNamespaceSegment":         {Scopes: []string{"entity.name.namespace"}},
-		"NodeModuleSegment":            {Scopes: []string{"entity.name.module"}},
-		"NodeEntityReference":          {Scopes: []string{"support.class.reference.configuration"}},
-		"NodeRulesetReferenceTerminal": {Scopes: []string{"support.class.ruleset"}},
-		"NodeModuleReferenceSegment":   {Scopes: []string{"support.other.module"}},
-		NodeModuleAlias:                {Scopes: []string{"entity.name.module.alias"}},
+		// NodePathSegment / NodeReferenceSegment / NodeRulesetReferenceSegment: prefix vs
+		// terminal scopes come from identifierOverride (regex lookahead), not here—see config.go.
+		NodeModuleAlias: {Scopes: []string{"entity.name.module.alias"}},
 
 		// ------------------------------------------------
 		// Theme / schema types (The Entities)
@@ -358,20 +355,20 @@ var ruleForgeSemanticManifest = toolchain.SemanticManifest[Token, Node]{
 }
 
 func ruleforgeOverrideProducer(
-	ruleset *lexarch.LexingRuleset[rune, string, string],
+	ruleset *lexarch.LexingRuleset[rune, uint32, uint32],
 	ctxProducer func(ctx *EditorCtx) toolchain.SublimeContext,
 ) func(ec *EditorCtx) []*EditorOverride {
 
-	registry := editor.NewOverrideRegistry[rune, string, string, string, string, toolchain.SublimeContext]()
-	patterns := editor.NewTextPatternBuilder[string, string, string, string, toolchain.SublimeContext](runeFactory)
+	registry := editor.NewOverrideRegistry[rune, uint32, uint32, string, uint32, toolchain.SublimeContext]()
+	patterns := editor.NewTextPatternBuilder[uint32, uint32, string, uint32, toolchain.SublimeContext](runeFactory)
 
-	registry.Register(string(TokLineComment), patterns.LineComment(
+	registry.Register(uint32(TokLineComment), patterns.LineComment(
 		"//",
 		toolchain.SublimeContext{Scope: "comment.line.double-slash"},
 		toolchain.SublimeContext{Scope: "punctuation.definition.comment"},
 	))
 
-	registry.Register(string(TokBlockComment), patterns.BlockComment(
+	registry.Register(uint32(TokBlockComment), patterns.BlockComment(
 		"/*",
 		"*/",
 		toolchain.SublimeContext{MetaScope: "comment.block"},
@@ -379,47 +376,41 @@ func ruleforgeOverrideProducer(
 		toolchain.SublimeContext{Scope: "punctuation.definition.comment.end"},
 	))
 
-	registry.Register(string(TokIdentifier), identifierOverride(
-		ruleset,
-		ctxProducer,
-	))
+	registry.Register(uint32(TokIdentifier), identifierOverride(ruleset))
 
 	return registry.Producer()
 }
 
 func identifierOverride(
-	ruleset *lexarch.LexingRuleset[rune, string, string],
-	ctxProducer func(ctx *EditorCtx) toolchain.SublimeContext,
-) editor.OverrideHandler[rune, string, string, string, string, toolchain.SublimeContext] {
+	ruleset *lexarch.LexingRuleset[rune, uint32, uint32],
+) editor.OverrideHandler[rune, uint32, uint32, string, uint32, toolchain.SublimeContext] {
 
-	identRegex := getTokenRegex(ruleset, string(TokIdentifier))
-	dotRegex := getTokenRegex(ruleset, string(TokDot))
+	identRegex := getTokenRegex(ruleset, TokIdentifier)
+	dotRegex := getTokenRegex(ruleset, TokDot)
 
 	// The mechanical lookaheads
 	prefixRegex := fmt.Sprintf(`%s(?=\s*%s)`, identRegex, dotRegex)
 	terminalRegex := fmt.Sprintf(`%s(?!\s*%s)`, identRegex, dotRegex)
 
-	// 1. Contexts for MODULE_PATH (Declarations & Imports: e.g., 'import core.test')
-	nsNode := string(Node("NodeNamespaceSegment"))
-	modNode := string(Node("NodeModuleSegment"))
-	pathPrefixCtx := ctxProducer(&EditorCtx{NodeKind: &nsNode})
-	pathTerminalCtx := ctxProducer(&EditorCtx{NodeKind: &modNode})
+	/*
+		Prefix vs terminal must not use ctxProducer with the same NodeKind: the grammar only
+		has one node kind per role (e.g. NodePathSegment for every module path segment), but
+		Sublime scopes differ for namespace prefix vs final module name. MatchContext replaces
+		the manifest entirely, so we set scopes here explicitly (same split as the pre-uint32
+		manifest keys NodeNamespaceSegment / NodeModuleSegment, etc.).
+	*/
+	pathPrefixCtx := toolchain.SublimeContext{Scope: "entity.name.namespace"}
+	pathTerminalCtx := toolchain.SublimeContext{Scope: "entity.name.module"}
 
-	// 2. Contexts for ENTITY_REF_WRAP (Pointers: e.g., 'core.BaseTiering')
-	modRefNode := "NodeModuleReferenceSegment" // Synthetic node for pointers
-	entityRefNode := string(Node("NodeEntityReference"))
-	refPrefixCtx := ctxProducer(&EditorCtx{NodeKind: &modRefNode})
-	refTerminalCtx := ctxProducer(&EditorCtx{NodeKind: &entityRefNode})
+	refPrefixCtx := toolchain.SublimeContext{Scope: "support.other.module"}
+	refTerminalCtx := toolchain.SublimeContext{Scope: "support.class.reference.configuration"}
 
-	// 3. Contexts for RULESET_REFERENCE (Pointers: e.g., 'include core.Currency')
-	rulesetRefTerminalNode := "NodeRulesetReferenceTerminal"
-	rulesetPrefixCtx := ctxProducer(&EditorCtx{NodeKind: &modRefNode}) // Uses the same pointer node
-	rulesetTerminalCtx := ctxProducer(&EditorCtx{NodeKind: &rulesetRefTerminalNode})
+	rulesetPrefixCtx := toolchain.SublimeContext{Scope: "support.other.module"}
+	rulesetTerminalCtx := toolchain.SublimeContext{Scope: "support.class.ruleset"}
 
-	// Target AST groups we are overriding
-	pathSeg := string(NodePathSegment)
-	refSeg := string(NodeReferenceSegment)
-	rulesetSeg := string(NodeRulesetReferenceSegment)
+	pathSeg := uint32(NodePathSegment)
+	refSeg := uint32(NodeReferenceSegment)
+	rulesetSeg := uint32(NodeRulesetReferenceSegment)
 
 	return func(ctx *EditorCtx) []*EditorOverride {
 		if ctx.NodeKind == nil {
@@ -449,11 +440,11 @@ func identifierOverride(
 }
 
 func getTokenRegex(
-	ruleset *lexarch.LexingRuleset[rune, string, string],
-	token string,
+	ruleset *lexarch.LexingRuleset[rune, uint32, uint32],
+	token Token,
 ) string {
 	for _, rule := range ruleset.GetRules() {
-		if rule.Token == token {
+		if rule.Token == uint32(token) {
 			regex, err := rule.Pattern.ToRegEx()
 			if err != nil {
 				panic(fmt.Sprintf("Failed to convert token %v to regex: %v", token, err))
