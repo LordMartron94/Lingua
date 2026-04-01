@@ -6,7 +6,6 @@ import (
 	"foundation/domain"
 	"langspec/editor"
 	"langspec/toolchain"
-	"lexarch"
 	"lingua/internal/generation"
 	. "lingua/ruleforge/artifacts"
 )
@@ -355,7 +354,7 @@ var ruleForgeSemanticManifest = toolchain.SemanticManifest[Token, Node]{
 }
 
 func ruleforgeOverrideProducer(
-	ruleset *lexarch.LexingRuleset[rune, uint32, uint32],
+	ruleset *editor.LexingRuleSet[rune, uint32, uint32],
 	ctxProducer func(ctx *EditorCtx) toolchain.SublimeContext,
 ) func(ec *EditorCtx) []*EditorOverride {
 
@@ -382,7 +381,7 @@ func ruleforgeOverrideProducer(
 }
 
 func identifierOverride(
-	ruleset *lexarch.LexingRuleset[rune, uint32, uint32],
+	ruleset *editor.LexingRuleSet[rune, uint32, uint32],
 ) editor.OverrideHandler[rune, uint32, uint32, string, uint32, toolchain.SublimeContext] {
 
 	identRegex := getTokenRegex(ruleset, TokIdentifier)
@@ -440,10 +439,10 @@ func identifierOverride(
 }
 
 func getTokenRegex(
-	ruleset *lexarch.LexingRuleset[rune, uint32, uint32],
+	ruleset *editor.LexingRuleSet[rune, uint32, uint32],
 	token Token,
 ) string {
-	for _, rule := range ruleset.GetRules() {
+	for _, rule := range editor.LexingRuleSetGetRules(ruleset) {
 		if rule.Token == uint32(token) {
 			regex, err := rule.Pattern.ToRegEx()
 			if err != nil {

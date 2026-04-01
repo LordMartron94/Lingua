@@ -3,7 +3,6 @@ package goDef
 import (
 	"langspec/editor"
 	"langspec/toolchain"
-	"lexarch"
 	. "lingua/go/artifacts"
 	"lingua/internal/generation"
 )
@@ -92,7 +91,7 @@ var goWorkSemanticManifest = toolchain.SemanticManifest[GoWorkToken, GoWorkNode]
 }
 
 func goWorkOverrideProducer(
-	_ *lexarch.LexingRuleset[rune, uint32, uint32],
+	_ *editor.LexingRuleSet[rune, uint32, uint32],
 	_ func(ctx *EditorCtx) toolchain.SublimeContext,
 ) func(ec *EditorCtx) []*EditorOverride {
 	registry := editor.NewOverrideRegistry[rune, uint32, uint32, string, uint32, toolchain.SublimeContext]()

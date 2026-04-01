@@ -8,102 +8,102 @@ import "strconv"
 type Token uint32
 
 const (
-	TokArrow Token = 1
-	TokAt Token = 2
-	TokBlockComment Token = 3
-	TokBraceClose Token = 4
-	TokBraceOpen Token = 5
-	TokBracketClose Token = 6
-	TokBracketOpen Token = 7
-	TokColon Token = 8
-	TokComma Token = 9
-	TokDollar Token = 10
-	TokDot Token = 11
-	TokEOF Token = 12
-	TokEquals Token = 13
-	TokFloat Token = 14
-	TokHexColor Token = 15
-	TokHue Token = 16
-	TokIdentifier Token = 17
-	TokInteger Token = 18
-	TokKWAction Token = 19
-	TokKWAdapter Token = 20
-	TokKWAs Token = 21
-	TokKWBackground Token = 22
-	TokKWBaseLine Token = 23
-	TokKWBorder Token = 24
-	TokKWColor Token = 25
-	TokKWColorSet Token = 26
-	TokKWConfiguration Token = 27
-	TokKWCoreConditions Token = 28
-	TokKWDescription Token = 29
-	TokKWDropSoundEnabled Token = 30
-	TokKWEffectColor Token = 31
-	TokKWEffectTemporary Token = 32
-	TokKWExport Token = 33
-	TokKWExtends Token = 34
-	TokKWFalse Token = 35
-	TokKWFontSize Token = 36
-	TokKWFunc Token = 37
-	TokKWHSL Token = 38
-	TokKWHSLA Token = 39
-	TokKWHSV Token = 40
-	TokKWHSVA Token = 41
-	TokKWHide Token = 42
-	TokKWImplements Token = 43
-	TokKWImport Token = 44
-	TokKWInclude Token = 45
-	TokKWInherit Token = 46
-	TokKWMinimap Token = 47
-	TokKWModule Token = 48
-	TokKWOnHide Token = 49
-	TokKWOnShow Token = 50
-	TokKWOverride Token = 51
-	TokKWPositional Token = 52
-	TokKWPrivate Token = 53
-	TokKWRGB Token = 54
-	TokKWRGBA Token = 55
-	TokKWRule Token = 56
-	TokKWRuleset Token = 57
-	TokKWScope Token = 58
-	TokKWShape Token = 59
-	TokKWShow Token = 60
-	TokKWSize Token = 61
-	TokKWSound Token = 62
-	TokKWSoundID Token = 63
-	TokKWSoundPath Token = 64
-	TokKWSoundVolume Token = 65
-	TokKWStyle Token = 66
-	TokKWTemplate Token = 67
-	TokKWTextColor Token = 68
-	TokKWTheme Token = 69
-	TokKWThemeSchema Token = 70
-	TokKWTrue Token = 71
-	TokKWVariants Token = 72
-	TokKWVersion Token = 73
-	TokKWWhen Token = 74
-	TokKWWith Token = 75
-	TokLightness Token = 76
-	TokLineComment Token = 77
-	TokOpEq Token = 78
-	TokOpGt Token = 79
-	TokOpGte Token = 80
-	TokOpLt Token = 81
-	TokOpLte Token = 82
-	TokOpNeq Token = 83
-	TokParenClose Token = 84
-	TokParenOpen Token = 85
-	TokPercentage Token = 86
-	TokRGBAlpha Token = 87
-	TokRGBBlue Token = 88
-	TokRGBGreen Token = 89
-	TokRGBRed Token = 90
-	TokSaturation Token = 91
-	TokSemi Token = 92
-	TokStringLiteral Token = 93
-	TokValue Token = 94
-	TokVersionIndicator Token = 95
-	TokWhitespace Token = 96
+	TokArrow Token = 2
+	TokAt Token = 3
+	TokBlockComment Token = 4
+	TokBraceClose Token = 5
+	TokBraceOpen Token = 6
+	TokBracketClose Token = 7
+	TokBracketOpen Token = 8
+	TokColon Token = 9
+	TokComma Token = 10
+	TokDollar Token = 11
+	TokDot Token = 12
+	TokEOF Token = 13
+	TokEquals Token = 14
+	TokFloat Token = 15
+	TokHexColor Token = 16
+	TokHue Token = 17
+	TokIdentifier Token = 18
+	TokInteger Token = 19
+	TokKWAction Token = 20
+	TokKWAdapter Token = 21
+	TokKWAs Token = 22
+	TokKWBackground Token = 23
+	TokKWBaseLine Token = 24
+	TokKWBorder Token = 25
+	TokKWColor Token = 26
+	TokKWColorSet Token = 27
+	TokKWConfiguration Token = 28
+	TokKWCoreConditions Token = 29
+	TokKWDescription Token = 30
+	TokKWDropSoundEnabled Token = 31
+	TokKWEffectColor Token = 32
+	TokKWEffectTemporary Token = 33
+	TokKWExport Token = 34
+	TokKWExtends Token = 35
+	TokKWFalse Token = 36
+	TokKWFontSize Token = 37
+	TokKWFunc Token = 38
+	TokKWHSL Token = 39
+	TokKWHSLA Token = 40
+	TokKWHSV Token = 41
+	TokKWHSVA Token = 42
+	TokKWHide Token = 43
+	TokKWImplements Token = 44
+	TokKWImport Token = 45
+	TokKWInclude Token = 46
+	TokKWInherit Token = 47
+	TokKWMinimap Token = 48
+	TokKWModule Token = 49
+	TokKWOnHide Token = 50
+	TokKWOnShow Token = 51
+	TokKWOverride Token = 52
+	TokKWPositional Token = 53
+	TokKWPrivate Token = 54
+	TokKWRGB Token = 55
+	TokKWRGBA Token = 56
+	TokKWRule Token = 57
+	TokKWRuleset Token = 58
+	TokKWScope Token = 59
+	TokKWShape Token = 60
+	TokKWShow Token = 61
+	TokKWSize Token = 62
+	TokKWSound Token = 63
+	TokKWSoundID Token = 64
+	TokKWSoundPath Token = 65
+	TokKWSoundVolume Token = 66
+	TokKWStyle Token = 67
+	TokKWTemplate Token = 68
+	TokKWTextColor Token = 69
+	TokKWTheme Token = 70
+	TokKWThemeSchema Token = 71
+	TokKWTrue Token = 72
+	TokKWVariants Token = 73
+	TokKWVersion Token = 74
+	TokKWWhen Token = 75
+	TokKWWith Token = 76
+	TokLightness Token = 77
+	TokLineComment Token = 78
+	TokOpEq Token = 79
+	TokOpGt Token = 80
+	TokOpGte Token = 81
+	TokOpLt Token = 82
+	TokOpLte Token = 83
+	TokOpNeq Token = 84
+	TokParenClose Token = 85
+	TokParenOpen Token = 86
+	TokPercentage Token = 87
+	TokRGBAlpha Token = 88
+	TokRGBBlue Token = 89
+	TokRGBGreen Token = 90
+	TokRGBRed Token = 91
+	TokSaturation Token = 92
+	TokSemi Token = 93
+	TokStringLiteral Token = 94
+	TokValue Token = 95
+	TokVersionIndicator Token = 96
+	TokWhitespace Token = 97
 )
 
 var TokenNames = [...]string{
@@ -206,10 +206,10 @@ var TokenNames = [...]string{
 }
 
 func (t Token) String() string {
-	if t == 0 || int(t) > len(TokenNames) {
+	if t < 2 || int(t-2) >= len(TokenNames) {
 		return "Token(" + strconv.FormatUint(uint64(t), 10) + ")"
 	}
-	return TokenNames[t-1]
+	return TokenNames[t-2]
 }
 
 // Node represents a Node generated by LangSpec (IDs match compiler symbol table).
@@ -748,7 +748,7 @@ var NodeNames = [...]string{
 }
 
 func (t Node) String() string {
-	if t == 0 || int(t) > len(NodeNames) {
+	if t < 1 || int(t-1) >= len(NodeNames) {
 		return "Node(" + strconv.FormatUint(uint64(t), 10) + ")"
 	}
 	return NodeNames[t-1]
