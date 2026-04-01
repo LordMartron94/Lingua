@@ -8,6 +8,7 @@ import (
 	"langspec/toolchain"
 	"os"
 	"reflect"
+	"strconv"
 )
 
 /*
@@ -23,12 +24,17 @@ type NodeConstraint interface {
 }
 
 func manifestKey[T comparable](k T) string {
+	v := reflect.ValueOf(k)
+	switch v.Kind() {
+	case reflect.String:
+		return v.String()
+	case reflect.Int, reflect.Int8, reflect.Int16, reflect.Int32, reflect.Int64:
+		return strconv.FormatInt(v.Int(), 10)
+	case reflect.Uint, reflect.Uint8, reflect.Uint16, reflect.Uint32, reflect.Uint64, reflect.Uintptr:
+		return strconv.FormatUint(v.Uint(), 10)
+	}
 	if s, ok := any(k).(fmt.Stringer); ok {
 		return s.String()
-	}
-	v := reflect.ValueOf(k)
-	if v.Kind() == reflect.String {
-		return v.String()
 	}
 	return fmt.Sprint(k)
 }
