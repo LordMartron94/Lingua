@@ -1,0 +1,75 @@
+--- "Helm" v0.1.0 | lspec v1.0.0 ---
+
+PRAGMA {
+	tool.sublime {
+		enable = true;
+		output-path = [
+			"libs/lingua/helm/artifacts/helm.sublime-syntax",
+			"/home/user/.config/sublime-text/Packages/User/helm.sublime-syntax"
+		];
+	}
+
+	tool.go_bindings {
+		enable = true;
+		output-path = "libs/lingua/helm/artifacts/go_bindings.go";
+		package-name = "artifacts";
+	}
+};
+
+PATTERN {
+	pat_TokEOF				: [];
+	pat_TokWhitespace       : (['\t', ' '])+;
+	pat_TokNewLine			: (['\n', '\r'])+;
+
+	pat_TokLineComment      : "/" "/" (!['\n', '\r'])*;
+	pat_TokBlockComment     : "/" "*" ((!'*' | ("*")+ !['*', '/']))* ("*")+ "/";
+
+	pat_TokEquals			: '=';
+
+	pat_TokStringLiteral 	: "\"" ((!['\n', '\r', '"', '\\'] | ("\\" ['"', '\\', 'n', 'r', 't'] | ("\\u" (['0'..'9', 'A'..'F', 'a'..'f']){4,4} | "\\U" (['0'..'9', 'A'..'F', 'a'..'f']){8,8}))))* "\"";
+	pat_TokIdentifier       : ['A'..'Z', '_', 'a'..'z'] (['-', '0'..'9', 'A'..'Z', '_', 'a'..'z'])*;
+
+}
+
+LEX {
+	// Main
+	1 TokIdentifier 		-> RULEFORGE_STRUCTURAL_ROLE : pat_TokIdentifier;
+	1 TokStringLiteral 		-> RULEFORGE_STRUCTURAL_ROLE : pat_TokStringLiteral;
+
+	// Operators
+	1 TokEquals 			-> RULEFORGE_STRUCTURAL_ROLE : pat_TokEquals;
+
+    // Hidden/Whitespace
+    0 TokWhitespace         -> RULEFORGE_WHITESPACE_ROLE : pat_TokWhitespace;
+	0 TokNewLine            -> RULEFORGE_STRUCTURAL_ROLE : pat_TokNewLine;
+
+    0 TokBlockComment       -> RULEFORGE_COMMENT_ROLE    : pat_TokBlockComment;
+    0 TokLineComment        -> RULEFORGE_COMMENT_ROLE    : pat_TokLineComment;
+
+    // End of File
+    0 TokEOF                -> RULEFORGE_STRUCTURAL_ROLE : pat_TokEOF %% EOF=true %%;
+}
+
+PARSE {
+	IGNORE {
+		RULEFORGE_WHITESPACE_ROLE RULEFORGE_COMMENT_ROLE
+	}
+
+	PROGRAM -> NodeProgram {
+		(
+			NEW_LINE | VARIABLE_STATEMENT
+		)*
+		virtual TokEOF
+	}
+
+	NEW_LINE -> NodeNewLine {
+		virtual TokNewLine
+	}
+
+	VARIABLE_STATEMENT -> NodeVariableDeclaration {
+		NodeVariableName : TokIdentifier
+		virtual TokEquals
+		NodeVariableValue : TokStringLiteral
+		NEW_LINE
+	}
+}
