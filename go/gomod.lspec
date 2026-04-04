@@ -49,6 +49,7 @@ PATTERN {
 }
 
 LEX {
+	state INITIAL {
 	2 TokKWModule           -> GOMOD_STRUCTURAL_ROLE : pat_TokKWModule;
 	2 TokKWGo               -> GOMOD_STRUCTURAL_ROLE : pat_TokKWGo;
 	2 TokKWRequire          -> GOMOD_STRUCTURAL_ROLE : pat_TokKWRequire;
@@ -78,6 +79,7 @@ LEX {
 
 	// End of File
 	0 TokEOF                -> GOMOD_STRUCTURAL_ROLE : pat_TokEOF %% EOF=true %%;
+	}
 }
 
 PARSE {

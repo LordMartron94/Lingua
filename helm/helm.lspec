@@ -32,6 +32,7 @@ PATTERN {
 }
 
 LEX {
+	state INITIAL {
 	// Main
 	1 TokIdentifier 		-> RULEFORGE_STRUCTURAL_ROLE : pat_TokIdentifier;
 	1 TokStringLiteral 		-> RULEFORGE_STRUCTURAL_ROLE : pat_TokStringLiteral;
@@ -48,6 +49,7 @@ LEX {
 
     // End of File
     0 TokEOF                -> RULEFORGE_STRUCTURAL_ROLE : pat_TokEOF %% EOF=true %%;
+	}
 }
 
 PARSE {

@@ -39,6 +39,7 @@ PATTERN {
 }
 
 LEX {
+	state INITIAL {
 	2 TokKWGo               -> GOWORK_STRUCTURAL_ROLE : pat_TokKWGo;
 	2 TokKWToolchain        -> GOWORK_STRUCTURAL_ROLE : pat_TokKWToolchain;
 	2 TokKWGodebug          -> GOWORK_STRUCTURAL_ROLE : pat_TokKWGodebug;
@@ -58,6 +59,7 @@ LEX {
 	0 TokEquals             -> GOWORK_STRUCTURAL_ROLE : pat_Equals;
 
 	0 TokEOF                -> GOWORK_STRUCTURAL_ROLE : pat_TokEOF %% EOF=true %%;
+	}
 }
 
 PARSE {

@@ -147,6 +147,7 @@ PATTERN {
 };
 
 LEX {
+	state INITIAL {
     // ========================================================================
     // 1. METADATA & MODULE SYSTEM (Priority 2)
     // ========================================================================
@@ -285,6 +286,7 @@ LEX {
 
     // End of File
     0 TokEOF                -> RULEFORGE_STRUCTURAL_ROLE : pat_TokEOF %% EOF=true %%;
+	}
 };
 
 PARSE {
