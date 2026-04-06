@@ -87,12 +87,12 @@ PARSE {
 		GOMOD_WHITESPACE_ROLE GOMOD_COMMENT_ROLE
 	};
 
-	PROGRAM -> NodeProgram {
+	rule PROGRAM -> NodeProgram {
 		BLOCK*
 		virtual TokEOF
 	}
 
-	BLOCK -> transparent gr_BLOCK {
+	rule BLOCK -> transparent gr_BLOCK {
 		MODULE_STATEMENT | 
 		GO_DECLARATION | 
 		REQUIRE_STATEMENT | 
@@ -104,17 +104,17 @@ PARSE {
 		TOOL_STATEMENT
 	}
 
-	MODULE_STATEMENT -> NodeModuleStatement {
+	rule MODULE_STATEMENT -> NodeModuleStatement {
 		virtual TokKWModule
 		NodeModuleName : TokModulePath
 	}
 
-	GO_DECLARATION -> NodeGoDecl {
+	rule GO_DECLARATION -> NodeGoDecl {
 		virtual TokKWGo
 		NodeGoVersion : TokFloat
 	}
 
-	REQUIRE_STATEMENT -> NodeRequireStatement {
+	rule REQUIRE_STATEMENT -> NodeRequireStatement {
 		virtual TokKWRequire
 		(
 			MODULE_REFERENCE |
@@ -124,12 +124,12 @@ PARSE {
 		)
 	}
 
-	MODULE_REFERENCE -> NodeModuleReference {
+	rule MODULE_REFERENCE -> NodeModuleReference {
 		NodeModuleReferenceIdent : TokModulePath
 		NodeModuleReferenceVersion : TokVersion
 	}
 
-	REPLACE_STATEMENT -> NodeReplaceStatement {
+	rule REPLACE_STATEMENT -> NodeReplaceStatement {
 		virtual TokKWReplace
 		(
 			REPLACE_REFERENCE |
@@ -139,7 +139,7 @@ PARSE {
 		)
 	}
 
-	REPLACE_REFERENCE -> NodeReplaceReference {
+	rule REPLACE_REFERENCE -> NodeReplaceReference {
 		NodeReplaceOriginal : TokModulePath
 		NodeReplaceOriginalVersion : TokVersion?
 		virtual TokArrow
@@ -147,7 +147,7 @@ PARSE {
 		NodeReplaceTargetVersion : TokVersion?
 	}
 
-	EXCLUDE_STATEMENT -> NodeExcludeStatement {
+	rule EXCLUDE_STATEMENT -> NodeExcludeStatement {
 		virtual TokKWExclude
 		(
 			MODULE_REFERENCE |
@@ -157,7 +157,7 @@ PARSE {
 		)
 	}
 
-	RETRACT_STATEMENT -> NodeRetractStatement {
+	rule RETRACT_STATEMENT -> NodeRetractStatement {
 		virtual TokKWRetract
 		(
 			RETRACT_REFERENCE |
@@ -167,12 +167,12 @@ PARSE {
 		)
 	}
 
-	RETRACT_REFERENCE -> NodeRetractReference {
+	rule RETRACT_REFERENCE -> NodeRetractReference {
 		NodeRetractSingle : TokVersion |
 		RETRACT_RANGE
 	}
 
-	RETRACT_RANGE -> NodeRetractRange {
+	rule RETRACT_RANGE -> NodeRetractRange {
 		nest TokBracketOpen TokBracketClose {
 			NodeRetractLow : TokVersion
 			virtual TokComma
@@ -180,12 +180,12 @@ PARSE {
 		}
 	}
 
-	TOOLCHAIN_STATEMENT -> NodeToolchainStatement {
+	rule TOOLCHAIN_STATEMENT -> NodeToolchainStatement {
 		virtual TokKWToolchain
 		NodeToolchainName : TokModulePath
 	}
 
-	GODEBUG_STATEMENT -> NodeGodebugStatement {
+	rule GODEBUG_STATEMENT -> NodeGodebugStatement {
 		virtual TokKWGodebug
 		(
 			GODEBUG_REFERENCE |
@@ -195,13 +195,13 @@ PARSE {
 		)
 	}
 
-	GODEBUG_REFERENCE -> NodeGodebugReference {
+	rule GODEBUG_REFERENCE -> NodeGodebugReference {
 		NodeGodebugKey : TokModulePath
 		virtual TokEquals
 		NodeGodebugValue : TokModulePath
 	}
 
-	TOOL_STATEMENT -> NodeToolStatement {
+	rule TOOL_STATEMENT -> NodeToolStatement {
 		virtual TokKWTool
 		(
 			TOOL_REFERENCE |
@@ -211,7 +211,7 @@ PARSE {
 		)
 	}
 
-	TOOL_REFERENCE -> NodeToolReference {
+	rule TOOL_REFERENCE -> NodeToolReference {
 		NodeToolPath : TokModulePath
 	}
 }

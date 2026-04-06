@@ -294,7 +294,7 @@ PARSE {
 		RULEFORGE_WHITESPACE_ROLE RULEFORGE_COMMENT_ROLE
 	};
 
-	PROGRAM -> NodeProgram {
+	rule PROGRAM -> NodeProgram {
 		VERSION_STATEMENT
 		MODULE_STATEMENT
 		IMPORT_STMT*
@@ -302,19 +302,19 @@ PARSE {
 		virtual TokEOF
 	}
 
-	VERSION_STATEMENT -> transparent gr_VSTMT sync (TokSemi) {
+	rule VERSION_STATEMENT -> transparent gr_VSTMT sync (TokSemi) {
 		virtual TokKWVersion
 		NodeVersionIndicator : TokVersionIndicator
 		virtual TokSemi
 	}
 
-	MODULE_STATEMENT -> transparent gr_MSTMT sync (TokSemi) {
+	rule MODULE_STATEMENT -> transparent gr_MSTMT sync (TokSemi) {
 		virtual TokKWModule
 		MODULE_PATH
 		virtual TokSemi
 	}
 
-	MODULE_PATH -> NodeModulePath {
+	rule MODULE_PATH -> NodeModulePath {
 		NodePathSegment : TokIdentifier
 		(
 			virtual TokDot 
@@ -326,11 +326,11 @@ PARSE {
 	// TOP LEVEL
 	// ---------------------------------------------------------
 
-	MAIN_BLOCK_LIST -> transparent gr_MAIN_BLOCK_LIST {
+	rule MAIN_BLOCK_LIST -> transparent gr_MAIN_BLOCK_LIST {
 		MAIN_BLOCK*
 	}
 
-	MAIN_BLOCK -> NodeMainBlock {
+	rule MAIN_BLOCK -> NodeMainBlock {
 		(
 			(	
 				NodeExportKeyword : TokKWExport
@@ -347,30 +347,30 @@ PARSE {
 		) | CONFIGURATION 
 	}
 
-	CONFIGURATION -> NodeConfiguration {
+	rule CONFIGURATION -> NodeConfiguration {
 		virtual TokKWConfiguration
 		nest TokBraceOpen TokBraceClose {
 			CONFIGURATION_BODY
 		}
 	}
 
-	CONFIGURATION_BODY -> transparent gr_CONFIGURATION_BODY {
+	rule CONFIGURATION_BODY -> transparent gr_CONFIGURATION_BODY {
 		CONFIGURATION_ASSIGNMENT*
 		ADAPTER_DEF*
 	}
 
-	CONFIGURATION_ASSIGNMENT -> NodeConfigurationEntry sync (TokSemi) {
+	rule CONFIGURATION_ASSIGNMENT -> NodeConfigurationEntry sync (TokSemi) {
 		NodeConfigurationKey : TokIdentifier
 		virtual TokEquals
 		CONFIGURATION_ASSIGNMENT_VALUE
 		virtual TokSemi
 	}
 
-	CONFIGURATION_ASSIGNMENT_VALUE -> NodeConfigurationValue {
+	rule CONFIGURATION_ASSIGNMENT_VALUE -> NodeConfigurationValue {
 		ENTITY_REF_WRAP
 	}
 
-	ENTITY_REF_WRAP -> transparent gr_ENTITY_REF_WRAP {
+	rule ENTITY_REF_WRAP -> transparent gr_ENTITY_REF_WRAP {
 		NodeReferenceSegment : TokIdentifier
 		(
 			virtual TokDot
@@ -378,7 +378,7 @@ PARSE {
 		)?
 	}
 
-	ADAPTER_DEF -> NodeAdapter {
+	rule ADAPTER_DEF -> NodeAdapter {
 		virtual TokKWAdapter
 		ORIGINAL_SCHEMA_REF
 		virtual TokArrow
@@ -388,19 +388,19 @@ PARSE {
 		}
 	}
 
-	ORIGINAL_SCHEMA_REF -> NodeOriginalSchemaReference {
+	rule ORIGINAL_SCHEMA_REF -> NodeOriginalSchemaReference {
 		ENTITY_REF_WRAP
 	}
 
-	TARGET_SCHEMA_REF -> NodeTargetSchemaReference {
+	rule TARGET_SCHEMA_REF -> NodeTargetSchemaReference {
 		ENTITY_REF_WRAP
 	}
 
-	ADAPTER_BODY -> transparent gr_ADAPTER_BODY {
+	rule ADAPTER_BODY -> transparent gr_ADAPTER_BODY {
 		SCHEMA_KEY_CONVERT_STMT*
 	}
 
-	SCHEMA_KEY_CONVERT_STMT -> NodeSchemaKeyAdapter sync (TokSemi) {
+	rule SCHEMA_KEY_CONVERT_STMT -> NodeSchemaKeyAdapter sync (TokSemi) {
 		NodeOriginalSchemaKey : TokIdentifier
 		virtual TokArrow
 		NodeTargetSchemaKey : TokIdentifier
@@ -411,7 +411,7 @@ PARSE {
 	// THEME SCHEMA
 	// ---------------------------------------------------------
 
-	THEME_SCHEMA -> NodeThemeSchema {
+	rule THEME_SCHEMA -> NodeThemeSchema {
 		virtual TokKWThemeSchema
 		NodeThemeSchemaName : TokIdentifier
 		nest TokBraceOpen TokBraceClose {
@@ -419,11 +419,11 @@ PARSE {
 		}
 	}
 
-	THEME_SCHEMA_STYLE_LIST -> transparent gr_THEME_SCHEMA_STYLE_LIST {
+	rule THEME_SCHEMA_STYLE_LIST -> transparent gr_THEME_SCHEMA_STYLE_LIST {
 		THEME_SCHEMA_STYLE_ENTRY*
 	}
 
-	THEME_SCHEMA_STYLE_ENTRY -> transparent gr_THEME_SCHEMA_STYLE_ENTRY sync (TokSemi) {
+	rule THEME_SCHEMA_STYLE_ENTRY -> transparent gr_THEME_SCHEMA_STYLE_ENTRY sync (TokSemi) {
 		NodeStyleKey : TokIdentifier
 		virtual TokSemi
 	}
@@ -432,7 +432,7 @@ PARSE {
 	// COLORSET
 	// ---------------------------------------------------------
 
-	COLORSET -> NodeColorSet {
+	rule COLORSET -> NodeColorSet {
 		virtual TokKWColorSet
 		NodeColorSetName : TokIdentifier
 		nest TokBraceOpen TokBraceClose {
@@ -440,18 +440,18 @@ PARSE {
 		}		
 	}
 
-	COLORSET_ITEM_LIST -> transparent gr_COLORSET_ITEM_LIST {
+	rule COLORSET_ITEM_LIST -> transparent gr_COLORSET_ITEM_LIST {
 		COLORSET_ITEM*
 	}
 
-	COLORSET_ITEM -> NodeColorSetEntry sync (TokSemi) {
+	rule COLORSET_ITEM -> NodeColorSetEntry sync (TokSemi) {
 		NodeColorKey : TokIdentifier
 		virtual TokEquals
 		COLOR_CONFIG
 		virtual TokSemi
 	}
 
-	COLOR_CONFIG -> transparent gr_COLOR_CONFIG {
+	rule COLOR_CONFIG -> transparent gr_COLOR_CONFIG {
 		RGB_SHORTHAND 
 		| HUE_SHORTHAND 
 		| RGB_LITERAL | RGBA_LITERAL
@@ -460,14 +460,14 @@ PARSE {
 		| HEX_LITERAL
 	}
 
-	RGB_SHORTHAND -> transparent gr_RGB_SHORTHAND {
+	rule RGB_SHORTHAND -> transparent gr_RGB_SHORTHAND {
 		NodeRGBRed   : TokRGBRed
 		NodeRGBGreen : TokRGBGreen
 		NodeRGBBlue  : TokRGBBlue
 		NodeRGBAlpha : TokRGBAlpha?
 	}
 
-	HUE_SHORTHAND -> transparent gr_HUE_SHORTHAND {
+	rule HUE_SHORTHAND -> transparent gr_HUE_SHORTHAND {
 		NodeHue        : TokHue
 		NodeSaturation : TokSaturation
 		(
@@ -477,11 +477,11 @@ PARSE {
 		NodeRGBAlpha : TokRGBAlpha?
 	}
 
-	HEX_LITERAL -> transparent gr_HEX_LITERAL {
+	rule HEX_LITERAL -> transparent gr_HEX_LITERAL {
 		NodeHexColor : TokHexColor
 	}
 
-	RGB_LITERAL -> transparent gr_RGB_LITERAL {
+	rule RGB_LITERAL -> transparent gr_RGB_LITERAL {
 		virtual TokKWRGB
 		nest TokParenOpen TokParenClose {
 			(NodeRGBRed : TokInteger | NodeRGBRed : TokFloat)
@@ -492,7 +492,7 @@ PARSE {
 		}
 	}
 
-	RGBA_LITERAL -> transparent gr_RGBA_LITERAL {
+	rule RGBA_LITERAL -> transparent gr_RGBA_LITERAL {
 		virtual TokKWRGBA
 		nest TokParenOpen TokParenClose {
 			(NodeRGBRed : TokInteger | NodeRGBRed : TokFloat)
@@ -505,7 +505,7 @@ PARSE {
 		}
 	}
 
-	HSV_LITERAL -> transparent gr_HSV_LITERAL {
+	rule HSV_LITERAL -> transparent gr_HSV_LITERAL {
 		virtual TokKWHSV
 		nest TokParenOpen TokParenClose {
 			(NodeHue : TokInteger | NodeHue : TokFloat)
@@ -516,7 +516,7 @@ PARSE {
 		}
 	}
 
-	HSVA_LITERAL -> transparent gr_HSVA_LITERAL {
+	rule HSVA_LITERAL -> transparent gr_HSVA_LITERAL {
 		virtual TokKWHSVA
 		nest TokParenOpen TokParenClose {
 			(NodeHue : TokInteger | NodeHue : TokFloat)
@@ -529,7 +529,7 @@ PARSE {
 		}
 	}
 
-	HSL_LITERAL -> transparent gr_HSL_LITERAL {
+	rule HSL_LITERAL -> transparent gr_HSL_LITERAL {
 		virtual TokKWHSL
 		nest TokParenOpen TokParenClose {
 			(NodeHue : TokInteger | NodeHue : TokFloat)
@@ -540,7 +540,7 @@ PARSE {
 		}
 	}
 
-	HSLA_LITERAL -> transparent gr_HSLA_LITERAL {
+	rule HSLA_LITERAL -> transparent gr_HSLA_LITERAL {
 		virtual TokKWHSLA
 		nest TokParenOpen TokParenClose {
 			(NodeHue : TokInteger | NodeHue : TokFloat)
@@ -557,7 +557,7 @@ PARSE {
 	// THEME
 	// ---------------------------------------------------------
 
-	THEME -> NodeTheme {
+	rule THEME -> NodeTheme {
 		virtual TokKWTheme
 		NodeThemeName : TokIdentifier
 		(
@@ -568,23 +568,23 @@ PARSE {
 		}
 	}
 
-	EXTEND_SEQUENCE -> transparent gr_THEME_EXTEND {
+	rule EXTEND_SEQUENCE -> transparent gr_THEME_EXTEND {
 		NodeExtends : TokKWExtends
 		NodeThemeReference : TokIdentifier
 	}
 
-	IMPLEMENT_SEQUENCE -> transparent gr_THEME_IMPLEMENT {
+	rule IMPLEMENT_SEQUENCE -> transparent gr_THEME_IMPLEMENT {
 		NodeImplements : TokKWImplements
 		NodeThemeSchemaReference : TokIdentifier
 	}
 
-	THEME_STYLE_LIST -> transparent gr_THEME_STYLE_LIST {
+	rule THEME_STYLE_LIST -> transparent gr_THEME_STYLE_LIST {
 		(
 			THEME_STYLE
 		)*
 	}
 
-	THEME_STYLE -> NodeThemeStyle {
+	rule THEME_STYLE -> NodeThemeStyle {
 		NodeOverride : TokKWOverride?
 		NodeThemeStyleName : TokIdentifier
 		nest TokBraceOpen TokBraceClose {
@@ -592,67 +592,67 @@ PARSE {
 		}
 	}
 
-	THEME_STYLE_ENTRY -> transparent gr_THEME_STYLE_ENTRY {
+	rule THEME_STYLE_ENTRY -> transparent gr_THEME_STYLE_ENTRY {
 		ON_SHOW_ACTION
 		ON_HIDE_ACTION?
 	}
 
-	ON_SHOW_ACTION -> NodeOnShow {
+	rule ON_SHOW_ACTION -> NodeOnShow {
 		virtual TokKWOnShow
 		STYLE_CONFIG_WRAP
 	}
 
-	ON_HIDE_ACTION -> NodeOnHide {
+	rule ON_HIDE_ACTION -> NodeOnHide {
 		virtual TokKWOnHide
 		STYLE_CONFIG_WRAP
 	}
 
-	STYLE_CONFIG_WRAP -> transparent gr_STYLE_CONFIG_WRAP {
+	rule STYLE_CONFIG_WRAP -> transparent gr_STYLE_CONFIG_WRAP {
 		nest TokBraceOpen TokBraceClose {
 			STYLE_CONFIGURATION_LIST
 		}		
 	}
 
-	STYLE_CONFIGURATION_LIST -> transparent gr_STYLE_CONFIG_LIST {
+	rule STYLE_CONFIGURATION_LIST -> transparent gr_STYLE_CONFIG_LIST {
 		STYLE_CONFIGURATION*
 	}
 
-	STYLE_CONFIGURATION -> transparent gr_STYLE_CONFIG {
+	rule STYLE_CONFIGURATION -> transparent gr_STYLE_CONFIG {
 		BACKGROUND | BORDER | TEXT_COLOR | TEXT_SIZE | EFFECT | SOUND | MINIMAP
 	}
 
-	BACKGROUND -> NodeBackground sync (TokSemi) {
+	rule BACKGROUND -> NodeBackground sync (TokSemi) {
 		virtual TokKWBackground
 		(COLOR_CONFIG | COLOR_REF)
 		virtual TokSemi
 	}
 
-	BORDER -> NodeBorder sync (TokSemi) {
+	rule BORDER -> NodeBorder sync (TokSemi) {
 		virtual TokKWBorder
 		(COLOR_CONFIG | COLOR_REF)
 		virtual TokSemi
 	}
 
-	TEXT_COLOR -> NodeTextColor sync (TokSemi) {
+	rule TEXT_COLOR -> NodeTextColor sync (TokSemi) {
 		virtual TokKWTextColor
 		(COLOR_CONFIG | COLOR_REF)
 		virtual TokSemi
 	}
 
-	TEXT_SIZE -> transparent gr_TextSize sync (TokSemi) {
+	rule TEXT_SIZE -> transparent gr_TextSize sync (TokSemi) {
 		virtual TokKWFontSize
 		NodeTextSize : TokInteger
 		virtual TokSemi
 	}
 
-	COLOR_REF -> NodeColorReference {
+	rule COLOR_REF -> NodeColorReference {
 		NodeColorSetReference : TokIdentifier
 		virtual TokDot
 		NodeColorKeyReference : TokIdentifier
 		COLOR_OVERRIDE?
 	}
 
-	COLOR_OVERRIDE -> NodeColorOverride {
+	rule COLOR_OVERRIDE -> NodeColorOverride {
 		virtual TokKWOverride
 		(
 			NodeRGBRed       : TokRGBRed
@@ -666,7 +666,7 @@ PARSE {
 		){1,4} 
 	}
 
-	EFFECT -> NodeEffect sync (TokSemi) {
+	rule EFFECT -> NodeEffect sync (TokSemi) {
 		( 
 			( 
 				virtual TokKWEffectColor 
@@ -684,18 +684,18 @@ PARSE {
 		virtual TokSemi	
 	}
 
-	SOUND -> NodeSound {
+	rule SOUND -> NodeSound {
 		virtual TokKWSound
 		nest TokBraceOpen TokBraceClose {
 			SOUND_CONFIGURATION_LIST
 		}
 	}
 
-	SOUND_CONFIGURATION_LIST -> transparent gr_SOUND_CONFIG_LIST {
+	rule SOUND_CONFIGURATION_LIST -> transparent gr_SOUND_CONFIG_LIST {
 		SOUND_CONFIGURATION*
 	}
 
-	SOUND_CONFIGURATION -> transparent gr_SOUND_CONFIG sync (TokSemi) {
+	rule SOUND_CONFIGURATION -> transparent gr_SOUND_CONFIG sync (TokSemi) {
 		(
 			(
 				virtual TokKWSoundID
@@ -731,18 +731,18 @@ PARSE {
 		virtual TokSemi  
 	}
 
-	MINIMAP -> NodeMinimap {
+	rule MINIMAP -> NodeMinimap {
 		virtual TokKWMinimap
 		nest TokBraceOpen TokBraceClose {
 			MINIMAP_CONFIGURATION_LIST
 		}	
 	}
 
-	MINIMAP_CONFIGURATION_LIST -> transparent gr_MINIMAP_CONFIG_LIST {
+	rule MINIMAP_CONFIGURATION_LIST -> transparent gr_MINIMAP_CONFIG_LIST {
 		MINIMAP_CONFIGURATION*
 	}
 
-	MINIMAP_CONFIGURATION -> transparent gr_MINIMAP_CONFIG sync (TokSemi) {
+	rule MINIMAP_CONFIGURATION -> transparent gr_MINIMAP_CONFIG sync (TokSemi) {
 		(
 			(
 				virtual TokKWColor
@@ -766,7 +766,7 @@ PARSE {
 	// TEMPLATE
 	// ---------------------------------------------------------
 
-	TEMPLATE -> NodeTemplate {
+	rule TEMPLATE -> NodeTemplate {
 		virtual TokKWTemplate
 		NodeTemplateName : TokIdentifier
 		nest TokParenOpen TokParenClose {
@@ -777,7 +777,7 @@ PARSE {
 		}
 	}
 
-	FUNCTION_SIGNATURE -> NodeFunctionSignature {
+	rule FUNCTION_SIGNATURE -> NodeFunctionSignature {
 		(
 			TEMPLATE_ARGUMENT
 			(
@@ -787,7 +787,7 @@ PARSE {
 		)?
 	}
 
-	TEMPLATE_ARGUMENT -> NodeFunctionArgument {
+	rule TEMPLATE_ARGUMENT -> NodeFunctionArgument {
 		NodeArgumentName : TokIdentifier
 		(
 			NodeArgumentType : TokIdentifier
@@ -797,21 +797,21 @@ PARSE {
 		)
 	}
 
-	RULE_BODY -> transparent gr_RULE_BODY {
+	rule RULE_BODY -> transparent gr_RULE_BODY {
 		SCOPE_BLOCK?
 		BASELINE_BLOCK
 		VARIANTS_BLOCK?
 	}
 
 	// --- Scope ---
-	SCOPE_BLOCK -> NodeScopeBlock {
+	rule SCOPE_BLOCK -> NodeScopeBlock {
 		virtual TokKWScope
 		nest TokBraceOpen TokBraceClose {
 			SCOPE_ASSIGNMENT*
 		}
 	}
 
-	SCOPE_ASSIGNMENT -> NodeScopeAssignment sync (TokSemi) {
+	rule SCOPE_ASSIGNMENT -> NodeScopeAssignment sync (TokSemi) {
 		NodeAssignTarget : TokIdentifier
 		virtual TokEquals
 		(
@@ -824,44 +824,44 @@ PARSE {
 	}
 
 	// --- Baseline ---
-	BASELINE_BLOCK -> NodeBaselineBlock {
+	rule BASELINE_BLOCK -> NodeBaselineBlock {
 		virtual TokKWBaseLine
 		nest TokBraceOpen TokBraceClose {
 			BASELINE_PROPERTY*
 		}
 	}
 
-	BASELINE_PROPERTY -> transparent gr_BASELINE_PROPERTY {
+	rule BASELINE_PROPERTY -> transparent gr_BASELINE_PROPERTY {
 		ACTION_DEF | STYLE_DEF
 	}
 
-	ACTION_DEF -> NodeActionDef sync (TokSemi) {
+	rule ACTION_DEF -> NodeActionDef sync (TokSemi) {
 		virtual TokKWAction
 		(NodeActionType : TokKWShow | NodeActionType : TokKWHide)
 		virtual TokSemi
 	}
 
-	STYLE_DEF -> NodeStyleDef sync (TokSemi) {
+	rule STYLE_DEF -> NodeStyleDef sync (TokSemi) {
 		virtual TokKWStyle
 		(VARIABLE_REF | STYLE_REF)
 		virtual TokSemi
 	}
 
-	INHERIT_DEF -> NodeInheritDef sync (TokSemi) {
+	rule INHERIT_DEF -> NodeInheritDef sync (TokSemi) {
 		virtual TokKWInherit
 		(NodeInheritTarget : TokKWAction | NodeInheritTarget : TokKWStyle)
 		virtual TokSemi
 	}
 
 	// --- Variants & Conditions ---
-	VARIANTS_BLOCK -> NodeVariantsBlock {
+	rule VARIANTS_BLOCK -> NodeVariantsBlock {
 		virtual TokKWVariants
 		nest TokBraceOpen TokBraceClose {
 			VARIANT_CONDITION*
 		}
 	}
 
-	VARIANT_CONDITION -> NodeVariantCondition {
+	rule VARIANT_CONDITION -> NodeVariantCondition {
 		virtual TokKWWhen
 		CONDITION_EXPR
 		nest TokBraceOpen TokBraceClose {
@@ -870,27 +870,27 @@ PARSE {
 		}
 	}
 
-	RULE_PROPERTY -> transparent gr_RULE_PROPERTY {
+	rule RULE_PROPERTY -> transparent gr_RULE_PROPERTY {
 		BASELINE_PROPERTY | INHERIT_DEF
 	}
 
-	CONDITION_EXPR -> NodeConditionExpr {
+	rule CONDITION_EXPR -> NodeConditionExpr {
 		CONDITION_LEFT
 		CONDITION_OPERATOR
 		CONDITION_RIGHT
 	}
 
-	CONDITION_LEFT -> transparent gr_COND_LEFT {
+	rule CONDITION_LEFT -> transparent gr_COND_LEFT {
 		ENGINE_DIRECTIVE 
 		| NodeConditionTarget : TokIdentifier
 	}
 
-	ENGINE_DIRECTIVE -> transparent gr_ENGINE_DIRECTIVE {
+	rule ENGINE_DIRECTIVE -> transparent gr_ENGINE_DIRECTIVE {
 		virtual TokAt
 		NodeEngineDirective : TokIdentifier
 	}
 
-	CONDITION_OPERATOR -> transparent gr_COND_OP {
+	rule CONDITION_OPERATOR -> transparent gr_COND_OP {
 		NodeOp : TokOpEq 
 		| NodeOp : TokOpNeq 
 		| NodeOp : TokOpGte 
@@ -899,7 +899,7 @@ PARSE {
 		| NodeOp : TokOpLt
 	}
 
-	CONDITION_RIGHT -> NodeConditionValue {
+	rule CONDITION_RIGHT -> NodeConditionValue {
 		NodeIntLiteral : TokInteger 
 		| STRING_ARRAY
 		| NodeStringLiteral : TokStringLiteral
@@ -912,7 +912,7 @@ PARSE {
 	// RULESET
 	// ---------------------------------------------------------
 
-	RULESET -> NodeRuleset {
+	rule RULESET -> NodeRuleset {
 		virtual TokKWRuleset
 		NodeRulesetName : TokIdentifier
 		nest TokBraceOpen TokBraceClose {
@@ -920,44 +920,44 @@ PARSE {
 		}
 	}
 
-	RULESET_BODY -> transparent gr_RULESET_BODY {
+	rule RULESET_BODY -> transparent gr_RULESET_BODY {
 		DESCRIPTION_STMT
 		CORE_CONDITIONS?
 		RULES
 	}
 
-	DESCRIPTION_STMT -> transparent gr_DESCRIPTION_STMT sync (TokSemi) {
+	rule DESCRIPTION_STMT -> transparent gr_DESCRIPTION_STMT sync (TokSemi) {
 		virtual TokKWDescription
 		NodeRulesetDescription : TokStringLiteral
 		virtual TokSemi
 	}
 
-	CORE_CONDITIONS -> NodeCoreConditions {
+	rule CORE_CONDITIONS -> NodeCoreConditions {
 		virtual TokKWCoreConditions
 		nest TokBraceOpen TokBraceClose {
 			CORE_CONDITION_STMT
 		}
 	}
 
-	CORE_CONDITION_STMT -> transparent gr_CORE_CONDITION_STMT sync (TokSemi) {
+	rule CORE_CONDITION_STMT -> transparent gr_CORE_CONDITION_STMT sync (TokSemi) {
 		(virtual TokKWWhen CONDITION_EXPR virtual TokSemi)*
 	}
 
-	RULES -> NodeRules {
-		(
+	rule RULES -> NodeRules {
+	 	(
 			virtual TokKWRule
 			RULE
 		)+
 	}
 
-	RULE -> NodeRule {
+	rule RULE -> NodeRule {
 		NodeRuleName : TokIdentifier
 		(
 			TEMPLATE_USAGE | RULE_BLOCK
 		)
 	}
 
-	TEMPLATE_USAGE -> NodeTemplateUsage sync (TokSemi) {
+	rule TEMPLATE_USAGE -> NodeTemplateUsage sync (TokSemi) {
 		virtual TokEquals
 		NodeTemplateReferenceTarget : TokIdentifier
 		nest TokParenOpen TokParenClose {
@@ -966,7 +966,7 @@ PARSE {
 		virtual TokSemi
 	}
 
-	TEMPLATE_CALL_ARGS -> NodeTemplateArguments {
+	rule TEMPLATE_CALL_ARGS -> NodeTemplateArguments {
 		TEMPLATE_CALL_ARG
 		(
 			virtual TokComma
@@ -974,18 +974,18 @@ PARSE {
 		)*
 	}
 
-	TEMPLATE_CALL_ARG -> transparent gr_TEMPLATE_CALL_ARG {
+	rule TEMPLATE_CALL_ARG -> transparent gr_TEMPLATE_CALL_ARG {
 		NodeStringLiteral : TokStringLiteral 
 		| STYLE_REF
 	}
 
-	STYLE_REF -> NodeStyleRef {
+	rule STYLE_REF -> NodeStyleRef {
 		NodeSchemaUsageTarget : TokIdentifier  
 		virtual TokDot
 		NodeStyleKeyRef : TokIdentifier
 	}
 
-	RULE_BLOCK -> NodeRuleBlock {
+	rule RULE_BLOCK -> NodeRuleBlock {
 		nest TokBraceOpen TokBraceClose {
 			RULE_BODY
 		}
@@ -995,7 +995,7 @@ PARSE {
 	// FUNCTION
 	// ---------------------------------------------------------
 
-	FUNCTION -> NodeFunction {
+	rule FUNCTION -> NodeFunction {
 		virtual TokKWFunc
 		NodeFunctionName : TokIdentifier
 		nest TokParenOpen TokParenClose {
@@ -1010,11 +1010,11 @@ PARSE {
 	For now functions only can include rulesets...
 	Later, the function functionality will be extended with iteration over datasets, etc.
 	*/
-	FUNCTION_BODY -> transparent gr_FUNCTION_BODY {
+	rule FUNCTION_BODY -> transparent gr_FUNCTION_BODY {
 		INCLUDE_STMT*
 	}
 
-	INCLUDE_STMT -> NodeIncludeRuleset sync (TokSemi) {
+	rule INCLUDE_STMT -> NodeIncludeRuleset sync (TokSemi) {
 		virtual TokKWInclude
 		RULESET_REFERENCE
 		(
@@ -1026,7 +1026,7 @@ PARSE {
 		virtual TokSemi
 	}
 
-	RULESET_REFERENCE -> NodeRulesetReference {
+	rule RULESET_REFERENCE -> NodeRulesetReference {
 		NodeRulesetReferenceSegment : TokIdentifier
 		(
 			virtual TokDot
@@ -1034,7 +1034,7 @@ PARSE {
 		)?
 	}
 
-	RULESET_OVERRIDE -> NodeRulesetOverride {
+	rule RULESET_OVERRIDE -> NodeRulesetOverride {
 		RULESET_OVERRIDE_STMT
 		(
 			virtual TokComma
@@ -1042,19 +1042,19 @@ PARSE {
 		)*
 	}
 
-	RULESET_OVERRIDE_STMT -> NodeRulesetOverrideEntry {
+	rule RULESET_OVERRIDE_STMT -> NodeRulesetOverrideEntry {
 		SOFT_OVERRIDE_KEY
 		virtual TokColon
 		RULESET_OVERRIDE_TARGET
 	}
 
-	SOFT_OVERRIDE_KEY -> transparent gr_SOFT_OVERRIDE_KEY {
+	rule SOFT_OVERRIDE_KEY -> transparent gr_SOFT_OVERRIDE_KEY {
 	    NodeRulesetOverrideKey : TokIdentifier
 	    | NodeRulesetOverrideKey : TokKWTheme
 	    | NodeRulesetOverrideKey : TokKWAdapter
 	}
 
-	RULESET_OVERRIDE_TARGET -> NodeRulesetOverrideTarget {
+	rule RULESET_OVERRIDE_TARGET -> NodeRulesetOverrideTarget {
 		ENTITY_REF_WRAP
 	}
 
@@ -1062,7 +1062,7 @@ PARSE {
 	// GENERAL
 	// ---------------------------------------------------------
 
-	IMPORT_STMT -> NodeImport sync (TokSemi) {
+	rule IMPORT_STMT -> NodeImport sync (TokSemi) {
 		virtual TokKWImport
 		MODULE_PATH
 		(
@@ -1072,7 +1072,7 @@ PARSE {
 		virtual TokSemi
 	}
 
-	STRING_ARRAY -> NodeStringArray {
+	rule STRING_ARRAY -> NodeStringArray {
 		nest TokBracketOpen TokBracketClose {
 			NodeStringLiteral : TokStringLiteral
 			(
@@ -1082,7 +1082,7 @@ PARSE {
 		}
 	}
 
-	VARIABLE_REF -> NodeVariableRef {
+	rule VARIABLE_REF -> NodeVariableRef {
 		virtual TokDollar
 		NodeVariableName : TokIdentifier
 	}

@@ -57,18 +57,18 @@ PARSE {
 		RULEFORGE_WHITESPACE_ROLE RULEFORGE_COMMENT_ROLE
 	}
 
-	PROGRAM -> NodeProgram {
+	rule PROGRAM -> NodeProgram {
 		(
 			NEW_LINE | VARIABLE_STATEMENT
 		)*
 		virtual TokEOF
 	}
 
-	NEW_LINE -> NodeNewLine {
+	rule NEW_LINE -> NodeNewLine {
 		virtual TokNewLine
 	}
 
-	VARIABLE_STATEMENT -> NodeVariableDeclaration {
+	rule VARIABLE_STATEMENT -> NodeVariableDeclaration {
 		NodeVariableName : TokIdentifier
 		virtual TokEquals
 		NodeVariableValue : TokStringLiteral

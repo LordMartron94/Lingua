@@ -67,12 +67,12 @@ PARSE {
 		GOWORK_WHITESPACE_ROLE GOWORK_COMMENT_ROLE
 	};
 
-	PROGRAM -> NodeProgram {
+	rule PROGRAM -> NodeProgram {
 		BLOCK*
 		virtual TokEOF
 	}
 
-	BLOCK -> transparent gr_BLOCK {
+	rule BLOCK -> transparent gr_BLOCK {
 		GO_DECLARATION | 
 		TOOLCHAIN_STATEMENT | 
 		GODEBUG_STATEMENT | 
@@ -80,17 +80,17 @@ PARSE {
 		REPLACE_STATEMENT
 	}
 
-	GO_DECLARATION -> NodeGoDecl {
+	rule GO_DECLARATION -> NodeGoDecl {
 		virtual TokKWGo
 		NodeGoVersion : TokFloat
 	}
 
-	TOOLCHAIN_STATEMENT -> NodeToolchainStatement {
+	rule TOOLCHAIN_STATEMENT -> NodeToolchainStatement {
 		virtual TokKWToolchain
 		NodeToolchainName : TokModulePath
 	}
 
-	GODEBUG_STATEMENT -> NodeGodebugStatement {
+	rule GODEBUG_STATEMENT -> NodeGodebugStatement {
 		virtual TokKWGodebug
 		(
 			GODEBUG_REFERENCE |
@@ -100,13 +100,13 @@ PARSE {
 		)
 	}
 
-	GODEBUG_REFERENCE -> NodeGodebugReference {
+	rule GODEBUG_REFERENCE -> NodeGodebugReference {
 		NodeGodebugKey : TokModulePath
 		virtual TokEquals
 		NodeGodebugValue : TokModulePath
 	}
 
-	USE_STATEMENT -> NodeUseStatement {
+	rule USE_STATEMENT -> NodeUseStatement {
 		virtual TokKWUse
 		(
 			USE_REFERENCE |
@@ -116,11 +116,11 @@ PARSE {
 		)
 	}
 
-	USE_REFERENCE -> NodeUseReference {
+	rule USE_REFERENCE -> NodeUseReference {
 		NodeUsePath : TokModulePath
 	}
 
-	REPLACE_STATEMENT -> NodeReplaceStatement {
+	rule REPLACE_STATEMENT -> NodeReplaceStatement {
 		virtual TokKWReplace
 		(
 			REPLACE_REFERENCE |
@@ -130,7 +130,7 @@ PARSE {
 		)
 	}
 
-	REPLACE_REFERENCE -> NodeReplaceReference {
+	rule REPLACE_REFERENCE -> NodeReplaceReference {
 		NodeReplaceOriginal : TokModulePath
 		NodeReplaceOriginalVersion : TokVersion?
 		virtual TokArrow
