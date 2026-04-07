@@ -70,62 +70,58 @@ type GoWorkNode uint32
 const (
 	GoWork_BLOCK GoWorkNode = 1
 	GoWork_ERROR_NODE GoWorkNode = 2
-	GoWork_GODEBUG_REFERENCE GoWorkNode = 3
-	GoWork_GODEBUG_STATEMENT GoWorkNode = 4
-	GoWork_GO_DECLARATION GoWorkNode = 5
-	GoWork_NodeGoDecl GoWorkNode = 6
-	GoWork_NodeGoVersion GoWorkNode = 7
-	GoWork_NodeGodebugKey GoWorkNode = 8
-	GoWork_NodeGodebugReference GoWorkNode = 9
-	GoWork_NodeGodebugStatement GoWorkNode = 10
-	GoWork_NodeGodebugValue GoWorkNode = 11
-	GoWork_NodeProgram GoWorkNode = 12
-	GoWork_NodeReplaceOriginal GoWorkNode = 13
-	GoWork_NodeReplaceOriginalVersion GoWorkNode = 14
-	GoWork_NodeReplaceReference GoWorkNode = 15
-	GoWork_NodeReplaceStatement GoWorkNode = 16
-	GoWork_NodeReplaceTarget GoWorkNode = 17
-	GoWork_NodeReplaceTargetVersion GoWorkNode = 18
-	GoWork_NodeToolchainName GoWorkNode = 19
-	GoWork_NodeToolchainStatement GoWorkNode = 20
-	GoWork_NodeUsePath GoWorkNode = 21
-	GoWork_NodeUseReference GoWorkNode = 22
-	GoWork_NodeUseStatement GoWorkNode = 23
-	GoWork_REPLACE_REFERENCE GoWorkNode = 24
-	GoWork_REPLACE_STATEMENT GoWorkNode = 25
-	GoWork_TOOLCHAIN_STATEMENT GoWorkNode = 26
-	GoWork_USE_REFERENCE GoWorkNode = 27
-	GoWork_USE_STATEMENT GoWorkNode = 28
-	GoWork_gr_BLOCK GoWorkNode = 29
+	GoWork_NodeGodebugReference GoWorkNode = 3
+	GoWork_NodeProgram GoWorkNode = 4
+	GoWork_NodeReplaceReference GoWorkNode = 5
+	GoWork_NodeUsePath GoWorkNode = 6
+	GoWork_NodeUseReference GoWorkNode = 7
+	GoWork_NodeUseStatement GoWorkNode = 8
+	GoWork_STD__GODEBUG_REFERENCE GoWorkNode = 9
+	GoWork_STD__NodeGoDecl GoWorkNode = 10
+	GoWork_STD__NodeGoVersion GoWorkNode = 11
+	GoWork_STD__NodeGodebugKey GoWorkNode = 12
+	GoWork_STD__NodeGodebugReference GoWorkNode = 13
+	GoWork_STD__NodeGodebugStatement GoWorkNode = 14
+	GoWork_STD__NodeGodebugValue GoWorkNode = 15
+	GoWork_STD__NodeReplaceOriginal GoWorkNode = 16
+	GoWork_STD__NodeReplaceOriginalVersion GoWorkNode = 17
+	GoWork_STD__NodeReplaceReference GoWorkNode = 18
+	GoWork_STD__NodeReplaceStatement GoWorkNode = 19
+	GoWork_STD__NodeReplaceTarget GoWorkNode = 20
+	GoWork_STD__NodeReplaceTargetVersion GoWorkNode = 21
+	GoWork_STD__NodeToolchainName GoWorkNode = 22
+	GoWork_STD__NodeToolchainStatement GoWorkNode = 23
+	GoWork_STD__REPLACE_REFERENCE GoWorkNode = 24
+	GoWork_USE_REFERENCE GoWorkNode = 25
+	GoWork_USE_STATEMENT GoWorkNode = 26
+	GoWork_gr_BLOCK GoWorkNode = 27
 )
 
 var GoWorkNodeNames = [...]string{
 	"BLOCK",
 	"ERROR_NODE",
-	"GODEBUG_REFERENCE",
-	"GODEBUG_STATEMENT",
-	"GO_DECLARATION",
-	"NodeGoDecl",
-	"NodeGoVersion",
-	"NodeGodebugKey",
 	"NodeGodebugReference",
-	"NodeGodebugStatement",
-	"NodeGodebugValue",
 	"NodeProgram",
-	"NodeReplaceOriginal",
-	"NodeReplaceOriginalVersion",
 	"NodeReplaceReference",
-	"NodeReplaceStatement",
-	"NodeReplaceTarget",
-	"NodeReplaceTargetVersion",
-	"NodeToolchainName",
-	"NodeToolchainStatement",
 	"NodeUsePath",
 	"NodeUseReference",
 	"NodeUseStatement",
-	"REPLACE_REFERENCE",
-	"REPLACE_STATEMENT",
-	"TOOLCHAIN_STATEMENT",
+	"STD__GODEBUG_REFERENCE",
+	"STD__NodeGoDecl",
+	"STD__NodeGoVersion",
+	"STD__NodeGodebugKey",
+	"STD__NodeGodebugReference",
+	"STD__NodeGodebugStatement",
+	"STD__NodeGodebugValue",
+	"STD__NodeReplaceOriginal",
+	"STD__NodeReplaceOriginalVersion",
+	"STD__NodeReplaceReference",
+	"STD__NodeReplaceStatement",
+	"STD__NodeReplaceTarget",
+	"STD__NodeReplaceTargetVersion",
+	"STD__NodeToolchainName",
+	"STD__NodeToolchainStatement",
+	"STD__REPLACE_REFERENCE",
 	"USE_REFERENCE",
 	"USE_STATEMENT",
 	"gr_BLOCK",

@@ -76,8 +76,8 @@ var goModSemanticManifest = toolchain.SemanticManifest[GoModToken, GoModNode]{
 		// ------------------------------------------------
 		// Go Version Declaration
 		// ------------------------------------------------
-		GoMod_NodeGoDecl:    {Scopes: []string{"meta.declaration.go.version"}},
-		GoMod_NodeGoVersion: {Scopes: []string{"constant.numeric.version"}},
+		GoMod_STD__NodeGoDecl:    {Scopes: []string{"meta.declaration.go.version"}},
+		GoMod_STD__NodeGoVersion: {Scopes: []string{"constant.numeric.version"}},
 
 		// ------------------------------------------------
 		// Require Block
@@ -90,12 +90,12 @@ var goModSemanticManifest = toolchain.SemanticManifest[GoModToken, GoModNode]{
 		// ------------------------------------------------
 		// Replace Block
 		// ------------------------------------------------
-		GoMod_NodeReplaceStatement:       {Scopes: []string{"meta.declaration.replace"}},
-		GoMod_NodeReplaceReference:       {Scopes: []string{"meta.reference.replace"}},
-		GoMod_NodeReplaceOriginal:        {Scopes: []string{"entity.name.reference.module.original"}},
-		GoMod_NodeReplaceOriginalVersion: {Scopes: []string{"constant.numeric.version"}},
-		GoMod_NodeReplaceTarget:          {Scopes: []string{"entity.name.reference.module.target"}},
-		GoMod_NodeReplaceTargetVersion:   {Scopes: []string{"constant.numeric.version"}},
+		GoMod_STD__NodeReplaceStatement:       {Scopes: []string{"meta.declaration.replace"}},
+		GoMod_STD__NodeReplaceReference:       {Scopes: []string{"meta.reference.replace"}},
+		GoMod_STD__NodeReplaceOriginal:        {Scopes: []string{"entity.name.reference.module.original"}},
+		GoMod_STD__NodeReplaceOriginalVersion: {Scopes: []string{"constant.numeric.version"}},
+		GoMod_STD__NodeReplaceTarget:          {Scopes: []string{"entity.name.reference.module.target"}},
+		GoMod_STD__NodeReplaceTargetVersion:   {Scopes: []string{"constant.numeric.version"}},
 
 		// ------------------------------------------------
 		// Exclude Block
@@ -115,16 +115,16 @@ var goModSemanticManifest = toolchain.SemanticManifest[GoModToken, GoModNode]{
 		// ------------------------------------------------
 		// Toolchain Block
 		// ------------------------------------------------
-		GoMod_NodeToolchainStatement: {Scopes: []string{"meta.declaration.toolchain"}},
-		GoMod_NodeToolchainName:      {Scopes: []string{"entity.name.reference.toolchain"}},
+		GoMod_STD__NodeToolchainStatement: {Scopes: []string{"meta.declaration.toolchain"}},
+		GoMod_STD__NodeToolchainName:      {Scopes: []string{"entity.name.reference.toolchain"}},
 
 		// ------------------------------------------------
 		// Godebug Block
 		// ------------------------------------------------
-		GoMod_NodeGodebugStatement: {Scopes: []string{"meta.declaration.godebug"}},
-		GoMod_NodeGodebugReference: {Scopes: []string{"meta.reference.godebug"}},
-		GoMod_NodeGodebugKey:       {Scopes: []string{"support.type.property-name"}},
-		GoMod_NodeGodebugValue:     {Scopes: []string{"constant.language.value"}},
+		GoMod_STD__NodeGodebugStatement: {Scopes: []string{"meta.declaration.godebug"}},
+		GoMod_STD__NodeGodebugReference: {Scopes: []string{"meta.reference.godebug"}},
+		GoMod_STD__NodeGodebugKey:       {Scopes: []string{"support.type.property-name"}},
+		GoMod_STD__NodeGodebugValue:     {Scopes: []string{"constant.language.value"}},
 
 		// ------------------------------------------------
 		// Tool Block

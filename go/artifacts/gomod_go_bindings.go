@@ -85,82 +85,67 @@ const (
 	GoMod_BLOCK GoModNode = 1
 	GoMod_ERROR_NODE GoModNode = 2
 	GoMod_EXCLUDE_STATEMENT GoModNode = 3
-	GoMod_GODEBUG_REFERENCE GoModNode = 4
-	GoMod_GODEBUG_STATEMENT GoModNode = 5
-	GoMod_GO_DECLARATION GoModNode = 6
-	GoMod_MODULE_REFERENCE GoModNode = 7
-	GoMod_MODULE_STATEMENT GoModNode = 8
-	GoMod_NodeExcludeStatement GoModNode = 9
-	GoMod_NodeGoDecl GoModNode = 10
-	GoMod_NodeGoVersion GoModNode = 11
-	GoMod_NodeGodebugKey GoModNode = 12
-	GoMod_NodeGodebugReference GoModNode = 13
-	GoMod_NodeGodebugStatement GoModNode = 14
-	GoMod_NodeGodebugValue GoModNode = 15
-	GoMod_NodeModuleName GoModNode = 16
-	GoMod_NodeModuleReference GoModNode = 17
-	GoMod_NodeModuleReferenceIdent GoModNode = 18
-	GoMod_NodeModuleReferenceVersion GoModNode = 19
-	GoMod_NodeModuleStatement GoModNode = 20
-	GoMod_NodeProgram GoModNode = 21
-	GoMod_NodeReplaceOriginal GoModNode = 22
-	GoMod_NodeReplaceOriginalVersion GoModNode = 23
-	GoMod_NodeReplaceReference GoModNode = 24
-	GoMod_NodeReplaceStatement GoModNode = 25
-	GoMod_NodeReplaceTarget GoModNode = 26
-	GoMod_NodeReplaceTargetVersion GoModNode = 27
-	GoMod_NodeRequireStatement GoModNode = 28
-	GoMod_NodeRetractHigh GoModNode = 29
-	GoMod_NodeRetractLow GoModNode = 30
-	GoMod_NodeRetractRange GoModNode = 31
-	GoMod_NodeRetractReference GoModNode = 32
-	GoMod_NodeRetractSingle GoModNode = 33
-	GoMod_NodeRetractStatement GoModNode = 34
-	GoMod_NodeToolPath GoModNode = 35
-	GoMod_NodeToolReference GoModNode = 36
-	GoMod_NodeToolStatement GoModNode = 37
-	GoMod_NodeToolchainName GoModNode = 38
-	GoMod_NodeToolchainStatement GoModNode = 39
-	GoMod_REPLACE_REFERENCE GoModNode = 40
-	GoMod_REPLACE_STATEMENT GoModNode = 41
-	GoMod_REQUIRE_STATEMENT GoModNode = 42
-	GoMod_RETRACT_RANGE GoModNode = 43
-	GoMod_RETRACT_REFERENCE GoModNode = 44
-	GoMod_RETRACT_STATEMENT GoModNode = 45
-	GoMod_TOOLCHAIN_STATEMENT GoModNode = 46
-	GoMod_TOOL_REFERENCE GoModNode = 47
-	GoMod_TOOL_STATEMENT GoModNode = 48
-	GoMod_gr_BLOCK GoModNode = 49
+	GoMod_MODULE_REFERENCE GoModNode = 4
+	GoMod_MODULE_STATEMENT GoModNode = 5
+	GoMod_NodeExcludeStatement GoModNode = 6
+	GoMod_NodeGodebugReference GoModNode = 7
+	GoMod_NodeModuleName GoModNode = 8
+	GoMod_NodeModuleReference GoModNode = 9
+	GoMod_NodeModuleReferenceIdent GoModNode = 10
+	GoMod_NodeModuleReferenceVersion GoModNode = 11
+	GoMod_NodeModuleStatement GoModNode = 12
+	GoMod_NodeProgram GoModNode = 13
+	GoMod_NodeReplaceReference GoModNode = 14
+	GoMod_NodeRequireStatement GoModNode = 15
+	GoMod_NodeRetractHigh GoModNode = 16
+	GoMod_NodeRetractLow GoModNode = 17
+	GoMod_NodeRetractRange GoModNode = 18
+	GoMod_NodeRetractReference GoModNode = 19
+	GoMod_NodeRetractSingle GoModNode = 20
+	GoMod_NodeRetractStatement GoModNode = 21
+	GoMod_NodeToolPath GoModNode = 22
+	GoMod_NodeToolReference GoModNode = 23
+	GoMod_NodeToolStatement GoModNode = 24
+	GoMod_REQUIRE_STATEMENT GoModNode = 25
+	GoMod_RETRACT_RANGE GoModNode = 26
+	GoMod_RETRACT_REFERENCE GoModNode = 27
+	GoMod_RETRACT_STATEMENT GoModNode = 28
+	GoMod_STD__GODEBUG_REFERENCE GoModNode = 29
+	GoMod_STD__NodeGoDecl GoModNode = 30
+	GoMod_STD__NodeGoVersion GoModNode = 31
+	GoMod_STD__NodeGodebugKey GoModNode = 32
+	GoMod_STD__NodeGodebugReference GoModNode = 33
+	GoMod_STD__NodeGodebugStatement GoModNode = 34
+	GoMod_STD__NodeGodebugValue GoModNode = 35
+	GoMod_STD__NodeReplaceOriginal GoModNode = 36
+	GoMod_STD__NodeReplaceOriginalVersion GoModNode = 37
+	GoMod_STD__NodeReplaceReference GoModNode = 38
+	GoMod_STD__NodeReplaceStatement GoModNode = 39
+	GoMod_STD__NodeReplaceTarget GoModNode = 40
+	GoMod_STD__NodeReplaceTargetVersion GoModNode = 41
+	GoMod_STD__NodeToolchainName GoModNode = 42
+	GoMod_STD__NodeToolchainStatement GoModNode = 43
+	GoMod_STD__REPLACE_REFERENCE GoModNode = 44
+	GoMod_TOOL_REFERENCE GoModNode = 45
+	GoMod_TOOL_STATEMENT GoModNode = 46
+	GoMod_gr_BLOCK GoModNode = 47
 )
 
 var GoModNodeNames = [...]string{
 	"BLOCK",
 	"ERROR_NODE",
 	"EXCLUDE_STATEMENT",
-	"GODEBUG_REFERENCE",
-	"GODEBUG_STATEMENT",
-	"GO_DECLARATION",
 	"MODULE_REFERENCE",
 	"MODULE_STATEMENT",
 	"NodeExcludeStatement",
-	"NodeGoDecl",
-	"NodeGoVersion",
-	"NodeGodebugKey",
 	"NodeGodebugReference",
-	"NodeGodebugStatement",
-	"NodeGodebugValue",
 	"NodeModuleName",
 	"NodeModuleReference",
 	"NodeModuleReferenceIdent",
 	"NodeModuleReferenceVersion",
 	"NodeModuleStatement",
 	"NodeProgram",
-	"NodeReplaceOriginal",
-	"NodeReplaceOriginalVersion",
 	"NodeReplaceReference",
-	"NodeReplaceStatement",
-	"NodeReplaceTarget",
-	"NodeReplaceTargetVersion",
 	"NodeRequireStatement",
 	"NodeRetractHigh",
 	"NodeRetractLow",
@@ -171,15 +156,26 @@ var GoModNodeNames = [...]string{
 	"NodeToolPath",
 	"NodeToolReference",
 	"NodeToolStatement",
-	"NodeToolchainName",
-	"NodeToolchainStatement",
-	"REPLACE_REFERENCE",
-	"REPLACE_STATEMENT",
 	"REQUIRE_STATEMENT",
 	"RETRACT_RANGE",
 	"RETRACT_REFERENCE",
 	"RETRACT_STATEMENT",
-	"TOOLCHAIN_STATEMENT",
+	"STD__GODEBUG_REFERENCE",
+	"STD__NodeGoDecl",
+	"STD__NodeGoVersion",
+	"STD__NodeGodebugKey",
+	"STD__NodeGodebugReference",
+	"STD__NodeGodebugStatement",
+	"STD__NodeGodebugValue",
+	"STD__NodeReplaceOriginal",
+	"STD__NodeReplaceOriginalVersion",
+	"STD__NodeReplaceReference",
+	"STD__NodeReplaceStatement",
+	"STD__NodeReplaceTarget",
+	"STD__NodeReplaceTargetVersion",
+	"STD__NodeToolchainName",
+	"STD__NodeToolchainStatement",
+	"STD__REPLACE_REFERENCE",
 	"TOOL_REFERENCE",
 	"TOOL_STATEMENT",
 	"gr_BLOCK",

@@ -1,0 +1,90 @@
+--- "Go Std" v1.0.0 | lspec v1.0.0 ---
+
+PRAGMA {
+	lspec { library = true; }
+};
+
+PATTERN {
+	export pat_TokEOF              : [];
+	export pat_TokWhitespace       : (['\t', '\n', '\r', ' '])+;
+	export pat_TokLineComment      : "/" "/" (!['\n', '\r'])*;
+
+	// Allows '.' at the start to support relative local paths in replace/use directives.
+	export pat_TokModulePath       : (['A'..'Z', 'a'..'z', '0'..'9', '.']) (['A'..'Z', 'a'..'z', '0'..'9', '.', '-', '_', '~', '/'])*;
+	export pat_TokFloat            : ('0'..'9')+ '.' ('0'..'9')+;
+
+	// Accounts for SemVer pre-releases, hashes, and build metadata.
+	export pat_TokVersion          : "v" ('0'..'9')+ (['-', '.', '+', 'A'..'Z', 'a'..'z', '0'..'9'])*;
+
+	export pat_TokKWGo             : "go";
+	export pat_TokKWToolchain      : "toolchain";
+	export pat_TokKWGodebug        : "godebug";
+	export pat_TokKWReplace        : "replace";
+
+	export pat_ParenOpen           : '(';
+	export pat_ParenClose          : ')';
+	export pat_Arrow               : "=>";
+	export pat_Equals              : '=';
+}
+
+LEX {
+	state INITIAL {
+		1 TokKWGo          -> STD_STRUCTURAL_ROLE : pat_TokKWGo;
+		1 TokKWToolchain   -> STD_STRUCTURAL_ROLE : pat_TokKWToolchain;
+		1 TokKWGodebug     -> STD_STRUCTURAL_ROLE : pat_TokKWGodebug;
+		1 TokKWReplace     -> STD_STRUCTURAL_ROLE : pat_TokKWReplace;
+		1 TokModulePath    -> STD_STRUCTURAL_ROLE : pat_TokModulePath;
+		1 TokFloat         -> STD_STRUCTURAL_ROLE : pat_TokFloat;
+		1 TokVersion       -> STD_STRUCTURAL_ROLE : pat_TokVersion;
+		0 TokParenOpen     -> STD_STRUCTURAL_ROLE : pat_ParenOpen;
+		0 TokParenClose    -> STD_STRUCTURAL_ROLE : pat_ParenClose;
+		0 TokArrow         -> STD_STRUCTURAL_ROLE : pat_Arrow;
+		0 TokEquals        -> STD_STRUCTURAL_ROLE : pat_Equals;
+	}
+}
+
+PARSE {
+	export rule GO_DECLARATION -> NodeGoDecl {
+		virtual TokKWGo
+		NodeGoVersion : TokFloat
+	}
+
+	export rule TOOLCHAIN_STATEMENT -> NodeToolchainStatement {
+		virtual TokKWToolchain
+		NodeToolchainName : TokModulePath
+	}
+
+	export rule GODEBUG_STATEMENT -> NodeGodebugStatement {
+		virtual TokKWGodebug
+		(
+			GODEBUG_REFERENCE |
+			nest TokParenOpen TokParenClose {
+				GODEBUG_REFERENCE*
+			}
+		)
+	}
+
+	export rule GODEBUG_REFERENCE -> NodeGodebugReference {
+		NodeGodebugKey : TokModulePath
+		virtual TokEquals
+		NodeGodebugValue : TokModulePath
+	}
+
+	export rule REPLACE_STATEMENT -> NodeReplaceStatement {
+		virtual TokKWReplace
+		(
+			REPLACE_REFERENCE |
+			nest TokParenOpen TokParenClose {
+				REPLACE_REFERENCE*
+			}
+		)
+	}
+
+	export rule REPLACE_REFERENCE -> NodeReplaceReference {
+		NodeReplaceOriginal : TokModulePath
+		NodeReplaceOriginalVersion : TokVersion?
+		virtual TokArrow
+		NodeReplaceTarget : TokModulePath
+		NodeReplaceTargetVersion : TokVersion?
+	}
+}

@@ -17,48 +17,34 @@ PRAGMA {
 	}
 };
 
+IMPORT {
+	"std.lspec" as STD;
+}
+
 PATTERN {
-	pat_TokEOF              : [];
-	pat_TokWhitespace       : (['\t', '\n', '\r', ' '])+;
-	pat_TokLineComment      : "/" "/" (!['\n', '\r'])*;
-
-	pat_TokModulePath       : (['A'..'Z', 'a'..'z', '0'..'9', '.']) (['A'..'Z', 'a'..'z', '0'..'9', '.', '-', '_', '~', '/'])*;
-	pat_TokFloat            : ('0'..'9')+ '.' ('0'..'9')+;
-	pat_TokVersion          : "v" ('0'..'9')+ (['-', '.', '+', 'A'..'Z', 'a'..'z', '0'..'9'])*;
-
-	pat_TokKWGo             : "go";
-	pat_TokKWToolchain      : "toolchain";
-	pat_TokKWGodebug        : "godebug";
 	pat_TokKWUse            : "use";
-	pat_TokKWReplace        : "replace";
-
-	pat_ParenOpen           : '(';
-	pat_ParenClose          : ')';
-	pat_Arrow               : "=" ">";
-	pat_Equals              : '=';
 }
 
 LEX {
 	state INITIAL {
-	2 TokKWGo               -> GOWORK_STRUCTURAL_ROLE : pat_TokKWGo;
-	2 TokKWToolchain        -> GOWORK_STRUCTURAL_ROLE : pat_TokKWToolchain;
-	2 TokKWGodebug          -> GOWORK_STRUCTURAL_ROLE : pat_TokKWGodebug;
 	2 TokKWUse              -> GOWORK_STRUCTURAL_ROLE : pat_TokKWUse;
-	2 TokKWReplace          -> GOWORK_STRUCTURAL_ROLE : pat_TokKWReplace;
+	1 TokKWGo               -> GOWORK_STRUCTURAL_ROLE : using STD.pat_TokKWGo;
+	1 TokKWToolchain        -> GOWORK_STRUCTURAL_ROLE : using STD.pat_TokKWToolchain;
+	1 TokKWGodebug          -> GOWORK_STRUCTURAL_ROLE : using STD.pat_TokKWGodebug;
+	1 TokKWReplace          -> GOWORK_STRUCTURAL_ROLE : using STD.pat_TokKWReplace;
+	1 TokModulePath         -> GOWORK_STRUCTURAL_ROLE : using STD.pat_TokModulePath;
+	1 TokVersion            -> GOWORK_STRUCTURAL_ROLE : using STD.pat_TokVersion;
+	1 TokFloat              -> GOWORK_STRUCTURAL_ROLE : using STD.pat_TokFloat;
 
-	1 TokVersion            -> GOWORK_STRUCTURAL_ROLE : pat_TokVersion;
-	1 TokModulePath         -> GOWORK_STRUCTURAL_ROLE : pat_TokModulePath;
-	1 TokFloat              -> GOWORK_STRUCTURAL_ROLE : pat_TokFloat;
+	0 TokWhitespace         -> GOWORK_WHITESPACE_ROLE : using STD.pat_TokWhitespace;
+	0 TokLineComment        -> GOWORK_COMMENT_ROLE    : using STD.pat_TokLineComment;
 
-	0 TokWhitespace         -> GOWORK_WHITESPACE_ROLE : pat_TokWhitespace;
-	0 TokLineComment        -> GOWORK_COMMENT_ROLE    : pat_TokLineComment;
+	0 TokParenOpen          -> GOWORK_STRUCTURAL_ROLE : using STD.pat_ParenOpen;
+	0 TokParenClose         -> GOWORK_STRUCTURAL_ROLE : using STD.pat_ParenClose;
+	0 TokArrow              -> GOWORK_STRUCTURAL_ROLE : using STD.pat_Arrow;
+	0 TokEquals             -> GOWORK_STRUCTURAL_ROLE : using STD.pat_Equals;
 
-	0 TokParenOpen          -> GOWORK_STRUCTURAL_ROLE : pat_ParenOpen;
-	0 TokParenClose         -> GOWORK_STRUCTURAL_ROLE : pat_ParenClose;
-	0 TokArrow              -> GOWORK_STRUCTURAL_ROLE : pat_Arrow;
-	0 TokEquals             -> GOWORK_STRUCTURAL_ROLE : pat_Equals;
-
-	0 TokEOF                -> GOWORK_STRUCTURAL_ROLE : pat_TokEOF %% EOF=true %%;
+	0 TokEOF                -> GOWORK_STRUCTURAL_ROLE : using STD.pat_TokEOF %% EOF=true %%;
 	}
 }
 
@@ -73,38 +59,16 @@ PARSE {
 	}
 
 	rule BLOCK -> transparent gr_BLOCK {
-		GO_DECLARATION | 
-		TOOLCHAIN_STATEMENT | 
-		GODEBUG_STATEMENT | 
+		using STD.GO_DECLARATION |
+		using STD.TOOLCHAIN_STATEMENT |
+		using STD.GODEBUG_STATEMENT |
 		USE_STATEMENT | 
-		REPLACE_STATEMENT
+		using STD.REPLACE_STATEMENT
 	}
 
-	rule GO_DECLARATION -> NodeGoDecl {
-		virtual TokKWGo
-		NodeGoVersion : TokFloat
-	}
+	rule REPLACE_REFERENCE -> NodeReplaceReference { using STD.REPLACE_REFERENCE }
 
-	rule TOOLCHAIN_STATEMENT -> NodeToolchainStatement {
-		virtual TokKWToolchain
-		NodeToolchainName : TokModulePath
-	}
-
-	rule GODEBUG_STATEMENT -> NodeGodebugStatement {
-		virtual TokKWGodebug
-		(
-			GODEBUG_REFERENCE |
-			nest TokParenOpen TokParenClose {
-				GODEBUG_REFERENCE*
-			}
-		)
-	}
-
-	rule GODEBUG_REFERENCE -> NodeGodebugReference {
-		NodeGodebugKey : TokModulePath
-		virtual TokEquals
-		NodeGodebugValue : TokModulePath
-	}
+	rule GODEBUG_REFERENCE -> NodeGodebugReference { using STD.GODEBUG_REFERENCE }
 
 	rule USE_STATEMENT -> NodeUseStatement {
 		virtual TokKWUse
@@ -120,21 +84,4 @@ PARSE {
 		NodeUsePath : TokModulePath
 	}
 
-	rule REPLACE_STATEMENT -> NodeReplaceStatement {
-		virtual TokKWReplace
-		(
-			REPLACE_REFERENCE |
-			nest TokParenOpen TokParenClose {
-				REPLACE_REFERENCE*
-			}
-		)
-	}
-
-	rule REPLACE_REFERENCE -> NodeReplaceReference {
-		NodeReplaceOriginal : TokModulePath
-		NodeReplaceOriginalVersion : TokVersion?
-		virtual TokArrow
-		NodeReplaceTarget : TokModulePath
-		NodeReplaceTargetVersion : TokVersion?
-	}
 }

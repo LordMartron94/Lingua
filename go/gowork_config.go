@@ -55,8 +55,8 @@ var goWorkSemanticManifest = toolchain.SemanticManifest[GoWorkToken, GoWorkNode]
 		// ------------------------------------------------
 		// Go Version Declaration
 		// ------------------------------------------------
-		GoWork_NodeGoDecl:    {Scopes: []string{"meta.declaration.go.version"}},
-		GoWork_NodeGoVersion: {Scopes: []string{"constant.numeric.version"}},
+		GoWork_STD__NodeGoDecl:    {Scopes: []string{"meta.declaration.go.version"}},
+		GoWork_STD__NodeGoVersion: {Scopes: []string{"constant.numeric.version"}},
 
 		// ------------------------------------------------
 		// Use Block (Workspace specific)
@@ -67,26 +67,26 @@ var goWorkSemanticManifest = toolchain.SemanticManifest[GoWorkToken, GoWorkNode]
 		// ------------------------------------------------
 		// Replace Block
 		// ------------------------------------------------
-		GoWork_NodeReplaceStatement:       {Scopes: []string{"meta.declaration.replace"}},
-		GoWork_NodeReplaceReference:       {Scopes: []string{"meta.reference.replace"}},
-		GoWork_NodeReplaceOriginal:        {Scopes: []string{"entity.name.reference.module.original"}},
-		GoWork_NodeReplaceOriginalVersion: {Scopes: []string{"constant.numeric.version"}},
-		GoWork_NodeReplaceTarget:          {Scopes: []string{"entity.name.reference.module.target"}},
-		GoWork_NodeReplaceTargetVersion:   {Scopes: []string{"constant.numeric.version"}},
+		GoWork_STD__NodeReplaceStatement:       {Scopes: []string{"meta.declaration.replace"}},
+		GoWork_STD__NodeReplaceReference:       {Scopes: []string{"meta.reference.replace"}},
+		GoWork_STD__NodeReplaceOriginal:        {Scopes: []string{"entity.name.reference.module.original"}},
+		GoWork_STD__NodeReplaceOriginalVersion: {Scopes: []string{"constant.numeric.version"}},
+		GoWork_STD__NodeReplaceTarget:          {Scopes: []string{"entity.name.reference.module.target"}},
+		GoWork_STD__NodeReplaceTargetVersion:   {Scopes: []string{"constant.numeric.version"}},
 
 		// ------------------------------------------------
 		// Toolchain Block
 		// ------------------------------------------------
-		GoWork_NodeToolchainStatement: {Scopes: []string{"meta.declaration.toolchain"}},
-		GoWork_NodeToolchainName:      {Scopes: []string{"entity.name.reference.toolchain"}},
+		GoWork_STD__NodeToolchainStatement: {Scopes: []string{"meta.declaration.toolchain"}},
+		GoWork_STD__NodeToolchainName:      {Scopes: []string{"entity.name.reference.toolchain"}},
 
 		// ------------------------------------------------
 		// Godebug Block
 		// ------------------------------------------------
-		GoWork_NodeGodebugStatement: {Scopes: []string{"meta.declaration.godebug"}},
-		GoWork_NodeGodebugReference: {Scopes: []string{"meta.reference.godebug"}},
-		GoWork_NodeGodebugKey:       {Scopes: []string{"support.type.property-name"}},
-		GoWork_NodeGodebugValue:     {Scopes: []string{"constant.language.value"}},
+		GoWork_STD__NodeGodebugStatement: {Scopes: []string{"meta.declaration.godebug"}},
+		GoWork_STD__NodeGodebugReference: {Scopes: []string{"meta.reference.godebug"}},
+		GoWork_STD__NodeGodebugKey:       {Scopes: []string{"support.type.property-name"}},
+		GoWork_STD__NodeGodebugValue:     {Scopes: []string{"constant.language.value"}},
 	},
 }
 

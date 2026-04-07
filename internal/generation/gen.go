@@ -23,7 +23,28 @@ type NodeConstraint interface {
 	comparable
 }
 
-func manifestKey[T comparable](k T) string {
+// manifestNodeKey turns a node key into the string form consumed by
+// SemanticManifestRemapFromStrings. Node enums should keep symbolic names.
+func manifestNodeKey[T comparable](k T) string {
+	if s, ok := any(k).(fmt.Stringer); ok {
+		return s.String()
+	}
+	v := reflect.ValueOf(k)
+	switch v.Kind() {
+	case reflect.String:
+		return v.String()
+	case reflect.Int, reflect.Int8, reflect.Int16, reflect.Int32, reflect.Int64:
+		return strconv.FormatInt(v.Int(), 10)
+	case reflect.Uint, reflect.Uint8, reflect.Uint16, reflect.Uint32, reflect.Uint64, reflect.Uintptr:
+		return strconv.FormatUint(v.Uint(), 10)
+	}
+	return fmt.Sprint(k)
+}
+
+// manifestTokenKey turns a token key into string form consumed by
+// SemanticManifestRemapFromStrings. Token keys intentionally prefer numeric IDs
+// over String() to avoid global TokenKind resolver collisions across languages.
+func manifestTokenKey[T comparable](k T) string {
 	v := reflect.ValueOf(k)
 	switch v.Kind() {
 	case reflect.String:
@@ -79,7 +100,7 @@ func adaptManifest[T TokenConstraint, N NodeConstraint](in toolchain.SemanticMan
 	}
 
 	for k, v := range in.BaseTokenScopes {
-		out.BaseTokenScopes[manifestKey(k)] = v
+		out.BaseTokenScopes[manifestTokenKey(k)] = v
 	}
 
 	for k, v := range in.NodeBindings {
@@ -89,9 +110,9 @@ func adaptManifest[T TokenConstraint, N NodeConstraint](in toolchain.SemanticMan
 			TokenScopes: make(map[string][]string),
 		}
 		for tk, tv := range v.TokenScopes {
-			binding.TokenScopes[manifestKey(tk)] = tv
+			binding.TokenScopes[manifestTokenKey(tk)] = tv
 		}
-		out.NodeBindings[manifestKey(k)] = binding
+		out.NodeBindings[manifestNodeKey(k)] = binding
 	}
 	return out
 }
