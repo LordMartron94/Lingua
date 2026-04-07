@@ -17,8 +17,12 @@ const (
 	TokIdentifier Token = 5
 	TokLineComment Token = 6
 	TokNewLine Token = 7
-	TokStringLiteral Token = 8
-	TokWhitespace Token = 9
+	TokStringEnd Token = 8
+	TokStringEscape Token = 9
+	TokStringInterpolation Token = 10
+	TokStringLiteral Token = 11
+	TokStringStart Token = 12
+	TokWhitespace Token = 13
 )
 
 var TokenNames = [...]string{
@@ -28,7 +32,11 @@ var TokenNames = [...]string{
 	"TokIdentifier",
 	"TokLineComment",
 	"TokNewLine",
+	"TokStringEnd",
+	"TokStringEscape",
+	"TokStringInterpolation",
 	"TokStringLiteral",
+	"TokStringStart",
 	"TokWhitespace",
 }
 
@@ -58,10 +66,13 @@ const (
 	NEW_LINE Node = 2
 	NodeNewLine Node = 3
 	NodeProgram Node = 4
-	NodeVariableDeclaration Node = 5
-	NodeVariableName Node = 6
-	NodeVariableValue Node = 7
-	VARIABLE_STATEMENT Node = 8
+	NodeStringInterpolation Node = 5
+	NodeStringText Node = 6
+	NodeVariableDeclaration Node = 7
+	NodeVariableName Node = 8
+	NodeVariableValue Node = 9
+	STRING_LITERAL Node = 10
+	VARIABLE_STATEMENT Node = 11
 )
 
 var NodeNames = [...]string{
@@ -69,9 +80,12 @@ var NodeNames = [...]string{
 	"NEW_LINE",
 	"NodeNewLine",
 	"NodeProgram",
+	"NodeStringInterpolation",
+	"NodeStringText",
 	"NodeVariableDeclaration",
 	"NodeVariableName",
 	"NodeVariableValue",
+	"STRING_LITERAL",
 	"VARIABLE_STATEMENT",
 }
 

@@ -26,29 +26,39 @@ PATTERN {
 
 	pat_TokEquals			: '=';
 
-	pat_TokStringLiteral 	: "\"" ((!['\n', '\r', '"', '\\'] | ("\\" ['"', '\\', 'n', 'r', 't'] | ("\\u" (['0'..'9', 'A'..'F', 'a'..'f']){4,4} | "\\U" (['0'..'9', 'A'..'F', 'a'..'f']){8,8}))))* "\"";
+	pat_TokStringStart      : "\"";
+	pat_TokStringEnd        : "\"";
+	pat_TokStringEscape     : ("\\" ['"', '\\', 'n', 'r', 't'] | ("\\u" (['0'..'9', 'A'..'F', 'a'..'f']){4,4} | "\\U" (['0'..'9', 'A'..'F', 'a'..'f']){8,8}));
+	pat_TokStringInterpolation : "$" "{" pat_TokIdentifier "}";
+	pat_TokStringLiteral    : (!['\n', '\r', '"', '\\'])+;
 	pat_TokIdentifier       : ['A'..'Z', '_', 'a'..'z'] (['-', '0'..'9', 'A'..'Z', '_', 'a'..'z'])*;
-
 }
 
 LEX {
 	state INITIAL {
-	// Main
-	1 TokIdentifier 		-> RULEFORGE_STRUCTURAL_ROLE : pat_TokIdentifier;
-	1 TokStringLiteral 		-> RULEFORGE_STRUCTURAL_ROLE : pat_TokStringLiteral;
+		// Main
+		1 TokIdentifier 		-> RULEFORGE_STRUCTURAL_ROLE : pat_TokIdentifier;
+		1 TokStringStart 		-> RULEFORGE_STRUCTURAL_ROLE : pat_TokStringStart [push(STRING)];
 
-	// Operators
-	1 TokEquals 			-> RULEFORGE_STRUCTURAL_ROLE : pat_TokEquals;
+		// Operators
+		1 TokEquals 			-> RULEFORGE_STRUCTURAL_ROLE : pat_TokEquals;
 
-    // Hidden/Whitespace
-    0 TokWhitespace         -> RULEFORGE_WHITESPACE_ROLE : pat_TokWhitespace;
-	0 TokNewLine            -> RULEFORGE_STRUCTURAL_ROLE : pat_TokNewLine;
+	    // Hidden/Whitespace
+	    0 TokWhitespace         -> RULEFORGE_WHITESPACE_ROLE : pat_TokWhitespace;
+		0 TokNewLine            -> RULEFORGE_STRUCTURAL_ROLE : pat_TokNewLine;
 
-    0 TokBlockComment       -> RULEFORGE_COMMENT_ROLE    : pat_TokBlockComment;
-    0 TokLineComment        -> RULEFORGE_COMMENT_ROLE    : pat_TokLineComment;
+	    0 TokBlockComment       -> RULEFORGE_COMMENT_ROLE    : pat_TokBlockComment;
+	    0 TokLineComment        -> RULEFORGE_COMMENT_ROLE    : pat_TokLineComment;
 
-    // End of File
-    0 TokEOF                -> RULEFORGE_STRUCTURAL_ROLE : pat_TokEOF %% EOF=true %%;
+	    // End of File
+	    0 TokEOF                -> RULEFORGE_STRUCTURAL_ROLE : pat_TokEOF %% EOF=true %%;
+	}
+
+	state STRING {
+		2 TokStringInterpolation -> RULEFORGE_STRUCTURAL_ROLE : pat_TokStringInterpolation;
+		1 TokStringEscape        -> RULEFORGE_STRUCTURAL_ROLE : pat_TokStringEscape;
+		1 TokStringLiteral       -> RULEFORGE_STRUCTURAL_ROLE : pat_TokStringLiteral;
+		1 TokStringEnd           -> RULEFORGE_STRUCTURAL_ROLE : pat_TokStringEnd [pop(1)];
 	}
 }
 
@@ -71,7 +81,17 @@ PARSE {
 	rule VARIABLE_STATEMENT -> NodeVariableDeclaration {
 		NodeVariableName : TokIdentifier
 		virtual TokEquals
-		NodeVariableValue : TokStringLiteral
+		STRING_LITERAL
 		NEW_LINE
+	}
+
+	rule STRING_LITERAL -> NodeVariableValue {
+		virtual TokStringStart
+		(
+			NodeStringText : TokStringLiteral
+			| NodeStringInterpolation : TokStringInterpolation
+			| virtual TokStringEscape
+		)*
+		virtual TokStringEnd
 	}
 }

@@ -32,9 +32,12 @@ func Config() generation.RunnerConfig[Token, Node] {
 var helmSemanticManifest = toolchain.SemanticManifest[Token, Node]{
 	InvalidScope: "invalid.illegal",
 	BaseTokenScopes: map[Token]string{
-		TokNewLine:       "whitespace.newline",
-		TokEquals:        "keyword.operator.assignment",
-		TokStringLiteral: "string.quoted.double",
+		TokNewLine:             "whitespace.newline",
+		TokEquals:              "keyword.operator.assignment",
+		TokStringLiteral:       "string.quoted.double",
+		TokStringStart:         "punctuation.definition.string.begin",
+		TokStringEnd:           "punctuation.definition.string.end",
+		TokStringInterpolation: "constant.other.placeholder",
 
 		// Variable fallback
 		TokIdentifier: "variable.other.readwrite",
