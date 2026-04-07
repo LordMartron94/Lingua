@@ -29,9 +29,11 @@ PATTERN {
 	pat_TokStringStart      : "\"";
 	pat_TokStringEnd        : "\"";
 	pat_TokStringEscape     : ("\\" ['"', '\\', 'n', 'r', 't'] | ("\\u" (['0'..'9', 'A'..'F', 'a'..'f']){4,4} | "\\U" (['0'..'9', 'A'..'F', 'a'..'f']){8,8}));
-	pat_TokStringInterpolation : "$" "{" pat_TokIdentifier "}";
 	pat_TokStringLiteral    : (!['\n', '\r', '"', '\\'])+;
 	pat_TokIdentifier       : ['A'..'Z', '_', 'a'..'z'] (['-', '0'..'9', 'A'..'Z', '_', 'a'..'z'])*;
+
+	pat_TokInterpolationStart : "$" "{";
+	pat_TokInterpolationEnd   : "}";
 }
 
 LEX {
@@ -55,10 +57,18 @@ LEX {
 	}
 
 	state STRING {
-		2 TokStringInterpolation -> RULEFORGE_STRUCTURAL_ROLE : pat_TokStringInterpolation;
-		1 TokStringEscape        -> RULEFORGE_STRUCTURAL_ROLE : pat_TokStringEscape;
-		1 TokStringLiteral       -> RULEFORGE_STRUCTURAL_ROLE : pat_TokStringLiteral;
-		1 TokStringEnd           -> RULEFORGE_STRUCTURAL_ROLE : pat_TokStringEnd [pop(1)];
+		1 TokInterpolationStart -> RULEFORGE_STRUCTURAL_ROLE : pat_TokInterpolationStart [push(INTERPOLATION)];
+		1 TokStringEscape       -> RULEFORGE_STRUCTURAL_ROLE : pat_TokStringEscape;
+		1 TokStringLiteral      -> RULEFORGE_STRUCTURAL_ROLE : pat_TokStringLiteral;
+		1 TokStringEnd          -> RULEFORGE_STRUCTURAL_ROLE : pat_TokStringEnd [pop(1)];
+	}
+
+	state INTERPOLATION {
+		1 TokIdentifier       -> RULEFORGE_STRUCTURAL_ROLE : pat_TokIdentifier;
+		1 TokInterpolationEnd -> RULEFORGE_STRUCTURAL_ROLE : pat_TokInterpolationEnd [pop(1)];
+		
+		// Optional: allow whitespace inside the brackets
+		0 TokWhitespace       -> RULEFORGE_WHITESPACE_ROLE : pat_TokWhitespace;
 	}
 }
 
@@ -81,17 +91,27 @@ PARSE {
 	rule VARIABLE_STATEMENT -> NodeVariableDeclaration {
 		NodeVariableName : TokIdentifier
 		virtual TokEquals
-		STRING_LITERAL
+		VARIABLE_TARGET
 		NEW_LINE
 	}
 
-	rule STRING_LITERAL -> NodeVariableValue {
+	rule VARIABLE_TARGET -> NodeVariableValue {
+		STRING_LITERAL
+	}
+
+	rule STRING_LITERAL -> NodeStringLiteral {
 		virtual TokStringStart
 		(
 			NodeStringText : TokStringLiteral
-			| NodeStringInterpolation : TokStringInterpolation
+			| STRING_INTERPOLATION
 			| virtual TokStringEscape
 		)*
 		virtual TokStringEnd
+	}
+
+	rule STRING_INTERPOLATION -> NodeStringInterpolation {
+		virtual TokInterpolationStart
+		NodeInterpolatedVariable : TokIdentifier
+		virtual TokInterpolationEnd
 	}
 }

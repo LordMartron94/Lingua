@@ -32,17 +32,28 @@ func Config() generation.RunnerConfig[Token, Node] {
 var helmSemanticManifest = toolchain.SemanticManifest[Token, Node]{
 	InvalidScope: "invalid.illegal",
 	BaseTokenScopes: map[Token]string{
-		TokNewLine:             "whitespace.newline",
-		TokEquals:              "keyword.operator.assignment",
-		TokStringLiteral:       "string.quoted.double",
-		TokStringStart:         "punctuation.definition.string.begin",
-		TokStringEnd:           "punctuation.definition.string.end",
-		TokStringInterpolation: "constant.other.placeholder",
+		TokNewLine:            "whitespace.newline",
+		TokEquals:             "keyword.operator.assignment",
+		TokStringLiteral:      "string.quoted.double",
+		TokStringStart:        "punctuation.definition.string.begin",
+		TokStringEnd:          "punctuation.definition.string.end",
+		TokInterpolationStart: "punctuation.section.interpolation.begin",
+		TokInterpolationEnd:   "punctuation.section.interpolation.end",
 
 		// Variable fallback
 		TokIdentifier: "variable.other.readwrite",
 	},
-	NodeBindings: map[Node]toolchain.NodeBinding[Token]{},
+	NodeBindings: map[Node]toolchain.NodeBinding[Token]{
+		NodeStringLiteral: {
+			MetaScope: "meta.string",
+		},
+		NodeStringInterpolation: {
+			MetaScope: "meta.interpolation",
+		},
+		NodeInterpolatedVariable: {
+			Scopes: []string{"variable.other.interpolated"},
+		},
+	},
 }
 
 func helmOverrideProducer(

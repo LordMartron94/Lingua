@@ -15,14 +15,15 @@ const (
 	TokEOF Token = 3
 	TokEquals Token = 4
 	TokIdentifier Token = 5
-	TokLineComment Token = 6
-	TokNewLine Token = 7
-	TokStringEnd Token = 8
-	TokStringEscape Token = 9
-	TokStringInterpolation Token = 10
-	TokStringLiteral Token = 11
-	TokStringStart Token = 12
-	TokWhitespace Token = 13
+	TokInterpolationEnd Token = 6
+	TokInterpolationStart Token = 7
+	TokLineComment Token = 8
+	TokNewLine Token = 9
+	TokStringEnd Token = 10
+	TokStringEscape Token = 11
+	TokStringLiteral Token = 12
+	TokStringStart Token = 13
+	TokWhitespace Token = 14
 )
 
 var TokenNames = [...]string{
@@ -30,11 +31,12 @@ var TokenNames = [...]string{
 	"TokEOF",
 	"TokEquals",
 	"TokIdentifier",
+	"TokInterpolationEnd",
+	"TokInterpolationStart",
 	"TokLineComment",
 	"TokNewLine",
 	"TokStringEnd",
 	"TokStringEscape",
-	"TokStringInterpolation",
 	"TokStringLiteral",
 	"TokStringStart",
 	"TokWhitespace",
@@ -64,29 +66,37 @@ type Node uint32
 const (
 	ERROR_NODE Node = 1
 	NEW_LINE Node = 2
-	NodeNewLine Node = 3
-	NodeProgram Node = 4
-	NodeStringInterpolation Node = 5
-	NodeStringText Node = 6
-	NodeVariableDeclaration Node = 7
-	NodeVariableName Node = 8
-	NodeVariableValue Node = 9
-	STRING_LITERAL Node = 10
-	VARIABLE_STATEMENT Node = 11
+	NodeInterpolatedVariable Node = 3
+	NodeNewLine Node = 4
+	NodeProgram Node = 5
+	NodeStringInterpolation Node = 6
+	NodeStringLiteral Node = 7
+	NodeStringText Node = 8
+	NodeVariableDeclaration Node = 9
+	NodeVariableName Node = 10
+	NodeVariableValue Node = 11
+	STRING_INTERPOLATION Node = 12
+	STRING_LITERAL Node = 13
+	VARIABLE_STATEMENT Node = 14
+	VARIABLE_TARGET Node = 15
 )
 
 var NodeNames = [...]string{
 	"ERROR_NODE",
 	"NEW_LINE",
+	"NodeInterpolatedVariable",
 	"NodeNewLine",
 	"NodeProgram",
 	"NodeStringInterpolation",
+	"NodeStringLiteral",
 	"NodeStringText",
 	"NodeVariableDeclaration",
 	"NodeVariableName",
 	"NodeVariableValue",
+	"STRING_INTERPOLATION",
 	"STRING_LITERAL",
 	"VARIABLE_STATEMENT",
+	"VARIABLE_TARGET",
 }
 
 func (t Node) String() string {
