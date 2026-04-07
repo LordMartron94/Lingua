@@ -11,24 +11,46 @@ import (
 type GoWorkToken = lexarch.TokenKind
 
 const (
-	GoWork_TokArrow GoWorkToken = 2
-	GoWork_TokEOF GoWorkToken = 3
-	GoWork_TokEquals GoWorkToken = 4
-	GoWork_TokFloat GoWorkToken = 5
-	GoWork_TokKWGo GoWorkToken = 6
-	GoWork_TokKWGodebug GoWorkToken = 7
-	GoWork_TokKWReplace GoWorkToken = 8
-	GoWork_TokKWToolchain GoWorkToken = 9
-	GoWork_TokKWUse GoWorkToken = 10
-	GoWork_TokLineComment GoWorkToken = 11
-	GoWork_TokModulePath GoWorkToken = 12
-	GoWork_TokParenClose GoWorkToken = 13
-	GoWork_TokParenOpen GoWorkToken = 14
-	GoWork_TokVersion GoWorkToken = 15
-	GoWork_TokWhitespace GoWorkToken = 16
+	GoWork_STD__TokArrow GoWorkToken = 2
+	GoWork_STD__TokEquals GoWorkToken = 3
+	GoWork_STD__TokFloat GoWorkToken = 4
+	GoWork_STD__TokKWGo GoWorkToken = 5
+	GoWork_STD__TokKWGodebug GoWorkToken = 6
+	GoWork_STD__TokKWReplace GoWorkToken = 7
+	GoWork_STD__TokKWToolchain GoWorkToken = 8
+	GoWork_STD__TokModulePath GoWorkToken = 9
+	GoWork_STD__TokParenClose GoWorkToken = 10
+	GoWork_STD__TokParenOpen GoWorkToken = 11
+	GoWork_STD__TokVersion GoWorkToken = 12
+	GoWork_TokArrow GoWorkToken = 13
+	GoWork_TokEOF GoWorkToken = 14
+	GoWork_TokEquals GoWorkToken = 15
+	GoWork_TokFloat GoWorkToken = 16
+	GoWork_TokKWGo GoWorkToken = 17
+	GoWork_TokKWGodebug GoWorkToken = 18
+	GoWork_TokKWReplace GoWorkToken = 19
+	GoWork_TokKWToolchain GoWorkToken = 20
+	GoWork_TokKWUse GoWorkToken = 21
+	GoWork_TokLineComment GoWorkToken = 22
+	GoWork_TokModulePath GoWorkToken = 23
+	GoWork_TokParenClose GoWorkToken = 24
+	GoWork_TokParenOpen GoWorkToken = 25
+	GoWork_TokVersion GoWorkToken = 26
+	GoWork_TokWhitespace GoWorkToken = 27
 )
 
 var GoWorkTokenNames = [...]string{
+	"STD__TokArrow",
+	"STD__TokEquals",
+	"STD__TokFloat",
+	"STD__TokKWGo",
+	"STD__TokKWGodebug",
+	"STD__TokKWReplace",
+	"STD__TokKWToolchain",
+	"STD__TokModulePath",
+	"STD__TokParenClose",
+	"STD__TokParenOpen",
+	"STD__TokVersion",
 	"TokArrow",
 	"TokEOF",
 	"TokEquals",

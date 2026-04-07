@@ -11,31 +11,53 @@ import (
 type GoModToken = lexarch.TokenKind
 
 const (
-	GoMod_TokArrow GoModToken = 2
-	GoMod_TokBracketClose GoModToken = 3
-	GoMod_TokBracketOpen GoModToken = 4
-	GoMod_TokComma GoModToken = 5
-	GoMod_TokEOF GoModToken = 6
-	GoMod_TokEquals GoModToken = 7
-	GoMod_TokFloat GoModToken = 8
-	GoMod_TokKWExclude GoModToken = 9
-	GoMod_TokKWGo GoModToken = 10
-	GoMod_TokKWGodebug GoModToken = 11
-	GoMod_TokKWModule GoModToken = 12
-	GoMod_TokKWReplace GoModToken = 13
-	GoMod_TokKWRequire GoModToken = 14
-	GoMod_TokKWRetract GoModToken = 15
-	GoMod_TokKWTool GoModToken = 16
-	GoMod_TokKWToolchain GoModToken = 17
-	GoMod_TokLineComment GoModToken = 18
-	GoMod_TokModulePath GoModToken = 19
-	GoMod_TokParenClose GoModToken = 20
-	GoMod_TokParenOpen GoModToken = 21
-	GoMod_TokVersion GoModToken = 22
-	GoMod_TokWhitespace GoModToken = 23
+	GoMod_STD__TokArrow GoModToken = 2
+	GoMod_STD__TokEquals GoModToken = 3
+	GoMod_STD__TokFloat GoModToken = 4
+	GoMod_STD__TokKWGo GoModToken = 5
+	GoMod_STD__TokKWGodebug GoModToken = 6
+	GoMod_STD__TokKWReplace GoModToken = 7
+	GoMod_STD__TokKWToolchain GoModToken = 8
+	GoMod_STD__TokModulePath GoModToken = 9
+	GoMod_STD__TokParenClose GoModToken = 10
+	GoMod_STD__TokParenOpen GoModToken = 11
+	GoMod_STD__TokVersion GoModToken = 12
+	GoMod_TokArrow GoModToken = 13
+	GoMod_TokBracketClose GoModToken = 14
+	GoMod_TokBracketOpen GoModToken = 15
+	GoMod_TokComma GoModToken = 16
+	GoMod_TokEOF GoModToken = 17
+	GoMod_TokEquals GoModToken = 18
+	GoMod_TokFloat GoModToken = 19
+	GoMod_TokKWExclude GoModToken = 20
+	GoMod_TokKWGo GoModToken = 21
+	GoMod_TokKWGodebug GoModToken = 22
+	GoMod_TokKWModule GoModToken = 23
+	GoMod_TokKWReplace GoModToken = 24
+	GoMod_TokKWRequire GoModToken = 25
+	GoMod_TokKWRetract GoModToken = 26
+	GoMod_TokKWTool GoModToken = 27
+	GoMod_TokKWToolchain GoModToken = 28
+	GoMod_TokLineComment GoModToken = 29
+	GoMod_TokModulePath GoModToken = 30
+	GoMod_TokParenClose GoModToken = 31
+	GoMod_TokParenOpen GoModToken = 32
+	GoMod_TokVersion GoModToken = 33
+	GoMod_TokWhitespace GoModToken = 34
 )
 
 var GoModTokenNames = [...]string{
+	"STD__TokArrow",
+	"STD__TokEquals",
+	"STD__TokFloat",
+	"STD__TokKWGo",
+	"STD__TokKWGodebug",
+	"STD__TokKWReplace",
+	"STD__TokKWToolchain",
+	"STD__TokModulePath",
+	"STD__TokParenClose",
+	"STD__TokParenOpen",
+	"STD__TokVersion",
 	"TokArrow",
 	"TokBracketClose",
 	"TokBracketOpen",
