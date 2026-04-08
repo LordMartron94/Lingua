@@ -12,29 +12,67 @@ type Token = lexarch.TokenKind
 
 const (
 	TokBlockComment Token = 2
-	TokEOF Token = 3
-	TokEquals Token = 4
-	TokIdentifier Token = 5
-	TokInterpolationEnd Token = 6
-	TokInterpolationStart Token = 7
-	TokLineComment Token = 8
-	TokNewLine Token = 9
-	TokStringEnd Token = 10
-	TokStringEscape Token = 11
-	TokStringLiteral Token = 12
-	TokStringStart Token = 13
-	TokWhitespace Token = 14
+	TokBraceClose Token = 3
+	TokBraceOpen Token = 4
+	TokBracketClose Token = 5
+	TokBracketOpen Token = 6
+	TokComma Token = 7
+	TokDollar Token = 8
+	TokEOF Token = 9
+	TokEquals Token = 10
+	TokIdentifier Token = 11
+	TokInterpolationEnd Token = 12
+	TokInterpolationStart Token = 13
+	TokKWBypass Token = 14
+	TokKWCache Token = 15
+	TokKWFalse Token = 16
+	TokKWGlob Token = 17
+	TokKWHelp Token = 18
+	TokKWInputs Token = 19
+	TokKWOutput Token = 20
+	TokKWPath Token = 21
+	TokKWTarget Token = 22
+	TokKWTrue Token = 23
+	TokLineComment Token = 24
+	TokNewLine Token = 25
+	TokParenClose Token = 26
+	TokParenOpen Token = 27
+	TokQuestion Token = 28
+	TokStringEnd Token = 29
+	TokStringEscape Token = 30
+	TokStringLiteral Token = 31
+	TokStringStart Token = 32
+	TokWhitespace Token = 33
 )
 
 var TokenNames = [...]string{
 	"TokBlockComment",
+	"TokBraceClose",
+	"TokBraceOpen",
+	"TokBracketClose",
+	"TokBracketOpen",
+	"TokComma",
+	"TokDollar",
 	"TokEOF",
 	"TokEquals",
 	"TokIdentifier",
 	"TokInterpolationEnd",
 	"TokInterpolationStart",
+	"TokKWBypass",
+	"TokKWCache",
+	"TokKWFalse",
+	"TokKWGlob",
+	"TokKWHelp",
+	"TokKWInputs",
+	"TokKWOutput",
+	"TokKWPath",
+	"TokKWTarget",
+	"TokKWTrue",
 	"TokLineComment",
 	"TokNewLine",
+	"TokParenClose",
+	"TokParenOpen",
+	"TokQuestion",
 	"TokStringEnd",
 	"TokStringEscape",
 	"TokStringLiteral",
@@ -64,39 +102,135 @@ func init() {
 type Node uint32
 
 const (
-	ERROR_NODE Node = 1
-	NEW_LINE Node = 2
-	NodeInterpolatedVariable Node = 3
-	NodeNewLine Node = 4
-	NodeProgram Node = 5
-	NodeStringInterpolation Node = 6
-	NodeStringLiteral Node = 7
-	NodeStringText Node = 8
-	NodeVariableDeclaration Node = 9
-	NodeVariableName Node = 10
-	NodeVariableValue Node = 11
-	STRING_INTERPOLATION Node = 12
-	STRING_LITERAL Node = 13
-	VARIABLE_STATEMENT Node = 14
-	VARIABLE_TARGET Node = 15
+	BYPASS_STATEMENT Node = 1
+	CACHE_BLOCK Node = 2
+	CACHE_BLOCK_CONTENT Node = 3
+	ERROR_NODE Node = 4
+	GLOB Node = 5
+	GLOB_ARGS Node = 6
+	GLOB_BASE_DIR Node = 7
+	GLOB_KWARG Node = 8
+	HELP_STATEMENT Node = 9
+	INPUTS_STATEMENT Node = 10
+	NEW_LINE Node = 11
+	NodeBypass Node = 12
+	NodeBypassValue Node = 13
+	NodeCacheBlock Node = 14
+	NodeCacheInputs Node = 15
+	NodeCacheOutputDirectory Node = 16
+	NodeGlob Node = 17
+	NodeGlobArguments Node = 18
+	NodeGlobBaseDirectory Node = 19
+	NodeGlobKwarg Node = 20
+	NodeGlobKwargIdentifier Node = 21
+	NodeHelpStatement Node = 22
+	NodeInterpolatedVariable Node = 23
+	NodeNewLine Node = 24
+	NodePath Node = 25
+	NodePathArgs Node = 26
+	NodeProgram Node = 27
+	NodeStringArray Node = 28
+	NodeStringDollar Node = 29
+	NodeStringInterpolation Node = 30
+	NodeStringLiteral Node = 31
+	NodeStringText Node = 32
+	NodeTarget Node = 33
+	NodeTargetBody Node = 34
+	NodeTargetIdentifier Node = 35
+	NodeTargetParameter Node = 36
+	NodeTargetParameterIdentifier Node = 37
+	NodeTargetParameterOptional Node = 38
+	NodeTargetParams Node = 39
+	NodeVariableDeclaration Node = 40
+	NodeVariableName Node = 41
+	NodeVariableReference Node = 42
+	NodeVariableValue Node = 43
+	OUTPUT_STATEMENT Node = 44
+	OUTPUT_STATEMENT_VALUE Node = 45
+	PATH Node = 46
+	PATH_ARGS Node = 47
+	PATH_ELEMENT Node = 48
+	STRING_ARRAY Node = 49
+	STRING_INTERPOLATION Node = 50
+	STRING_LITERAL Node = 51
+	TARGET Node = 52
+	TARGET_BODY Node = 53
+	TARGET_PARAM Node = 54
+	TARGET_PARAMS Node = 55
+	VARIABLE_STATEMENT Node = 56
+	VARIABLE_TARGET Node = 57
+	VAR_REF Node = 58
+	gr_CACHE_BLOCK_CONTENT Node = 59
+	gr_INPUTS_VALUE Node = 60
+	gr_OUTPUT_VALUE Node = 61
+	gr_PATH_ELEMENT Node = 62
+	gr_VAR_REF Node = 63
 )
 
 var NodeNames = [...]string{
+	"BYPASS_STATEMENT",
+	"CACHE_BLOCK",
+	"CACHE_BLOCK_CONTENT",
 	"ERROR_NODE",
+	"GLOB",
+	"GLOB_ARGS",
+	"GLOB_BASE_DIR",
+	"GLOB_KWARG",
+	"HELP_STATEMENT",
+	"INPUTS_STATEMENT",
 	"NEW_LINE",
+	"NodeBypass",
+	"NodeBypassValue",
+	"NodeCacheBlock",
+	"NodeCacheInputs",
+	"NodeCacheOutputDirectory",
+	"NodeGlob",
+	"NodeGlobArguments",
+	"NodeGlobBaseDirectory",
+	"NodeGlobKwarg",
+	"NodeGlobKwargIdentifier",
+	"NodeHelpStatement",
 	"NodeInterpolatedVariable",
 	"NodeNewLine",
+	"NodePath",
+	"NodePathArgs",
 	"NodeProgram",
+	"NodeStringArray",
+	"NodeStringDollar",
 	"NodeStringInterpolation",
 	"NodeStringLiteral",
 	"NodeStringText",
+	"NodeTarget",
+	"NodeTargetBody",
+	"NodeTargetIdentifier",
+	"NodeTargetParameter",
+	"NodeTargetParameterIdentifier",
+	"NodeTargetParameterOptional",
+	"NodeTargetParams",
 	"NodeVariableDeclaration",
 	"NodeVariableName",
+	"NodeVariableReference",
 	"NodeVariableValue",
+	"OUTPUT_STATEMENT",
+	"OUTPUT_STATEMENT_VALUE",
+	"PATH",
+	"PATH_ARGS",
+	"PATH_ELEMENT",
+	"STRING_ARRAY",
 	"STRING_INTERPOLATION",
 	"STRING_LITERAL",
+	"TARGET",
+	"TARGET_BODY",
+	"TARGET_PARAM",
+	"TARGET_PARAMS",
 	"VARIABLE_STATEMENT",
 	"VARIABLE_TARGET",
+	"VAR_REF",
+	"gr_CACHE_BLOCK_CONTENT",
+	"gr_INPUTS_VALUE",
+	"gr_OUTPUT_VALUE",
+	"gr_PATH_ELEMENT",
+	"gr_VAR_REF",
 }
 
 func (t Node) String() string {

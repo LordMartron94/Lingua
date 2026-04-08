@@ -1,0 +1,73 @@
+--- "Lingua Std" v1.0.0 | lspec v1.0.0 ---
+
+PRAGMA {
+	lspec { library = true; }
+};
+
+PATTERN {
+
+}
+
+LEX {
+
+}
+
+PARSE {
+	/*
+	Internal helper to handle the interspersed element/separator logic.
+	Avoids logic duplication across the public array templates.
+	*/
+	template _LIST_BODY($elementRule: Rule, $separatorTk: Token) {
+	    $elementRule
+	    (
+	        virtual $separatorTk
+	        $elementRule
+	    )*
+	}
+
+	/*
+	Standard array: [ element, element ].
+	Supports zero or more elements. No trailing comma allowed.
+	*/
+	export template t_ARRAY($openTk: Token, $closeTk: Token, $elementRule: Rule, $separatorTk: Token) {
+	    virtual $openTk
+	    (
+	    	call _LIST_BODY($elementRule, $separatorTk)
+    	)?
+	    virtual $closeTk
+	}
+
+	/*
+	Flexible array: [ element, element, ].
+	Supports zero or more elements. Allows an optional trailing separator.
+	*/
+	export template t_ARRAY_TRAILING_COMMA($openTk: Token, $closeTk: Token, $elementRule: Rule, $separatorTk: Token) {
+	    virtual $openTk
+	    (
+	        call _LIST_BODY($elementRule, $separatorTk)
+	        virtual $separatorTk?
+	    )?
+	    virtual $closeTk
+	}
+
+	/*
+	Strict non-empty array: [ element, element ].
+	Requires at least one element. No trailing comma allowed.
+	*/
+	export template t_ARRAY_1_OR_MORE($openTk: Token, $closeTk: Token, $elementRule: Rule, $separatorTk: Token) {
+	    virtual $openTk
+	    call _LIST_BODY($elementRule, $separatorTk)
+	    virtual $closeTk
+	}
+
+	/*
+	Flexible non-empty array: [ element, element, ].
+	Requires at least one element. Allows an optional trailing separator.
+	*/
+	export template t_ARRAY_1_OR_MORE_TRAILING_COMMA($openTk: Token, $closeTk: Token, $elementRule: Rule, $separatorTk: Token) {
+	    virtual $openTk
+	    call _LIST_BODY($elementRule, $separatorTk)
+	    virtual $separatorTk?
+	    virtual $closeTk
+	}
+}

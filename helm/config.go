@@ -39,6 +39,25 @@ var helmSemanticManifest = toolchain.SemanticManifest[Token, Node]{
 		TokStringEnd:          "punctuation.definition.string.end",
 		TokInterpolationStart: "punctuation.section.interpolation.begin",
 		TokInterpolationEnd:   "punctuation.section.interpolation.end",
+		TokBraceOpen:          "punctuation.section.braces.begin",
+		TokBraceClose:         "punctuation.section.braces.end",
+		TokParenOpen:          "punctuation.section.parens.begin",
+		TokParenClose:         "punctuation.section.parens.end",
+		TokQuestion:           "punctuation.question",
+		TokKWTarget:           "keyword.target",
+
+		TokKWPath: "support.function.path",
+		TokKWGlob: "support.function.glob",
+
+		TokKWHelp:  "support.type.property-name.help",
+		TokKWCache: "support.type.property-name.cache",
+
+		TokKWInputs: "support.type.property-name.inputs",
+		TokKWOutput: "support.type.property-name.output",
+		TokKWBypass: "support.type.property-name.bypass",
+
+		TokKWTrue:  "constant.language.boolean.true",
+		TokKWFalse: "constant.language.boolean.false",
 
 		// Variable fallback
 		TokIdentifier: "variable.other.readwrite",
@@ -52,6 +71,33 @@ var helmSemanticManifest = toolchain.SemanticManifest[Token, Node]{
 		},
 		NodeInterpolatedVariable: {
 			Scopes: []string{"variable.other.interpolated"},
+		},
+		NodeTargetParams: {
+			MetaScope: "meta.target.parameters",
+		},
+		NodeTargetParameter: {
+			MetaScope: "meta.target.parameter",
+		},
+		NodeTargetParameterIdentifier: {
+			Scopes: []string{"variable.parameter"},
+		},
+		NodeTargetParameterOptional: {
+			Scopes: []string{"keyword.operator.optional"},
+		},
+		NodeTargetIdentifier: {
+			Scopes: []string{"entity.name.function.target"},
+		},
+		NodeTargetBody: {
+			MetaScope: "meta.target.body",
+		},
+		NodeVariableReference: {
+			Scopes: []string{"variable.other.reference"},
+		},
+		NodeGlobKwargIdentifier: {
+			Scopes: []string{"variable.parameter"},
+		},
+		NodeStringDollar: {
+			Scopes: []string{"string.quoted.double"},
 		},
 	},
 }

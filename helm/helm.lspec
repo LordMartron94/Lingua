@@ -14,7 +14,22 @@ PRAGMA {
 		output-path = "libs/lingua/helm/artifacts/go_bindings.go";
 		package-name = "artifacts";
 	}
+
+	tool.tm_comments {
+		enable = true;
+		output-path = [
+			"/home/user/.config/sublime-text/Packages/User/Comments (Helm).tmPreferences"
+		];
+		scope-extension = ".helm";
+		single-line-comment-start = "// ";
+		block-comment-start = "/*";
+		block-comment-end = "*/";
+	}
 };
+
+IMPORT {
+	embed "../lspec_std/std.lspec" as STD;
+}
 
 PATTERN {
 	pat_TokEOF				: [];
@@ -29,21 +44,66 @@ PATTERN {
 	pat_TokStringStart      : "\"";
 	pat_TokStringEnd        : "\"";
 	pat_TokStringEscape     : ("\\" ['"', '\\', 'n', 'r', 't'] | ("\\u" (['0'..'9', 'A'..'F', 'a'..'f']){4,4} | "\\U" (['0'..'9', 'A'..'F', 'a'..'f']){8,8}));
-	pat_TokStringLiteral    : (!['\n', '\r', '"', '\\'])+;
+	pat_TokStringLiteral    : (!['\n', '\r', '"', '\\', '$'])+;
 	pat_TokIdentifier       : ['A'..'Z', '_', 'a'..'z'] (['-', '0'..'9', 'A'..'Z', '_', 'a'..'z'])*;
 
-	pat_TokInterpolationStart : "$" "{";
-	pat_TokInterpolationEnd   : "}";
+	pat_TokDollar    			: "$";
+	pat_TokInterpolationStart 	: "${";
+	pat_TokInterpolationEnd   	: "}";
+
+	pat_TokKWTarget			  	: "target";
+	pat_TokKWHelp				: "help";
+	pat_TokKWCache				: "cache";
+	pat_TokKWInputs				: "inputs";
+	pat_TokKWGlob				: "glob";
+	pat_TokKWOutput 			: "output";
+	pat_TokKWPath				: "path";
+	pat_TokKWBypass				: "bypass";
+
+	pat_TokKWTrue				: "true";
+	pat_TokKWFalse				: "false";
+
+	pat_TokParenOpen 			: '(';
+	pat_TokParenClose			: ')';
+	pat_TokQuestion				: '?';
+	pat_TokComma				: ',';
+	pat_TokBraceOpen			: '{';
+	pat_TokBraceClose			: "}"; 
+	pat_TokBracketOpen			: "[";
+	pat_TokBracketClose			: "]";
 }
 
 LEX {
 	state INITIAL {
-		// Main
+		// Keywords
+		2 TokKWTarget 			-> RULEFORGE_STRUCTURAL_ROLE : pat_TokKWTarget;
+		2 TokKWHelp 			-> RULEFORGE_STRUCTURAL_ROLE : pat_TokKWHelp;
+		2 TokKWCache 			-> RULEFORGE_STRUCTURAL_ROLE : pat_TokKWCache;
+		2 TokKWInputs 			-> RULEFORGE_STRUCTURAL_ROLE : pat_TokKWInputs;
+		2 TokKWGlob 			-> RULEFORGE_STRUCTURAL_ROLE : pat_TokKWGlob;
+		2 TokKWOutput 			-> RULEFORGE_STRUCTURAL_ROLE : pat_TokKWOutput;
+		2 TokKWPath 			-> RULEFORGE_STRUCTURAL_ROLE : pat_TokKWPath;
+		2 TokKWBypass 			-> RULEFORGE_STRUCTURAL_ROLE : pat_TokKWBypass;
+
+		2 TokKWTrue 			-> RULEFORGE_STRUCTURAL_ROLE : pat_TokKWTrue;
+		2 TokKWFalse 			-> RULEFORGE_STRUCTURAL_ROLE : pat_TokKWFalse;
+
+		// Conventional
 		1 TokIdentifier 		-> RULEFORGE_STRUCTURAL_ROLE : pat_TokIdentifier;
 		1 TokStringStart 		-> RULEFORGE_STRUCTURAL_ROLE : pat_TokStringStart [push(STRING)];
 
-		// Operators
+		// // Operators
 		1 TokEquals 			-> RULEFORGE_STRUCTURAL_ROLE : pat_TokEquals;
+		1 TokQuestion 			-> RULEFORGE_STRUCTURAL_ROLE : pat_TokQuestion;
+
+		// Structure
+		1 TokBraceOpen 			-> RULEFORGE_STRUCTURAL_ROLE : pat_TokBraceOpen;
+		1 TokBraceClose 		-> RULEFORGE_STRUCTURAL_ROLE : pat_TokBraceClose;
+		1 TokParenOpen 			-> RULEFORGE_STRUCTURAL_ROLE : pat_TokParenOpen;
+		1 TokParenClose 		-> RULEFORGE_STRUCTURAL_ROLE : pat_TokParenClose;
+		1 TokComma 				-> RULEFORGE_STRUCTURAL_ROLE : pat_TokComma;
+		1 TokBracketOpen		-> RULEFORGE_STRUCTURAL_ROLE : pat_TokBracketOpen;
+		1 TokBracketClose 		-> RULEFORGE_STRUCTURAL_ROLE : pat_TokBracketClose;
 
 	    // Hidden/Whitespace
 	    0 TokWhitespace         -> RULEFORGE_WHITESPACE_ROLE : pat_TokWhitespace;
@@ -57,8 +117,9 @@ LEX {
 	}
 
 	state STRING {
-		1 TokInterpolationStart -> RULEFORGE_STRUCTURAL_ROLE : pat_TokInterpolationStart [push(INTERPOLATION)];
+		2 TokInterpolationStart -> RULEFORGE_STRUCTURAL_ROLE : pat_TokInterpolationStart [push(INTERPOLATION)];
 		1 TokStringEscape       -> RULEFORGE_STRUCTURAL_ROLE : pat_TokStringEscape;
+		1 TokDollar         	-> RULEFORGE_STRUCTURAL_ROLE : pat_TokDollar;
 		1 TokStringLiteral      -> RULEFORGE_STRUCTURAL_ROLE : pat_TokStringLiteral;
 		1 TokStringEnd          -> RULEFORGE_STRUCTURAL_ROLE : pat_TokStringEnd [pop(1)];
 	}
@@ -77,16 +138,16 @@ PARSE {
 		RULEFORGE_WHITESPACE_ROLE RULEFORGE_COMMENT_ROLE
 	}
 
+	// --- ENTRY ---
+
 	rule PROGRAM -> NodeProgram {
 		(
-			NEW_LINE | VARIABLE_STATEMENT
+			NEW_LINE | VARIABLE_STATEMENT | TARGET
 		)*
 		virtual TokEOF
 	}
 
-	rule NEW_LINE -> NodeNewLine {
-		virtual TokNewLine
-	}
+	// --- VARIABLES ---
 
 	rule VARIABLE_STATEMENT -> NodeVariableDeclaration {
 		NodeVariableName : TokIdentifier
@@ -99,12 +160,158 @@ PARSE {
 		STRING_LITERAL
 	}
 
+	// --- TARGETS ---
+
+	pair Parens TokParenOpen TokParenClose;
+	pair Braces TokBraceOpen TokBraceClose;
+
+	rule TARGET -> NodeTarget {	
+		virtual TokKWTarget
+		NodeTargetIdentifier : TokIdentifier
+		nest @Parens {
+			TARGET_PARAMS
+		}
+		nest @Braces {
+			TARGET_BODY
+		}
+	}
+
+	rule TARGET_PARAMS -> NodeTargetParams {
+		(
+			TARGET_PARAM
+			(
+				virtual TokComma
+				TARGET_PARAM
+			)*
+		)?
+	}
+
+	rule TARGET_PARAM -> NodeTargetParameter {
+		NodeTargetParameterIdentifier : TokIdentifier
+		NodeTargetParameterOptional : TokQuestion?
+	}
+
+	rule TARGET_BODY -> NodeTargetBody {
+		(
+			NEW_LINE | HELP_STATEMENT | CACHE_BLOCK
+		)*
+	}
+
+	rule HELP_STATEMENT -> NodeHelpStatement {
+		virtual TokKWHelp
+		virtual TokEquals
+		STRING_LITERAL
+	} 
+
+	rule CACHE_BLOCK -> NodeCacheBlock {
+		virtual TokKWCache
+		nest @Braces {
+			CACHE_BLOCK_CONTENT
+		}
+	}
+
+	rule CACHE_BLOCK_CONTENT -> transparent gr_CACHE_BLOCK_CONTENT {
+		(
+			(
+				NEW_LINE
+				| INPUTS_STATEMENT
+				| OUTPUT_STATEMENT
+				| BYPASS_STATEMENT
+			)
+		)*
+	}
+
+	template t_cacheAssignment($keyword: Token, $rule: Rule) {
+		virtual $keyword
+		virtual TokEquals
+		$rule
+	}
+
+	rule INPUTS_STATEMENT -> NodeCacheInputs {
+		call t_cacheAssignment(TokKWInputs, INPUTS_VALUE)
+		NEW_LINE
+	}
+
+	rule INPUTS_VALUE -> transparent gr_INPUTS_VALUE {
+		STRING_ARRAY | GLOB
+	}
+
+	rule GLOB -> NodeGlob {
+		virtual TokKWGlob
+		nest @Parens {
+			GLOB_ARGS
+		}
+	}
+
+	rule GLOB_ARGS -> NodeGlobArguments {
+		GLOB_BASE_DIR
+		(
+			virtual TokComma
+			GLOB_KWARG
+		)*
+	}
+
+	rule GLOB_BASE_DIR -> NodeGlobBaseDirectory {
+		VAR_REF
+		| STRING_LITERAL
+	}
+
+	rule GLOB_KWARG -> NodeGlobKwarg {
+		NodeGlobKwargIdentifier : TokIdentifier
+		virtual TokEquals
+		STRING_LITERAL
+	}
+
+	rule OUTPUT_STATEMENT -> NodeCacheOutputDirectory {
+		virtual TokKWOutput
+		virtual TokEquals
+		OUTPUT_STATEMENT_VALUE
+		NEW_LINE
+	}
+
+	rule OUTPUT_STATEMENT_VALUE -> transparent gr_OUTPUT_VALUE {
+		VAR_REF | STRING_LITERAL | PATH
+	}
+	
+	rule PATH -> NodePath {
+		virtual TokKWPath
+		nest @Parens {
+			PATH_ARGS
+		}
+	}
+
+	rule PATH_ARGS -> NodePathArgs {
+		PATH_ELEMENT
+		(
+			virtual TokComma
+			PATH_ELEMENT
+		)*
+	}
+
+	rule PATH_ELEMENT -> transparent gr_PATH_ELEMENT {
+		VAR_REF | STRING_LITERAL
+	}
+
+	rule BYPASS_STATEMENT -> NodeBypass {
+		virtual TokKWBypass
+		virtual TokEquals
+		NodeBypassValue : (virtual TokKWTrue | virtual TokKWFalse)
+		NEW_LINE
+	}
+
+	// --- STRINGS ---
+
+	rule STRING_ARRAY -> NodeStringArray {
+		using STD.t_ARRAY(TokBracketOpen, TokBracketClose, STRING_LITERAL, TokComma)
+	}
+
 	rule STRING_LITERAL -> NodeStringLiteral {
 		virtual TokStringStart
 		(
-			NodeStringText : TokStringLiteral
-			| STRING_INTERPOLATION
+			STRING_INTERPOLATION
 			| virtual TokStringEscape
+			| NodeStringText : TokStringLiteral
+			| NodeStringDollar : TokDollar
 		)*
 		virtual TokStringEnd
 	}
@@ -113,5 +320,15 @@ PARSE {
 		virtual TokInterpolationStart
 		NodeInterpolatedVariable : TokIdentifier
 		virtual TokInterpolationEnd
+	}
+
+	// --- OTHER ---
+
+	rule VAR_REF -> transparent gr_VAR_REF {
+		NodeVariableReference : TokIdentifier
+	}
+
+	rule NEW_LINE -> NodeNewLine {
+		virtual TokNewLine
 	}
 }
