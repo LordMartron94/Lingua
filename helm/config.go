@@ -47,6 +47,7 @@ var helmSemanticManifest = toolchain.SemanticManifest[Token, Node]{
 		TokBracketClose:       "punctuation.section.brackets.close",
 		TokQuestion:           "punctuation.question",
 		TokKWTarget:           "keyword.declaration.target",
+		TokComma:              "punctuation.separator.comma",
 
 		TokKWPath: "support.function.builtin.path",
 		TokKWGlob: "support.function.builtin.glob",
@@ -59,22 +60,24 @@ var helmSemanticManifest = toolchain.SemanticManifest[Token, Node]{
 		TokKWWhen: "keyword.control.condition.when",
 
 		TokKWRun:       "keyword.control.execution",
-		TokKWInvoke:    "keyword.control.execution",
-		TokKWParallel:  "keyword.control.parallel",
 		TokKWDependsOn: "keyword.control.depends-on",
 
-		TokKWHelp:  "support.type.property-name.help",
-		TokKWCache: "support.type.property-name.cache",
+		TokKWHelp:      "support.type.property-name.help",
+		TokKWArtifacts: "keyword.declaration.artifacts",
+		TokKWAliases:   "support.type.property-name.aliases",
 
-		TokKWInputs: "support.type.property-name.inputs",
-		TokKWOutput: "support.type.property-name.output",
-		TokKWBypass: "support.type.property-name.bypass",
+		TokKWInputs:   "support.type.property-name.inputs",
+		TokKWOutput:   "support.type.property-name.output",
+		TokKWVolatile: "support.type.property-name.volatile",
 
 		TokKWConfirm:  "support.type.property-name.confirm",
 		TokKWOptional: "support.type.property-name.optional",
 
 		TokKWTrue:  "constant.language.boolean.true",
 		TokKWFalse: "constant.language.boolean.false",
+
+		TokKWEnv:        "keyword.declaration.env",
+		TokKWWorkingDir: "support.type.property-name.workdir",
 
 		// Variable fallback
 		TokIdentifier: "variable.other.readwrite",
@@ -124,6 +127,21 @@ var helmSemanticManifest = toolchain.SemanticManifest[Token, Node]{
 		},
 		NodeInvokeTarget: {
 			Scopes: []string{"meta.target-reference", "variable.other.target.reference"},
+		},
+		// --- Environment & Properties ---
+		NodeEnvKey: {
+			Scopes: []string{"variable.other.property.env"},
+		},
+
+		// --- Structural Meta Boundaries ---
+		NodeArtifactsBlock: {
+			MetaScope: "meta.block.artifacts",
+		},
+		NodeEnvDeclaration: {
+			MetaScope: "meta.block.env",
+		},
+		NodeTargetDepends: {
+			MetaScope: "meta.block.depends-on",
 		},
 	},
 }

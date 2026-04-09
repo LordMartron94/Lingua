@@ -53,20 +53,21 @@ PATTERN {
 
 	pat_TokKWTarget			  	: "target";
 	pat_TokKWHelp				: "help";
-	pat_TokKWCache				: "cache";
+	pat_TokKWArtifacts			: "artifacts";
 	pat_TokKWInputs				: "inputs";
 	pat_TokKWGlob				: "glob";
 	pat_TokKWOutput 			: "output";
 	pat_TokKWPath				: "path";
-	pat_TokKWBypass				: "bypass";
-	pat_TokKWInvoke				: "invoke";
+	pat_TokKWAliases			: "aliases";
+	pat_TokKWVolatile   		: "volatile";
+	pat_TokKWEnv 				: "env";
+	pat_TokKWWorkingDir			: "workdir";
 
 	pat_TokKWConfirm			: "confirm";
 	pat_TokKWOptional			: "optional";
 
 	pat_TokKWWhen				: "when";
 
-	pat_TokKWParallel			: "parallel";
 	pat_TokKWDependsOn			: "depends_on";
 
 	pat_TokKWDefined			: "defined";
@@ -96,13 +97,16 @@ LEX {
 		// Keywords
 		2 TokKWTarget 			-> HELM_STRUCTURAL_ROLE : pat_TokKWTarget;
 		2 TokKWHelp 			-> HELM_STRUCTURAL_ROLE : pat_TokKWHelp;
-		2 TokKWCache 			-> HELM_STRUCTURAL_ROLE : pat_TokKWCache;
+		2 TokKWArtifacts		-> HELM_STRUCTURAL_ROLE : pat_TokKWArtifacts;
 		2 TokKWInputs 			-> HELM_STRUCTURAL_ROLE : pat_TokKWInputs;
 		2 TokKWGlob 			-> HELM_STRUCTURAL_ROLE : pat_TokKWGlob;
 		2 TokKWOutput 			-> HELM_STRUCTURAL_ROLE : pat_TokKWOutput;
 		2 TokKWPath 			-> HELM_STRUCTURAL_ROLE : pat_TokKWPath;
-		2 TokKWBypass 			-> HELM_STRUCTURAL_ROLE : pat_TokKWBypass;
-		2 TokKWInvoke 			-> HELM_STRUCTURAL_ROLE : pat_TokKWInvoke;
+		2 TokKWAliases 			-> HELM_STRUCTURAL_ROLE : pat_TokKWAliases;
+		2 TokKWVolatile 		-> HELM_STRUCTURAL_ROLE : pat_TokKWVolatile;
+
+		2 TokKWEnv 				-> HELM_STRUCTURAL_ROLE : pat_TokKWEnv;
+		2 TokKWWorkingDir 		-> HELM_STRUCTURAL_ROLE : pat_TokKWWorkingDir;
 
 		2 TokKWTrue 			-> HELM_STRUCTURAL_ROLE : pat_TokKWTrue;
 		2 TokKWFalse 			-> HELM_STRUCTURAL_ROLE : pat_TokKWFalse;
@@ -110,7 +114,6 @@ LEX {
 		2 TokKWConfirm 			-> HELM_STRUCTURAL_ROLE : pat_TokKWConfirm;
 		2 TokKWOptional 		-> HELM_STRUCTURAL_ROLE : pat_TokKWOptional;
 
-		2 TokKWParallel 		-> HELM_STRUCTURAL_ROLE : pat_TokKWParallel;
 		2 TokKWDependsOn 		-> HELM_STRUCTURAL_ROLE : pat_TokKWDependsOn;
 
 		2 TokKWWhen 			-> HELM_STRUCTURAL_ROLE : pat_TokKWWhen;
@@ -229,33 +232,49 @@ PARSE {
 
 	rule TARGET_BODY -> NodeTargetBody {
 		(
-			NEW_LINE | HELP_STATEMENT | CACHE_BLOCK | CONDITIONAL_BLOCK | DEPENDS_ON | PARALLEL
-			| RUN | INVOKE
+			NEW_LINE | HELP_STATEMENT | ALIASES_DECLARATION | ARTIFACTS_BLOCK | CONDITIONAL_BLOCK | DEPENDS_ON
+			| RUN | WORK_DIR | ENV_DECLARATION
 		)*
+	}
+
+	rule WORK_DIR -> NodeWorkingDirectory {
+		call t_simpleAssignment(TokKWWorkingDir, STRING_LITERAL)
+	}
+
+	rule ENV_DECLARATION -> NodeEnvDeclaration {
+		virtual TokKWEnv
+		using STD.t_MULTILINE_BLOCK(@Braces, ENV_ASSIGNMENT, TokNewLine)
+	}
+
+	rule ENV_ASSIGNMENT -> transparent gr_ENV_ASSIGNMENT {
+		ENV_KEY
+		virtual TokEquals
+		ENV_VALUE
+	}
+
+	rule ENV_KEY -> transparent gr_ENV_KEY {
+		NodeEnvKey : TokIdentifier
+	}
+
+	rule ENV_VALUE -> transparent gr_ENV_VALUE {
+		STRING_LITERAL
 	}
 
 	rule HELP_STATEMENT -> NodeHelpStatement {
-		virtual TokKWHelp
-		virtual TokEquals
-		STRING_LITERAL
+		call t_simpleAssignment(TokKWHelp, STRING_LITERAL)
 	} 
 
-	rule CACHE_BLOCK -> NodeCacheBlock {
-		virtual TokKWCache
-		nest @Braces {
-			CACHE_BLOCK_CONTENT
-		}
+	rule ALIASES_DECLARATION -> NodeAliases {
+		call t_simpleAssignment(TokKWAliases, STRING_ARRAY)
 	}
 
-	rule CACHE_BLOCK_CONTENT -> transparent gr_CACHE_BLOCK_CONTENT {
-		(
-			(
-				NEW_LINE
-				| INPUTS_STATEMENT
-				| OUTPUT_STATEMENT
-				| BYPASS_STATEMENT
-			)
-		)*
+	rule ARTIFACTS_BLOCK -> NodeArtifactsBlock {
+		virtual TokKWArtifacts
+		using STD.t_MULTILINE_BLOCK(@Braces, ARTIFACTS_STATEMENT, TokNewLine)
+	}
+
+	rule ARTIFACTS_STATEMENT -> transparent gr_ARTIFACTS_STATEMENT {
+		INPUTS_STATEMENT | OUTPUT_STATEMENT | VOLATILE_STATEMENT
 	}
 
 	template t_simpleAssignment($keyword: Token, $rule: Rule) {
@@ -271,6 +290,10 @@ PARSE {
 
 	rule INPUTS_VALUE -> transparent gr_INPUTS_VALUE {
 		STRING_ARRAY | GLOB
+	}
+
+	rule VOLATILE_STATEMENT -> NodeVolatile {
+		call t_simpleAssignment(TokKWVolatile, TRUE_OR_FALSE)
 	}
 
 	rule GLOB -> NodeGlob {
@@ -329,13 +352,6 @@ PARSE {
 		VAR_REF | STRING_LITERAL
 	}
 
-	rule BYPASS_STATEMENT -> NodeBypass {
-		virtual TokKWBypass
-		virtual TokEquals
-		TRUE_OR_FALSE
-		NEW_LINE
-	}
-
 	rule CONDITIONAL_BLOCK -> NodeConditional {
 		virtual TokKWWhen
 
@@ -370,7 +386,7 @@ PARSE {
 	}
 
 	rule TARGET_EXECUTION -> NodeTargetExecution {
-		RUN | INVOKE
+		RUN
 	}
 
 	rule RUN -> NodeRunStatement {
@@ -379,23 +395,14 @@ PARSE {
 		NEW_LINE
 	}
 
-	rule INVOKE -> NodeInvokeStatement {
-		virtual TokKWInvoke
-		INVOKE_CONTENT
-	}
-
-	rule INVOKE_IMPLICIT -> NodeInvokeStatement {
-		INVOKE_CONTENT
-	}
-
-	rule INVOKE_CONTENT -> transparent gr_INVOKE_CONTENT {
+	rule TARGET_DEPENDENCY -> NodeTargetDependency {
 		call t_ALLOWED_TARGET_NAME(NodeInvokeTarget)
 		nest @Braces {
-			INVOKE_OPTIONS
+			DEPENDENCY_OPTIONS
 		}?
 	}
 
-	rule INVOKE_OPTIONS -> NodeInvokeOptions {
+	rule DEPENDENCY_OPTIONS -> NodeDependencyOptions {
 		(
 			call t_simpleAssignment(TokKWConfirm, TRUE_OR_FALSE)
 			|
@@ -411,32 +418,11 @@ PARSE {
 
 	rule DEPENDS_ON -> NodeTargetDepends {
 		virtual TokKWDependsOn
-		nest @Brackets {
-			DEPENDS_ON_CONTENT
-		}
-	}
-
-	rule DEPENDS_ON_CONTENT -> transparent gr_DEPENDS_ON_CONTENT {
-		(
-			DEPENDENCY_ELEMENT | NEW_LINE
-		)*
+		using STD.t_MULTILINE_BLOCK(@Brackets, DEPENDENCY_ELEMENT, TokNewLine)
 	}
 
 	rule DEPENDENCY_ELEMENT -> transparent gr_DEP_EL {
-		INVOKE | INVOKE_IMPLICIT
-	}
-
-	rule PARALLEL -> NodeParallel {
-		virtual TokKWParallel
-		nest @Braces {
-			PARALLEL_CONTENT
-		}
-	}
-
-	rule PARALLEL_CONTENT -> transparent gr_PARALLEL_CONTENT {
-		(
-			INVOKE | INVOKE_IMPLICIT | NEW_LINE
-		)*
+		TARGET_DEPENDENCY
 	}
 
 	// --- STRINGS ---
@@ -468,7 +454,7 @@ PARSE {
 		$outNode : (
 			virtual TokIdentifier 
 			| virtual TokKWRun 
-			| virtual TokKWCache 
+			| virtual TokKWArtifacts
 			| virtual TokKWPath
 		)
 	}
@@ -477,7 +463,7 @@ PARSE {
 		NodeVariableReference : TokIdentifier
 	}
 
-	rule NEW_LINE -> NodeNewLine {
+	rule NEW_LINE -> transparent gr_NEW_LINE {
 		virtual TokNewLine
 	}
 }

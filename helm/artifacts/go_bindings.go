@@ -24,37 +24,38 @@ const (
 	TokInteger Token = 12
 	TokInterpolationEnd Token = 13
 	TokInterpolationStart Token = 14
-	TokKWBypass Token = 15
-	TokKWCache Token = 16
+	TokKWAliases Token = 15
+	TokKWArtifacts Token = 16
 	TokKWConfirm Token = 17
 	TokKWDefined Token = 18
 	TokKWDependsOn Token = 19
-	TokKWEquals Token = 20
-	TokKWFalse Token = 21
-	TokKWGlob Token = 22
-	TokKWHelp Token = 23
-	TokKWInputs Token = 24
-	TokKWInvoke Token = 25
+	TokKWEnv Token = 20
+	TokKWEquals Token = 21
+	TokKWFalse Token = 22
+	TokKWGlob Token = 23
+	TokKWHelp Token = 24
+	TokKWInputs Token = 25
 	TokKWNotDefined Token = 26
 	TokKWNotEquals Token = 27
 	TokKWOptional Token = 28
 	TokKWOutput Token = 29
-	TokKWParallel Token = 30
-	TokKWPath Token = 31
-	TokKWRun Token = 32
-	TokKWTarget Token = 33
-	TokKWTrue Token = 34
+	TokKWPath Token = 30
+	TokKWRun Token = 31
+	TokKWTarget Token = 32
+	TokKWTrue Token = 33
+	TokKWVolatile Token = 34
 	TokKWWhen Token = 35
-	TokLineComment Token = 36
-	TokNewLine Token = 37
-	TokParenClose Token = 38
-	TokParenOpen Token = 39
-	TokQuestion Token = 40
-	TokStringEnd Token = 41
-	TokStringEscape Token = 42
-	TokStringLiteral Token = 43
-	TokStringStart Token = 44
-	TokWhitespace Token = 45
+	TokKWWorkingDir Token = 36
+	TokLineComment Token = 37
+	TokNewLine Token = 38
+	TokParenClose Token = 39
+	TokParenOpen Token = 40
+	TokQuestion Token = 41
+	TokStringEnd Token = 42
+	TokStringEscape Token = 43
+	TokStringLiteral Token = 44
+	TokStringStart Token = 45
+	TokWhitespace Token = 46
 )
 
 var TokenNames = [...]string{
@@ -71,27 +72,28 @@ var TokenNames = [...]string{
 	"TokInteger",
 	"TokInterpolationEnd",
 	"TokInterpolationStart",
-	"TokKWBypass",
-	"TokKWCache",
+	"TokKWAliases",
+	"TokKWArtifacts",
 	"TokKWConfirm",
 	"TokKWDefined",
 	"TokKWDependsOn",
+	"TokKWEnv",
 	"TokKWEquals",
 	"TokKWFalse",
 	"TokKWGlob",
 	"TokKWHelp",
 	"TokKWInputs",
-	"TokKWInvoke",
 	"TokKWNotDefined",
 	"TokKWNotEquals",
 	"TokKWOptional",
 	"TokKWOutput",
-	"TokKWParallel",
 	"TokKWPath",
 	"TokKWRun",
 	"TokKWTarget",
 	"TokKWTrue",
+	"TokKWVolatile",
 	"TokKWWhen",
+	"TokKWWorkingDir",
 	"TokLineComment",
 	"TokNewLine",
 	"TokParenClose",
@@ -126,37 +128,37 @@ func init() {
 type Node uint32
 
 const (
-	BYPASS_STATEMENT Node = 1
-	CACHE_BLOCK Node = 2
-	CACHE_BLOCK_CONTENT Node = 3
-	CONDITIONAL_BLOCK Node = 4
-	CONDITIONAL_TARGET Node = 5
-	DEFINES Node = 6
-	DEPENDENCY_ELEMENT Node = 7
-	DEPENDS_ON Node = 8
-	DEPENDS_ON_CONTENT Node = 9
-	EQUALS Node = 10
-	ERROR_NODE Node = 11
-	GLOB Node = 12
-	GLOB_ARGS Node = 13
-	GLOB_BASE_DIR Node = 14
-	GLOB_KWARG Node = 15
-	HELP_STATEMENT Node = 16
-	INPUTS_STATEMENT Node = 17
-	INVOKE Node = 18
-	INVOKE_CONTENT Node = 19
-	INVOKE_IMPLICIT Node = 20
-	INVOKE_OPTIONS Node = 21
-	NEW_LINE Node = 22
-	NodeBoolean Node = 23
-	NodeBypass Node = 24
-	NodeCacheBlock Node = 25
-	NodeCacheInputs Node = 26
-	NodeCacheOutputDirectory Node = 27
-	NodeCondition Node = 28
-	NodeConditional Node = 29
-	NodeConditionalParameter Node = 30
-	NodeConditionalTarget Node = 31
+	ALIASES_DECLARATION Node = 1
+	ARTIFACTS_BLOCK Node = 2
+	CONDITIONAL_BLOCK Node = 3
+	CONDITIONAL_TARGET Node = 4
+	DEFINES Node = 5
+	DEPENDENCY_OPTIONS Node = 6
+	DEPENDS_ON Node = 7
+	ENV_DECLARATION Node = 8
+	ENV_KEY Node = 9
+	ENV_VALUE Node = 10
+	EQUALS Node = 11
+	ERROR_NODE Node = 12
+	GLOB Node = 13
+	GLOB_ARGS Node = 14
+	GLOB_BASE_DIR Node = 15
+	GLOB_KWARG Node = 16
+	HELP_STATEMENT Node = 17
+	INPUTS_STATEMENT Node = 18
+	NEW_LINE Node = 19
+	NodeAliases Node = 20
+	NodeArtifactsBlock Node = 21
+	NodeBoolean Node = 22
+	NodeCacheInputs Node = 23
+	NodeCacheOutputDirectory Node = 24
+	NodeCondition Node = 25
+	NodeConditional Node = 26
+	NodeConditionalParameter Node = 27
+	NodeConditionalTarget Node = 28
+	NodeDependencyOptions Node = 29
+	NodeEnvDeclaration Node = 30
+	NodeEnvKey Node = 31
 	NodeGlob Node = 32
 	NodeGlobArguments Node = 33
 	NodeGlobBaseDirectory Node = 34
@@ -164,78 +166,79 @@ const (
 	NodeGlobKwargIdentifier Node = 36
 	NodeHelpStatement Node = 37
 	NodeInterpolatedVariable Node = 38
-	NodeInvokeOptions Node = 39
-	NodeInvokeStatement Node = 40
-	NodeInvokeTarget Node = 41
-	NodeNewLine Node = 42
-	NodeNumber Node = 43
-	NodeParallel Node = 44
-	NodePath Node = 45
-	NodePathArgs Node = 46
-	NodeProgram Node = 47
-	NodeRunStatement Node = 48
-	NodeStringArray Node = 49
-	NodeStringDollar Node = 50
-	NodeStringInterpolation Node = 51
-	NodeStringLiteral Node = 52
-	NodeStringText Node = 53
-	NodeTarget Node = 54
-	NodeTargetBody Node = 55
-	NodeTargetDepends Node = 56
-	NodeTargetExecution Node = 57
-	NodeTargetIdentifier Node = 58
-	NodeTargetParameter Node = 59
-	NodeTargetParameterIdentifier Node = 60
-	NodeTargetParameterOptional Node = 61
-	NodeTargetParams Node = 62
-	NodeVariableDeclaration Node = 63
-	NodeVariableName Node = 64
-	NodeVariableReference Node = 65
-	NodeVariableValue Node = 66
-	OUTPUT_STATEMENT Node = 67
-	OUTPUT_STATEMENT_VALUE Node = 68
-	PARALLEL Node = 69
-	PARALLEL_CONTENT Node = 70
-	PATH Node = 71
-	PATH_ARGS Node = 72
-	PATH_ELEMENT Node = 73
-	RUN Node = 74
-	STRING_ARRAY Node = 75
-	STRING_INTERPOLATION Node = 76
-	STRING_LITERAL Node = 77
-	TARGET Node = 78
-	TARGET_BODY Node = 79
-	TARGET_EXECUTION Node = 80
-	TARGET_PARAM Node = 81
-	TARGET_PARAMS Node = 82
-	TRUE_OR_FALSE Node = 83
-	VARIABLE_STATEMENT Node = 84
-	VARIABLE_TARGET Node = 85
-	VAR_REF Node = 86
-	gr_CACHE_BLOCK_CONTENT Node = 87
-	gr_DEFINES Node = 88
-	gr_DEPENDS_ON_CONTENT Node = 89
-	gr_DEP_EL Node = 90
-	gr_EQUALS Node = 91
-	gr_INPUTS_VALUE Node = 92
-	gr_INVOKE_CONTENT Node = 93
-	gr_OUTPUT_VALUE Node = 94
-	gr_PARALLEL_CONTENT Node = 95
+	NodeInvokeTarget Node = 39
+	NodeNumber Node = 40
+	NodePath Node = 41
+	NodePathArgs Node = 42
+	NodeProgram Node = 43
+	NodeRunStatement Node = 44
+	NodeStringArray Node = 45
+	NodeStringDollar Node = 46
+	NodeStringInterpolation Node = 47
+	NodeStringLiteral Node = 48
+	NodeStringText Node = 49
+	NodeTarget Node = 50
+	NodeTargetBody Node = 51
+	NodeTargetDependency Node = 52
+	NodeTargetDepends Node = 53
+	NodeTargetExecution Node = 54
+	NodeTargetIdentifier Node = 55
+	NodeTargetParameter Node = 56
+	NodeTargetParameterIdentifier Node = 57
+	NodeTargetParameterOptional Node = 58
+	NodeTargetParams Node = 59
+	NodeVariableDeclaration Node = 60
+	NodeVariableName Node = 61
+	NodeVariableReference Node = 62
+	NodeVariableValue Node = 63
+	NodeVolatile Node = 64
+	NodeWorkingDirectory Node = 65
+	OUTPUT_STATEMENT Node = 66
+	OUTPUT_STATEMENT_VALUE Node = 67
+	PATH Node = 68
+	PATH_ARGS Node = 69
+	PATH_ELEMENT Node = 70
+	RUN Node = 71
+	STRING_ARRAY Node = 72
+	STRING_INTERPOLATION Node = 73
+	STRING_LITERAL Node = 74
+	TARGET Node = 75
+	TARGET_BODY Node = 76
+	TARGET_DEPENDENCY Node = 77
+	TARGET_EXECUTION Node = 78
+	TARGET_PARAM Node = 79
+	TARGET_PARAMS Node = 80
+	VARIABLE_STATEMENT Node = 81
+	VARIABLE_TARGET Node = 82
+	VAR_REF Node = 83
+	VOLATILE_STATEMENT Node = 84
+	WORK_DIR Node = 85
+	gr_ARTIFACTS_STATEMENT Node = 86
+	gr_DEFINES Node = 87
+	gr_DEP_EL Node = 88
+	gr_ENV_ASSIGNMENT Node = 89
+	gr_ENV_KEY Node = 90
+	gr_ENV_VALUE Node = 91
+	gr_EQUALS Node = 92
+	gr_INPUTS_VALUE Node = 93
+	gr_NEW_LINE Node = 94
+	gr_OUTPUT_VALUE Node = 95
 	gr_PATH_ELEMENT Node = 96
 	gr_TRUE_OR_FALSE Node = 97
 	gr_VAR_REF Node = 98
 )
 
 var NodeNames = [...]string{
-	"BYPASS_STATEMENT",
-	"CACHE_BLOCK",
-	"CACHE_BLOCK_CONTENT",
+	"ALIASES_DECLARATION",
+	"ARTIFACTS_BLOCK",
 	"CONDITIONAL_BLOCK",
 	"CONDITIONAL_TARGET",
 	"DEFINES",
-	"DEPENDENCY_ELEMENT",
+	"DEPENDENCY_OPTIONS",
 	"DEPENDS_ON",
-	"DEPENDS_ON_CONTENT",
+	"ENV_DECLARATION",
+	"ENV_KEY",
+	"ENV_VALUE",
 	"EQUALS",
 	"ERROR_NODE",
 	"GLOB",
@@ -244,20 +247,19 @@ var NodeNames = [...]string{
 	"GLOB_KWARG",
 	"HELP_STATEMENT",
 	"INPUTS_STATEMENT",
-	"INVOKE",
-	"INVOKE_CONTENT",
-	"INVOKE_IMPLICIT",
-	"INVOKE_OPTIONS",
 	"NEW_LINE",
+	"NodeAliases",
+	"NodeArtifactsBlock",
 	"NodeBoolean",
-	"NodeBypass",
-	"NodeCacheBlock",
 	"NodeCacheInputs",
 	"NodeCacheOutputDirectory",
 	"NodeCondition",
 	"NodeConditional",
 	"NodeConditionalParameter",
 	"NodeConditionalTarget",
+	"NodeDependencyOptions",
+	"NodeEnvDeclaration",
+	"NodeEnvKey",
 	"NodeGlob",
 	"NodeGlobArguments",
 	"NodeGlobBaseDirectory",
@@ -265,12 +267,8 @@ var NodeNames = [...]string{
 	"NodeGlobKwargIdentifier",
 	"NodeHelpStatement",
 	"NodeInterpolatedVariable",
-	"NodeInvokeOptions",
-	"NodeInvokeStatement",
 	"NodeInvokeTarget",
-	"NodeNewLine",
 	"NodeNumber",
-	"NodeParallel",
 	"NodePath",
 	"NodePathArgs",
 	"NodeProgram",
@@ -282,6 +280,7 @@ var NodeNames = [...]string{
 	"NodeStringText",
 	"NodeTarget",
 	"NodeTargetBody",
+	"NodeTargetDependency",
 	"NodeTargetDepends",
 	"NodeTargetExecution",
 	"NodeTargetIdentifier",
@@ -293,10 +292,10 @@ var NodeNames = [...]string{
 	"NodeVariableName",
 	"NodeVariableReference",
 	"NodeVariableValue",
+	"NodeVolatile",
+	"NodeWorkingDirectory",
 	"OUTPUT_STATEMENT",
 	"OUTPUT_STATEMENT_VALUE",
-	"PARALLEL",
-	"PARALLEL_CONTENT",
 	"PATH",
 	"PATH_ARGS",
 	"PATH_ELEMENT",
@@ -306,22 +305,25 @@ var NodeNames = [...]string{
 	"STRING_LITERAL",
 	"TARGET",
 	"TARGET_BODY",
+	"TARGET_DEPENDENCY",
 	"TARGET_EXECUTION",
 	"TARGET_PARAM",
 	"TARGET_PARAMS",
-	"TRUE_OR_FALSE",
 	"VARIABLE_STATEMENT",
 	"VARIABLE_TARGET",
 	"VAR_REF",
-	"gr_CACHE_BLOCK_CONTENT",
+	"VOLATILE_STATEMENT",
+	"WORK_DIR",
+	"gr_ARTIFACTS_STATEMENT",
 	"gr_DEFINES",
-	"gr_DEPENDS_ON_CONTENT",
 	"gr_DEP_EL",
+	"gr_ENV_ASSIGNMENT",
+	"gr_ENV_KEY",
+	"gr_ENV_VALUE",
 	"gr_EQUALS",
 	"gr_INPUTS_VALUE",
-	"gr_INVOKE_CONTENT",
+	"gr_NEW_LINE",
 	"gr_OUTPUT_VALUE",
-	"gr_PARALLEL_CONTENT",
 	"gr_PATH_ELEMENT",
 	"gr_TRUE_OR_FALSE",
 	"gr_VAR_REF",
