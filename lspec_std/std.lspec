@@ -41,7 +41,7 @@ PARSE {
 	Flexible array: [ element, element, ].
 	Supports zero or more elements. Allows an optional trailing separator.
 	*/
-	export template t_ARRAY_TRAILING_COMMA($openTk: Token, $closeTk: Token, $elementRule: Rule, $separatorTk: Token) {
+	export template t_ARRAY_TRAILING_SEP($openTk: Token, $closeTk: Token, $elementRule: Rule, $separatorTk: Token) {
 	    virtual $openTk
 	    (
 	        call _LIST_BODY($elementRule, $separatorTk)
@@ -64,7 +64,7 @@ PARSE {
 	Flexible non-empty array: [ element, element, ].
 	Requires at least one element. Allows an optional trailing separator.
 	*/
-	export template t_ARRAY_1_OR_MORE_TRAILING_COMMA($openTk: Token, $closeTk: Token, $elementRule: Rule, $separatorTk: Token) {
+	export template t_ARRAY_1_OR_MORE_TRAILING_SEP($openTk: Token, $closeTk: Token, $elementRule: Rule, $separatorTk: Token) {
 	    virtual $openTk
 	    call _LIST_BODY($elementRule, $separatorTk)
 	    virtual $separatorTk?

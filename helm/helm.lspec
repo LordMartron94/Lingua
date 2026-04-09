@@ -59,8 +59,15 @@ PATTERN {
 	pat_TokKWOutput 			: "output";
 	pat_TokKWPath				: "path";
 	pat_TokKWBypass				: "bypass";
+	pat_TokKWInvoke				: "invoke";
+
+	pat_TokKWConfirm			: "confirm";
+	pat_TokKWOptional			: "optional";
 
 	pat_TokKWWhen				: "when";
+
+	pat_TokKWParallel			: "parallel";
+	pat_TokKWDependsOn			: "depends_on";
 
 	pat_TokKWDefined			: "defined";
 	pat_TokKWNotDefined			: "not_defined";
@@ -95,9 +102,16 @@ LEX {
 		2 TokKWOutput 			-> HELM_STRUCTURAL_ROLE : pat_TokKWOutput;
 		2 TokKWPath 			-> HELM_STRUCTURAL_ROLE : pat_TokKWPath;
 		2 TokKWBypass 			-> HELM_STRUCTURAL_ROLE : pat_TokKWBypass;
+		2 TokKWInvoke 			-> HELM_STRUCTURAL_ROLE : pat_TokKWInvoke;
 
 		2 TokKWTrue 			-> HELM_STRUCTURAL_ROLE : pat_TokKWTrue;
 		2 TokKWFalse 			-> HELM_STRUCTURAL_ROLE : pat_TokKWFalse;
+
+		2 TokKWConfirm 			-> HELM_STRUCTURAL_ROLE : pat_TokKWConfirm;
+		2 TokKWOptional 		-> HELM_STRUCTURAL_ROLE : pat_TokKWOptional;
+
+		2 TokKWParallel 		-> HELM_STRUCTURAL_ROLE : pat_TokKWParallel;
+		2 TokKWDependsOn 		-> HELM_STRUCTURAL_ROLE : pat_TokKWDependsOn;
 
 		2 TokKWWhen 			-> HELM_STRUCTURAL_ROLE : pat_TokKWWhen;
 
@@ -185,10 +199,11 @@ PARSE {
 
 	pair Parens TokParenOpen TokParenClose;
 	pair Braces TokBraceOpen TokBraceClose;
+	pair Brackets TokBracketOpen TokBracketClose;
 
 	rule TARGET -> NodeTarget {	
 		virtual TokKWTarget
-		NodeTargetIdentifier : TokIdentifier
+		call t_ALLOWED_TARGET_NAME(NodeTargetIdentifier)
 		nest @Parens {
 			TARGET_PARAMS
 		}
@@ -214,7 +229,8 @@ PARSE {
 
 	rule TARGET_BODY -> NodeTargetBody {
 		(
-			NEW_LINE | HELP_STATEMENT | CACHE_BLOCK | CONDITIONAL_BLOCK
+			NEW_LINE | HELP_STATEMENT | CACHE_BLOCK | CONDITIONAL_BLOCK | DEPENDS_ON | PARALLEL
+			| RUN | INVOKE
 		)*
 	}
 
@@ -242,14 +258,14 @@ PARSE {
 		)*
 	}
 
-	template t_cacheAssignment($keyword: Token, $rule: Rule) {
+	template t_simpleAssignment($keyword: Token, $rule: Rule) {
 		virtual $keyword
 		virtual TokEquals
 		$rule
 	}
 
 	rule INPUTS_STATEMENT -> NodeCacheInputs {
-		call t_cacheAssignment(TokKWInputs, INPUTS_VALUE)
+		call t_simpleAssignment(TokKWInputs, INPUTS_VALUE)
 		NEW_LINE
 	}
 
@@ -316,7 +332,7 @@ PARSE {
 	rule BYPASS_STATEMENT -> NodeBypass {
 		virtual TokKWBypass
 		virtual TokEquals
-		NodeBypassValue : (virtual TokKWTrue | virtual TokKWFalse)
+		TRUE_OR_FALSE
 		NEW_LINE
 	}
 
@@ -354,13 +370,73 @@ PARSE {
 	}
 
 	rule TARGET_EXECUTION -> NodeTargetExecution {
-		RUN // For now only Run, maybe more later
+		RUN | INVOKE
 	}
 
 	rule RUN -> NodeRunStatement {
 		virtual TokKWRun
 		STRING_LITERAL
 		NEW_LINE
+	}
+
+	rule INVOKE -> NodeInvokeStatement {
+		virtual TokKWInvoke
+		INVOKE_CONTENT
+	}
+
+	rule INVOKE_IMPLICIT -> NodeInvokeStatement {
+		INVOKE_CONTENT
+	}
+
+	rule INVOKE_CONTENT -> transparent gr_INVOKE_CONTENT {
+		call t_ALLOWED_TARGET_NAME(NodeInvokeTarget)
+		nest @Braces {
+			INVOKE_OPTIONS
+		}?
+	}
+
+	rule INVOKE_OPTIONS -> NodeInvokeOptions {
+		(
+			call t_simpleAssignment(TokKWConfirm, TRUE_OR_FALSE)
+			|
+			call t_simpleAssignment(TokKWOptional, TRUE_OR_FALSE)
+			|
+			NEW_LINE
+		)*
+	}
+
+	rule TRUE_OR_FALSE -> gr_TRUE_OR_FALSE {
+		NodeBoolean : (virtual TokKWTrue | virtual TokKWFalse)
+	}
+
+	rule DEPENDS_ON -> NodeTargetDepends {
+		virtual TokKWDependsOn
+		nest @Brackets {
+			DEPENDS_ON_CONTENT
+		}
+	}
+
+	rule DEPENDS_ON_CONTENT -> transparent gr_DEPENDS_ON_CONTENT {
+		(
+			DEPENDENCY_ELEMENT | NEW_LINE
+		)*
+	}
+
+	rule DEPENDENCY_ELEMENT -> transparent gr_DEP_EL {
+		INVOKE | INVOKE_IMPLICIT
+	}
+
+	rule PARALLEL -> NodeParallel {
+		virtual TokKWParallel
+		nest @Braces {
+			PARALLEL_CONTENT
+		}
+	}
+
+	rule PARALLEL_CONTENT -> transparent gr_PARALLEL_CONTENT {
+		(
+			INVOKE | INVOKE_IMPLICIT | NEW_LINE
+		)*
 	}
 
 	// --- STRINGS ---
@@ -387,6 +463,15 @@ PARSE {
 	}
 
 	// --- OTHER ---
+
+	template t_ALLOWED_TARGET_NAME($outNode: Node) {
+		$outNode : (
+			virtual TokIdentifier 
+			| virtual TokKWRun 
+			| virtual TokKWCache 
+			| virtual TokKWPath
+		)
+	}
 
 	rule VAR_REF -> transparent gr_VAR_REF {
 		NodeVariableReference : TokIdentifier

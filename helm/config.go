@@ -43,6 +43,8 @@ var helmSemanticManifest = toolchain.SemanticManifest[Token, Node]{
 		TokBraceClose:         "punctuation.section.braces.end",
 		TokParenOpen:          "punctuation.section.parens.begin",
 		TokParenClose:         "punctuation.section.parens.end",
+		TokBracketOpen:        "punctuation.section.brackets.begin",
+		TokBracketClose:       "punctuation.section.brackets.close",
 		TokQuestion:           "punctuation.question",
 		TokKWTarget:           "keyword.declaration.target",
 
@@ -56,7 +58,10 @@ var helmSemanticManifest = toolchain.SemanticManifest[Token, Node]{
 
 		TokKWWhen: "keyword.control.condition.when",
 
-		TokKWRun: "support.function.builtin.execution",
+		TokKWRun:       "keyword.control.execution",
+		TokKWInvoke:    "keyword.control.execution",
+		TokKWParallel:  "keyword.control.parallel",
+		TokKWDependsOn: "keyword.control.depends-on",
 
 		TokKWHelp:  "support.type.property-name.help",
 		TokKWCache: "support.type.property-name.cache",
@@ -64,6 +69,9 @@ var helmSemanticManifest = toolchain.SemanticManifest[Token, Node]{
 		TokKWInputs: "support.type.property-name.inputs",
 		TokKWOutput: "support.type.property-name.output",
 		TokKWBypass: "support.type.property-name.bypass",
+
+		TokKWConfirm:  "support.type.property-name.confirm",
+		TokKWOptional: "support.type.property-name.optional",
 
 		TokKWTrue:  "constant.language.boolean.true",
 		TokKWFalse: "constant.language.boolean.false",
@@ -113,6 +121,9 @@ var helmSemanticManifest = toolchain.SemanticManifest[Token, Node]{
 		},
 		NodeNumber: {
 			Scopes: []string{"constant.language.numeric"},
+		},
+		NodeInvokeTarget: {
+			Scopes: []string{"meta.target-reference", "variable.other.target.reference"},
 		},
 	},
 }
