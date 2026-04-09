@@ -64,6 +64,10 @@ PATTERN {
 
 	pat_TokKWDefined			: "defined";
 	pat_TokKWNotDefined			: "not_defined";
+	pat_TokKWEquals				: "equals";
+	pat_TokKWNotEquals			: "not_equals";
+
+	pat_TokInteger 				: '0' | ['1'..'9'] ['0'..'9']+;
 
 	pat_TokKWRun				: "run";
 
@@ -83,71 +87,76 @@ PATTERN {
 LEX {
 	state INITIAL {
 		// Keywords
-		2 TokKWTarget 			-> RULEFORGE_STRUCTURAL_ROLE : pat_TokKWTarget;
-		2 TokKWHelp 			-> RULEFORGE_STRUCTURAL_ROLE : pat_TokKWHelp;
-		2 TokKWCache 			-> RULEFORGE_STRUCTURAL_ROLE : pat_TokKWCache;
-		2 TokKWInputs 			-> RULEFORGE_STRUCTURAL_ROLE : pat_TokKWInputs;
-		2 TokKWGlob 			-> RULEFORGE_STRUCTURAL_ROLE : pat_TokKWGlob;
-		2 TokKWOutput 			-> RULEFORGE_STRUCTURAL_ROLE : pat_TokKWOutput;
-		2 TokKWPath 			-> RULEFORGE_STRUCTURAL_ROLE : pat_TokKWPath;
-		2 TokKWBypass 			-> RULEFORGE_STRUCTURAL_ROLE : pat_TokKWBypass;
+		2 TokKWTarget 			-> HELM_STRUCTURAL_ROLE : pat_TokKWTarget;
+		2 TokKWHelp 			-> HELM_STRUCTURAL_ROLE : pat_TokKWHelp;
+		2 TokKWCache 			-> HELM_STRUCTURAL_ROLE : pat_TokKWCache;
+		2 TokKWInputs 			-> HELM_STRUCTURAL_ROLE : pat_TokKWInputs;
+		2 TokKWGlob 			-> HELM_STRUCTURAL_ROLE : pat_TokKWGlob;
+		2 TokKWOutput 			-> HELM_STRUCTURAL_ROLE : pat_TokKWOutput;
+		2 TokKWPath 			-> HELM_STRUCTURAL_ROLE : pat_TokKWPath;
+		2 TokKWBypass 			-> HELM_STRUCTURAL_ROLE : pat_TokKWBypass;
 
-		2 TokKWTrue 			-> RULEFORGE_STRUCTURAL_ROLE : pat_TokKWTrue;
-		2 TokKWFalse 			-> RULEFORGE_STRUCTURAL_ROLE : pat_TokKWFalse;
+		2 TokKWTrue 			-> HELM_STRUCTURAL_ROLE : pat_TokKWTrue;
+		2 TokKWFalse 			-> HELM_STRUCTURAL_ROLE : pat_TokKWFalse;
 
-		2 TokKWWhen 			-> RULEFORGE_STRUCTURAL_ROLE : pat_TokKWWhen;
-		2 TokKWDefined 			-> RULEFORGE_STRUCTURAL_ROLE : pat_TokKWDefined;
-		2 TokKWNotDefined 		-> RULEFORGE_STRUCTURAL_ROLE : pat_TokKWNotDefined;
-		2 TokKWRun 				-> RULEFORGE_STRUCTURAL_ROLE : pat_TokKWRun;
+		2 TokKWWhen 			-> HELM_STRUCTURAL_ROLE : pat_TokKWWhen;
+
+		2 TokKWDefined 			-> HELM_STRUCTURAL_ROLE : pat_TokKWDefined;
+		2 TokKWNotDefined 		-> HELM_STRUCTURAL_ROLE : pat_TokKWNotDefined;
+		2 TokKWEquals 			-> HELM_STRUCTURAL_ROLE : pat_TokKWEquals;
+		2 TokKWNotEquals 		-> HELM_STRUCTURAL_ROLE : pat_TokKWNotEquals;
+
+		2 TokKWRun 				-> HELM_STRUCTURAL_ROLE : pat_TokKWRun;
 
 		// Conventional
-		1 TokIdentifier 		-> RULEFORGE_STRUCTURAL_ROLE : pat_TokIdentifier;
-		1 TokStringStart 		-> RULEFORGE_STRUCTURAL_ROLE : pat_TokStringStart [push(STRING)];
+		1 TokIdentifier 		-> HELM_STRUCTURAL_ROLE : pat_TokIdentifier;
+		1 TokStringStart 		-> HELM_STRUCTURAL_ROLE : pat_TokStringStart [push(STRING)];
+		1 TokInteger 			-> HELM_STRUCTURAL_ROLE : pat_TokInteger;
 
 		// // Operators
-		1 TokEquals 			-> RULEFORGE_STRUCTURAL_ROLE : pat_TokEquals;
-		1 TokQuestion 			-> RULEFORGE_STRUCTURAL_ROLE : pat_TokQuestion;
+		1 TokEquals 			-> HELM_STRUCTURAL_ROLE : pat_TokEquals;
+		1 TokQuestion 			-> HELM_STRUCTURAL_ROLE : pat_TokQuestion;
 
 		// Structure
-		1 TokBraceOpen 			-> RULEFORGE_STRUCTURAL_ROLE : pat_TokBraceOpen;
-		1 TokBraceClose 		-> RULEFORGE_STRUCTURAL_ROLE : pat_TokBraceClose;
-		1 TokParenOpen 			-> RULEFORGE_STRUCTURAL_ROLE : pat_TokParenOpen;
-		1 TokParenClose 		-> RULEFORGE_STRUCTURAL_ROLE : pat_TokParenClose;
-		1 TokComma 				-> RULEFORGE_STRUCTURAL_ROLE : pat_TokComma;
-		1 TokBracketOpen		-> RULEFORGE_STRUCTURAL_ROLE : pat_TokBracketOpen;
-		1 TokBracketClose 		-> RULEFORGE_STRUCTURAL_ROLE : pat_TokBracketClose;
+		1 TokBraceOpen 			-> HELM_STRUCTURAL_ROLE : pat_TokBraceOpen;
+		1 TokBraceClose 		-> HELM_STRUCTURAL_ROLE : pat_TokBraceClose;
+		1 TokParenOpen 			-> HELM_STRUCTURAL_ROLE : pat_TokParenOpen;
+		1 TokParenClose 		-> HELM_STRUCTURAL_ROLE : pat_TokParenClose;
+		1 TokComma 				-> HELM_STRUCTURAL_ROLE : pat_TokComma;
+		1 TokBracketOpen		-> HELM_STRUCTURAL_ROLE : pat_TokBracketOpen;
+		1 TokBracketClose 		-> HELM_STRUCTURAL_ROLE : pat_TokBracketClose;
 
 	    // Hidden/Whitespace
-	    0 TokWhitespace         -> RULEFORGE_WHITESPACE_ROLE : pat_TokWhitespace;
-		0 TokNewLine            -> RULEFORGE_STRUCTURAL_ROLE : pat_TokNewLine;
+	    0 TokWhitespace         -> HELM_WHITESPACE_ROLE : pat_TokWhitespace;
+		0 TokNewLine            -> HELM_STRUCTURAL_ROLE : pat_TokNewLine;
 
-	    0 TokBlockComment       -> RULEFORGE_COMMENT_ROLE    : pat_TokBlockComment;
-	    0 TokLineComment        -> RULEFORGE_COMMENT_ROLE    : pat_TokLineComment;
+	    0 TokBlockComment       -> HELM_COMMENT_ROLE    : pat_TokBlockComment;
+	    0 TokLineComment        -> HELM_COMMENT_ROLE    : pat_TokLineComment;
 
 	    // End of File
-	    0 TokEOF                -> RULEFORGE_STRUCTURAL_ROLE : pat_TokEOF %% EOF=true %%;
+	    0 TokEOF                -> HELM_STRUCTURAL_ROLE : pat_TokEOF %% EOF=true %%;
 	}
 
 	state STRING {
-		2 TokInterpolationStart -> RULEFORGE_STRUCTURAL_ROLE : pat_TokInterpolationStart [push(INTERPOLATION)];
-		1 TokStringEscape       -> RULEFORGE_STRUCTURAL_ROLE : pat_TokStringEscape;
-		1 TokDollar         	-> RULEFORGE_STRUCTURAL_ROLE : pat_TokDollar;
-		1 TokStringLiteral      -> RULEFORGE_STRUCTURAL_ROLE : pat_TokStringLiteral;
-		1 TokStringEnd          -> RULEFORGE_STRUCTURAL_ROLE : pat_TokStringEnd [pop(1)];
+		2 TokInterpolationStart -> HELM_STRUCTURAL_ROLE : pat_TokInterpolationStart [push(INTERPOLATION)];
+		1 TokStringEscape       -> HELM_STRUCTURAL_ROLE : pat_TokStringEscape;
+		1 TokDollar         	-> HELM_STRUCTURAL_ROLE : pat_TokDollar;
+		1 TokStringLiteral      -> HELM_STRUCTURAL_ROLE : pat_TokStringLiteral;
+		1 TokStringEnd          -> HELM_STRUCTURAL_ROLE : pat_TokStringEnd [pop(1)];
 	}
 
 	state INTERPOLATION {
-		1 TokIdentifier       -> RULEFORGE_STRUCTURAL_ROLE : pat_TokIdentifier;
-		1 TokInterpolationEnd -> RULEFORGE_STRUCTURAL_ROLE : pat_TokInterpolationEnd [pop(1)];
+		1 TokIdentifier       -> HELM_STRUCTURAL_ROLE : pat_TokIdentifier;
+		1 TokInterpolationEnd -> HELM_STRUCTURAL_ROLE : pat_TokInterpolationEnd [pop(1)];
 		
 		// Optional: allow whitespace inside the brackets
-		0 TokWhitespace       -> RULEFORGE_WHITESPACE_ROLE : pat_TokWhitespace;
+		0 TokWhitespace       -> HELM_WHITESPACE_ROLE : pat_TokWhitespace;
 	}
 }
 
 PARSE {
 	IGNORE {
-		RULEFORGE_WHITESPACE_ROLE RULEFORGE_COMMENT_ROLE
+		HELM_WHITESPACE_ROLE HELM_COMMENT_ROLE
 	}
 
 	// --- ENTRY ---
@@ -313,16 +322,35 @@ PARSE {
 
 	rule CONDITIONAL_BLOCK -> NodeConditional {
 		virtual TokKWWhen
-		NodeCondition : (virtual TokKWDefined | virtual TokKWNotDefined)
-		nest @Parens {
-			NodeConditionalParameter : TokIdentifier
-		}
+
+		(DEFINES | EQUALS)
+
 		nest @Braces {
 			(
 				NEW_LINE
 				| TARGET_EXECUTION
 			)*
+		}	
+	}
+
+	rule DEFINES -> transparent gr_DEFINES {
+		NodeCondition : (virtual TokKWDefined | virtual TokKWNotDefined)
+		nest @Parens {
+			NodeConditionalParameter : TokIdentifier
 		}
+	}
+
+	rule EQUALS -> transparent gr_EQUALS {
+		NodeCondition : (virtual TokKWEquals | virtual TokKWNotEquals)
+		nest @Parens {
+			NodeConditionalParameter : TokIdentifier
+			virtual TokComma
+			CONDITIONAL_TARGET 
+		}
+	}
+
+	rule CONDITIONAL_TARGET -> NodeConditionalTarget {
+		STRING_LITERAL | NodeNumber : TokInteger
 	}
 
 	rule TARGET_EXECUTION -> NodeTargetExecution {

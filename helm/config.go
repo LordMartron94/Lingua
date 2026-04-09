@@ -51,6 +51,8 @@ var helmSemanticManifest = toolchain.SemanticManifest[Token, Node]{
 
 		TokKWDefined:    "support.function.builtin.defined",
 		TokKWNotDefined: "support.function.builtin.not-defined",
+		TokKWEquals:     "support.function.builtin.equals",
+		TokKWNotEquals:  "support.function.builtin.not-equals",
 
 		TokKWWhen: "keyword.control.condition.when",
 
@@ -103,8 +105,14 @@ var helmSemanticManifest = toolchain.SemanticManifest[Token, Node]{
 		NodeGlobKwargIdentifier: {
 			Scopes: []string{"variable.parameter"},
 		},
+		NodeConditionalParameter: {
+			Scopes: []string{"variable.parameter"},
+		},
 		NodeStringDollar: {
 			Scopes: []string{"string.quoted.double"},
+		},
+		NodeNumber: {
+			Scopes: []string{"constant.language.numeric"},
 		},
 	},
 }
