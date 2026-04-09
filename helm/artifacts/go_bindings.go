@@ -25,24 +25,28 @@ const (
 	TokInterpolationStart Token = 13
 	TokKWBypass Token = 14
 	TokKWCache Token = 15
-	TokKWFalse Token = 16
-	TokKWGlob Token = 17
-	TokKWHelp Token = 18
-	TokKWInputs Token = 19
-	TokKWOutput Token = 20
-	TokKWPath Token = 21
-	TokKWTarget Token = 22
-	TokKWTrue Token = 23
-	TokLineComment Token = 24
-	TokNewLine Token = 25
-	TokParenClose Token = 26
-	TokParenOpen Token = 27
-	TokQuestion Token = 28
-	TokStringEnd Token = 29
-	TokStringEscape Token = 30
-	TokStringLiteral Token = 31
-	TokStringStart Token = 32
-	TokWhitespace Token = 33
+	TokKWDefined Token = 16
+	TokKWFalse Token = 17
+	TokKWGlob Token = 18
+	TokKWHelp Token = 19
+	TokKWInputs Token = 20
+	TokKWNotDefined Token = 21
+	TokKWOutput Token = 22
+	TokKWPath Token = 23
+	TokKWRun Token = 24
+	TokKWTarget Token = 25
+	TokKWTrue Token = 26
+	TokKWWhen Token = 27
+	TokLineComment Token = 28
+	TokNewLine Token = 29
+	TokParenClose Token = 30
+	TokParenOpen Token = 31
+	TokQuestion Token = 32
+	TokStringEnd Token = 33
+	TokStringEscape Token = 34
+	TokStringLiteral Token = 35
+	TokStringStart Token = 36
+	TokWhitespace Token = 37
 )
 
 var TokenNames = [...]string{
@@ -60,14 +64,18 @@ var TokenNames = [...]string{
 	"TokInterpolationStart",
 	"TokKWBypass",
 	"TokKWCache",
+	"TokKWDefined",
 	"TokKWFalse",
 	"TokKWGlob",
 	"TokKWHelp",
 	"TokKWInputs",
+	"TokKWNotDefined",
 	"TokKWOutput",
 	"TokKWPath",
+	"TokKWRun",
 	"TokKWTarget",
 	"TokKWTrue",
+	"TokKWWhen",
 	"TokLineComment",
 	"TokNewLine",
 	"TokParenClose",
@@ -105,72 +113,81 @@ const (
 	BYPASS_STATEMENT Node = 1
 	CACHE_BLOCK Node = 2
 	CACHE_BLOCK_CONTENT Node = 3
-	ERROR_NODE Node = 4
-	GLOB Node = 5
-	GLOB_ARGS Node = 6
-	GLOB_BASE_DIR Node = 7
-	GLOB_KWARG Node = 8
-	HELP_STATEMENT Node = 9
-	INPUTS_STATEMENT Node = 10
-	NEW_LINE Node = 11
-	NodeBypass Node = 12
-	NodeBypassValue Node = 13
-	NodeCacheBlock Node = 14
-	NodeCacheInputs Node = 15
-	NodeCacheOutputDirectory Node = 16
-	NodeGlob Node = 17
-	NodeGlobArguments Node = 18
-	NodeGlobBaseDirectory Node = 19
-	NodeGlobKwarg Node = 20
-	NodeGlobKwargIdentifier Node = 21
-	NodeHelpStatement Node = 22
-	NodeInterpolatedVariable Node = 23
-	NodeNewLine Node = 24
-	NodePath Node = 25
-	NodePathArgs Node = 26
-	NodeProgram Node = 27
-	NodeStringArray Node = 28
-	NodeStringDollar Node = 29
-	NodeStringInterpolation Node = 30
-	NodeStringLiteral Node = 31
-	NodeStringText Node = 32
-	NodeTarget Node = 33
-	NodeTargetBody Node = 34
-	NodeTargetIdentifier Node = 35
-	NodeTargetParameter Node = 36
-	NodeTargetParameterIdentifier Node = 37
-	NodeTargetParameterOptional Node = 38
-	NodeTargetParams Node = 39
-	NodeVariableDeclaration Node = 40
-	NodeVariableName Node = 41
-	NodeVariableReference Node = 42
-	NodeVariableValue Node = 43
-	OUTPUT_STATEMENT Node = 44
-	OUTPUT_STATEMENT_VALUE Node = 45
-	PATH Node = 46
-	PATH_ARGS Node = 47
-	PATH_ELEMENT Node = 48
-	STRING_ARRAY Node = 49
-	STRING_INTERPOLATION Node = 50
-	STRING_LITERAL Node = 51
-	TARGET Node = 52
-	TARGET_BODY Node = 53
-	TARGET_PARAM Node = 54
-	TARGET_PARAMS Node = 55
-	VARIABLE_STATEMENT Node = 56
-	VARIABLE_TARGET Node = 57
-	VAR_REF Node = 58
-	gr_CACHE_BLOCK_CONTENT Node = 59
-	gr_INPUTS_VALUE Node = 60
-	gr_OUTPUT_VALUE Node = 61
-	gr_PATH_ELEMENT Node = 62
-	gr_VAR_REF Node = 63
+	CONDITIONAL_BLOCK Node = 4
+	ERROR_NODE Node = 5
+	GLOB Node = 6
+	GLOB_ARGS Node = 7
+	GLOB_BASE_DIR Node = 8
+	GLOB_KWARG Node = 9
+	HELP_STATEMENT Node = 10
+	INPUTS_STATEMENT Node = 11
+	NEW_LINE Node = 12
+	NodeBypass Node = 13
+	NodeBypassValue Node = 14
+	NodeCacheBlock Node = 15
+	NodeCacheInputs Node = 16
+	NodeCacheOutputDirectory Node = 17
+	NodeCondition Node = 18
+	NodeConditional Node = 19
+	NodeConditionalParameter Node = 20
+	NodeGlob Node = 21
+	NodeGlobArguments Node = 22
+	NodeGlobBaseDirectory Node = 23
+	NodeGlobKwarg Node = 24
+	NodeGlobKwargIdentifier Node = 25
+	NodeHelpStatement Node = 26
+	NodeInterpolatedVariable Node = 27
+	NodeNewLine Node = 28
+	NodePath Node = 29
+	NodePathArgs Node = 30
+	NodeProgram Node = 31
+	NodeRunStatement Node = 32
+	NodeStringArray Node = 33
+	NodeStringDollar Node = 34
+	NodeStringInterpolation Node = 35
+	NodeStringLiteral Node = 36
+	NodeStringText Node = 37
+	NodeTarget Node = 38
+	NodeTargetBody Node = 39
+	NodeTargetExecution Node = 40
+	NodeTargetIdentifier Node = 41
+	NodeTargetParameter Node = 42
+	NodeTargetParameterIdentifier Node = 43
+	NodeTargetParameterOptional Node = 44
+	NodeTargetParams Node = 45
+	NodeVariableDeclaration Node = 46
+	NodeVariableName Node = 47
+	NodeVariableReference Node = 48
+	NodeVariableValue Node = 49
+	OUTPUT_STATEMENT Node = 50
+	OUTPUT_STATEMENT_VALUE Node = 51
+	PATH Node = 52
+	PATH_ARGS Node = 53
+	PATH_ELEMENT Node = 54
+	RUN Node = 55
+	STRING_ARRAY Node = 56
+	STRING_INTERPOLATION Node = 57
+	STRING_LITERAL Node = 58
+	TARGET Node = 59
+	TARGET_BODY Node = 60
+	TARGET_EXECUTION Node = 61
+	TARGET_PARAM Node = 62
+	TARGET_PARAMS Node = 63
+	VARIABLE_STATEMENT Node = 64
+	VARIABLE_TARGET Node = 65
+	VAR_REF Node = 66
+	gr_CACHE_BLOCK_CONTENT Node = 67
+	gr_INPUTS_VALUE Node = 68
+	gr_OUTPUT_VALUE Node = 69
+	gr_PATH_ELEMENT Node = 70
+	gr_VAR_REF Node = 71
 )
 
 var NodeNames = [...]string{
 	"BYPASS_STATEMENT",
 	"CACHE_BLOCK",
 	"CACHE_BLOCK_CONTENT",
+	"CONDITIONAL_BLOCK",
 	"ERROR_NODE",
 	"GLOB",
 	"GLOB_ARGS",
@@ -184,6 +201,9 @@ var NodeNames = [...]string{
 	"NodeCacheBlock",
 	"NodeCacheInputs",
 	"NodeCacheOutputDirectory",
+	"NodeCondition",
+	"NodeConditional",
+	"NodeConditionalParameter",
 	"NodeGlob",
 	"NodeGlobArguments",
 	"NodeGlobBaseDirectory",
@@ -195,6 +215,7 @@ var NodeNames = [...]string{
 	"NodePath",
 	"NodePathArgs",
 	"NodeProgram",
+	"NodeRunStatement",
 	"NodeStringArray",
 	"NodeStringDollar",
 	"NodeStringInterpolation",
@@ -202,6 +223,7 @@ var NodeNames = [...]string{
 	"NodeStringText",
 	"NodeTarget",
 	"NodeTargetBody",
+	"NodeTargetExecution",
 	"NodeTargetIdentifier",
 	"NodeTargetParameter",
 	"NodeTargetParameterIdentifier",
@@ -216,11 +238,13 @@ var NodeNames = [...]string{
 	"PATH",
 	"PATH_ARGS",
 	"PATH_ELEMENT",
+	"RUN",
 	"STRING_ARRAY",
 	"STRING_INTERPOLATION",
 	"STRING_LITERAL",
 	"TARGET",
 	"TARGET_BODY",
+	"TARGET_EXECUTION",
 	"TARGET_PARAM",
 	"TARGET_PARAMS",
 	"VARIABLE_STATEMENT",

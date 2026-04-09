@@ -60,6 +60,13 @@ PATTERN {
 	pat_TokKWPath				: "path";
 	pat_TokKWBypass				: "bypass";
 
+	pat_TokKWWhen				: "when";
+
+	pat_TokKWDefined			: "defined";
+	pat_TokKWNotDefined			: "not_defined";
+
+	pat_TokKWRun				: "run";
+
 	pat_TokKWTrue				: "true";
 	pat_TokKWFalse				: "false";
 
@@ -87,6 +94,11 @@ LEX {
 
 		2 TokKWTrue 			-> RULEFORGE_STRUCTURAL_ROLE : pat_TokKWTrue;
 		2 TokKWFalse 			-> RULEFORGE_STRUCTURAL_ROLE : pat_TokKWFalse;
+
+		2 TokKWWhen 			-> RULEFORGE_STRUCTURAL_ROLE : pat_TokKWWhen;
+		2 TokKWDefined 			-> RULEFORGE_STRUCTURAL_ROLE : pat_TokKWDefined;
+		2 TokKWNotDefined 		-> RULEFORGE_STRUCTURAL_ROLE : pat_TokKWNotDefined;
+		2 TokKWRun 				-> RULEFORGE_STRUCTURAL_ROLE : pat_TokKWRun;
 
 		// Conventional
 		1 TokIdentifier 		-> RULEFORGE_STRUCTURAL_ROLE : pat_TokIdentifier;
@@ -193,7 +205,7 @@ PARSE {
 
 	rule TARGET_BODY -> NodeTargetBody {
 		(
-			NEW_LINE | HELP_STATEMENT | CACHE_BLOCK
+			NEW_LINE | HELP_STATEMENT | CACHE_BLOCK | CONDITIONAL_BLOCK
 		)*
 	}
 
@@ -296,6 +308,30 @@ PARSE {
 		virtual TokKWBypass
 		virtual TokEquals
 		NodeBypassValue : (virtual TokKWTrue | virtual TokKWFalse)
+		NEW_LINE
+	}
+
+	rule CONDITIONAL_BLOCK -> NodeConditional {
+		virtual TokKWWhen
+		NodeCondition : (virtual TokKWDefined | virtual TokKWNotDefined)
+		nest @Parens {
+			NodeConditionalParameter : TokIdentifier
+		}
+		nest @Braces {
+			(
+				NEW_LINE
+				| TARGET_EXECUTION
+			)*
+		}
+	}
+
+	rule TARGET_EXECUTION -> NodeTargetExecution {
+		RUN // For now only Run, maybe more later
+	}
+
+	rule RUN -> NodeRunStatement {
+		virtual TokKWRun
+		STRING_LITERAL
 		NEW_LINE
 	}
 

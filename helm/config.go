@@ -44,10 +44,17 @@ var helmSemanticManifest = toolchain.SemanticManifest[Token, Node]{
 		TokParenOpen:          "punctuation.section.parens.begin",
 		TokParenClose:         "punctuation.section.parens.end",
 		TokQuestion:           "punctuation.question",
-		TokKWTarget:           "keyword.target",
+		TokKWTarget:           "keyword.declaration.target",
 
-		TokKWPath: "support.function.path",
-		TokKWGlob: "support.function.glob",
+		TokKWPath: "support.function.builtin.path",
+		TokKWGlob: "support.function.builtin.glob",
+
+		TokKWDefined:    "support.function.builtin.defined",
+		TokKWNotDefined: "support.function.builtin.not-defined",
+
+		TokKWWhen: "keyword.control.condition.when",
+
+		TokKWRun: "support.function.builtin.execution",
 
 		TokKWHelp:  "support.type.property-name.help",
 		TokKWCache: "support.type.property-name.cache",
