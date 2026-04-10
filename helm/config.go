@@ -67,7 +67,7 @@ var helmSemanticManifest = toolchain.SemanticManifest[Token, Node]{
 		TokKWAliases:   "support.type.property-name.aliases",
 
 		TokKWInputs:   "support.type.property-name.inputs",
-		TokKWOutput:   "support.type.property-name.output",
+		TokKWOutputs:  "support.type.property-name.outputs",
 		TokKWVolatile: "support.type.property-name.volatile",
 
 		TokKWConfirm:  "support.type.property-name.confirm",
@@ -127,6 +127,12 @@ var helmSemanticManifest = toolchain.SemanticManifest[Token, Node]{
 		},
 		NodeInvokeTarget: {
 			Scopes: []string{"meta.target-reference", "variable.other.target.reference"},
+		},
+		NodeInputArray: {
+			MetaScope: "meta.array.inputs",
+		},
+		NodeOutputArray: {
+			MetaScope: "meta.array.outputs",
 		},
 		// --- Environment & Properties ---
 		NodeEnvKey: {

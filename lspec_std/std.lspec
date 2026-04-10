@@ -13,16 +13,26 @@ LEX {
 }
 
 PARSE {
-	/*
-	Internal helper to handle the interspersed element/separator logic.
-	Avoids logic duplication across the public array templates.
-	*/
+	/* ------------------------------------------------------------------
+	SINGLE-LINE ARRAYS
+	------------------------------------------------------------------ */
+
+	/* Internal helper: Strict repetition */
 	template _LIST_BODY($elementRule: Rule, $separatorTk: Token) {
-	    $elementRule
-	    (
-	        virtual $separatorTk
-	        $elementRule
-	    )*
+		$elementRule
+		(
+			virtual $separatorTk
+			$elementRule
+		)*
+	}
+
+	/* Internal helper: LL-compatible trailing separator repetition */
+	template _LIST_BODY_TRAILING_SEP($elementRule: Rule, $separatorTk: Token) {
+		$elementRule
+		(
+			virtual $separatorTk
+			$elementRule?
+		)*
 	}
 
 	/*
@@ -30,11 +40,9 @@ PARSE {
 	Supports zero or more elements. No trailing comma allowed.
 	*/
 	export template t_ARRAY($openTk: Token, $closeTk: Token, $elementRule: Rule, $separatorTk: Token) {
-	    nest $openTk $closeTk {
-		    (
-		    	call _LIST_BODY($elementRule, $separatorTk)
-	    	)?	    	
-	    }
+		nest $openTk $closeTk {
+			( call _LIST_BODY($elementRule, $separatorTk) )?
+		}
 	}
 
 	/*
@@ -42,12 +50,9 @@ PARSE {
 	Supports zero or more elements. Allows an optional trailing separator.
 	*/
 	export template t_ARRAY_TRAILING_SEP($openTk: Token, $closeTk: Token, $elementRule: Rule, $separatorTk: Token) {
-	    nest $openTk $closeTk {
-		    (
-		    	call _LIST_BODY($elementRule, $separatorTk)
-		    	virtual $separatorTk?
-	    	)?	    	
-	    }
+		nest $openTk $closeTk {
+			( call _LIST_BODY_TRAILING_SEP($elementRule, $separatorTk) )?
+		}
 	}
 
 	/*
@@ -55,9 +60,9 @@ PARSE {
 	Requires at least one element. No trailing comma allowed.
 	*/
 	export template t_ARRAY_1_OR_MORE($openTk: Token, $closeTk: Token, $elementRule: Rule, $separatorTk: Token) {
-	    nest $openTk $closeTk {
-		    call _LIST_BODY($elementRule, $separatorTk)    	
-	    }
+		nest $openTk $closeTk {
+			call _LIST_BODY($elementRule, $separatorTk)
+		}
 	}
 
 	/*
@@ -65,35 +70,106 @@ PARSE {
 	Requires at least one element. Allows an optional trailing separator.
 	*/
 	export template t_ARRAY_1_OR_MORE_TRAILING_SEP($openTk: Token, $closeTk: Token, $elementRule: Rule, $separatorTk: Token) {
-	    nest $openTk $closeTk {
-		    call _LIST_BODY($elementRule, $separatorTk)
-		    virtual $separatorTk? 	
-	    }
+		nest $openTk $closeTk {
+			call _LIST_BODY_TRAILING_SEP($elementRule, $separatorTk)
+		}
 	}
 
 	/* ------------------------------------------------------------------
-	   MAPPING TEMPLATES
-	   ------------------------------------------------------------------ */
+	MULTILINE DATA ARRAYS
+	------------------------------------------------------------------ */
+
+	template _MULTILINE_ELEMENT($elementRule: Rule, $newlineTk: Token) {
+		(virtual $newlineTk)*
+		$elementRule
+		(virtual $newlineTk)*
+	}
+
+	template _MULTILINE_BODY($elementRule: Rule, $separatorTk: Token, $newlineTk: Token) {
+		call _MULTILINE_ELEMENT($elementRule, $newlineTk)
+		(
+			virtual $separatorTk
+			call _MULTILINE_ELEMENT($elementRule, $newlineTk)
+		)*
+	}
+
+	template _MULTILINE_BODY_TRAILING_SEP($elementRule: Rule, $separatorTk: Token, $newlineTk: Token) {
+		(virtual $newlineTk)*
+		$elementRule
+		(virtual $newlineTk)*
+		(
+			virtual $separatorTk
+			(virtual $newlineTk)*
+			(
+				$elementRule
+				(virtual $newlineTk)*
+			)?
+		)*
+	}
 
 	/*
-	Internal helper for a single key-value assignment.
-	Keeps the cognitive complexity of the mapping loops low.
+	Standard multiline array: [ \n element, \n element \n ].
+	Supports zero or more elements. No trailing separator allowed.
 	*/
+	export template t_MULTILINE_ARRAY($pair: Pair, $elementRule: Rule, $separatorTk: Token, $newlineTk: Token) {
+		nest $pair {
+			( call _MULTILINE_BODY($elementRule, $separatorTk, $newlineTk) )?
+		}
+	}
+
+	/*
+	Flexible multiline array: [ \n element, \n element, \n ].
+	Supports zero or more elements. Allows an optional trailing separator.
+	*/
+	export template t_MULTILINE_ARRAY_TRAILING_SEP($pair: Pair, $elementRule: Rule, $separatorTk: Token, $newlineTk: Token) {
+		nest $pair {
+			( call _MULTILINE_BODY_TRAILING_SEP($elementRule, $separatorTk, $newlineTk) )?
+		}
+	}
+
+	/*
+	Strict non-empty multiline array: [ \n element, \n element \n ].
+	Requires at least one element. No trailing separator allowed.
+	*/
+	export template t_MULTILINE_ARRAY_1_OR_MORE($pair: Pair, $elementRule: Rule, $separatorTk: Token, $newlineTk: Token) {
+		nest $pair {
+			call _MULTILINE_BODY($elementRule, $separatorTk, $newlineTk)
+		}
+	}
+
+	/*
+	Flexible non-empty multiline array: [ \n element, \n element, \n ].
+	Requires at least one element. Allows an optional trailing separator.
+	*/
+	export template t_MULTILINE_ARRAY_1_OR_MORE_TRAILING_SEP($pair: Pair, $elementRule: Rule, $separatorTk: Token, $newlineTk: Token) {
+		nest $pair {
+			call _MULTILINE_BODY_TRAILING_SEP($elementRule, $separatorTk, $newlineTk)
+		}
+	}
+
+	/* ------------------------------------------------------------------
+	MAPPING TEMPLATES
+	------------------------------------------------------------------ */
+
 	template _KV_PAIR($keyRule: Rule, $assignmentTk: Token, $valueRule: Rule) {
 		$keyRule
 		virtual $assignmentTk
 		$valueRule
 	}
 
-	/*
-	Internal helper to handle the interspersed pair/separator logic.
-	Avoids logic duplication across the public mapping templates.
-	*/
 	template _MAPPING_BODY($keyRule: Rule, $assignmentTk: Token, $valueRule: Rule, $separatorTk: Token) {
 		call _KV_PAIR($keyRule, $assignmentTk, $valueRule)
 		(
 			virtual $separatorTk
 			call _KV_PAIR($keyRule, $assignmentTk, $valueRule)
+		)*
+	}
+
+	template _MAPPING_BODY_TRAILING_SEP($keyRule: Rule, $assignmentTk: Token, $valueRule: Rule, $separatorTk: Token) {
+		call _KV_PAIR($keyRule, $assignmentTk, $valueRule)
+		(
+			virtual $separatorTk
+			( call _KV_PAIR($keyRule, $assignmentTk, $valueRule) )?
 		)*
 	}
 
@@ -103,9 +179,7 @@ PARSE {
 	*/
 	export template t_MAPPING($openClosePair: Pair, $keyRule: Rule, $valueRule: Rule, $assignmentTk: Token, $separatorTk: Token) {
 		nest $openClosePair {
-			(
-				call _MAPPING_BODY($keyRule, $assignmentTk, $valueRule, $separatorTk)
-			)?
+			( call _MAPPING_BODY($keyRule, $assignmentTk, $valueRule, $separatorTk) )?
 		}
 	}
 
@@ -115,10 +189,7 @@ PARSE {
 	*/
 	export template t_MAPPING_TRAILING_SEP($openClosePair: Pair, $keyRule: Rule, $valueRule: Rule, $assignmentTk: Token, $separatorTk: Token) {
 		nest $openClosePair {
-			(
-				call _MAPPING_BODY($keyRule, $assignmentTk, $valueRule, $separatorTk)
-				virtual $separatorTk?
-			)?
+			( call _MAPPING_BODY_TRAILING_SEP($keyRule, $assignmentTk, $valueRule, $separatorTk) )?
 		}
 	}
 
@@ -138,18 +209,17 @@ PARSE {
 	*/
 	export template t_MAPPING_1_OR_MORE_TRAILING_SEP($openClosePair: Pair, $keyRule: Rule, $valueRule: Rule, $assignmentTk: Token, $separatorTk: Token) {
 		nest $openClosePair {
-			call _MAPPING_BODY($keyRule, $assignmentTk, $valueRule, $separatorTk)
-			virtual $separatorTk?
+			call _MAPPING_BODY_TRAILING_SEP($keyRule, $assignmentTk, $valueRule, $separatorTk)
 		}
 	}
 
 	/* ------------------------------------------------------------------
-	   STRUCTURAL BLOCKS
-	   ------------------------------------------------------------------ */
+	STRUCTURAL BLOCKS
+	------------------------------------------------------------------ */
 
 	/*
-	Standard multiline block. 
-	Eats newlines freely alongside valid statements. 
+	Standard multiline block.
+	Eats newlines freely alongside valid statements.
 	Designed for architectural boundaries, NOT inline data arrays.
 	*/
 	export template t_MULTILINE_BLOCK($pair: Pair, $statementRule: Rule, $newlineTk: Token) {

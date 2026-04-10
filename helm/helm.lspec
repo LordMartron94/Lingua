@@ -56,7 +56,7 @@ PATTERN {
 	pat_TokKWArtifacts			: "artifacts";
 	pat_TokKWInputs				: "inputs";
 	pat_TokKWGlob				: "glob";
-	pat_TokKWOutput 			: "output";
+	pat_TokKWOutputs 			: "outputs";
 	pat_TokKWPath				: "path";
 	pat_TokKWAliases			: "aliases";
 	pat_TokKWVolatile   		: "volatile";
@@ -100,7 +100,7 @@ LEX {
 		2 TokKWArtifacts		-> HELM_STRUCTURAL_ROLE : pat_TokKWArtifacts;
 		2 TokKWInputs 			-> HELM_STRUCTURAL_ROLE : pat_TokKWInputs;
 		2 TokKWGlob 			-> HELM_STRUCTURAL_ROLE : pat_TokKWGlob;
-		2 TokKWOutput 			-> HELM_STRUCTURAL_ROLE : pat_TokKWOutput;
+		2 TokKWOutputs 			-> HELM_STRUCTURAL_ROLE : pat_TokKWOutputs;
 		2 TokKWPath 			-> HELM_STRUCTURAL_ROLE : pat_TokKWPath;
 		2 TokKWAliases 			-> HELM_STRUCTURAL_ROLE : pat_TokKWAliases;
 		2 TokKWVolatile 		-> HELM_STRUCTURAL_ROLE : pat_TokKWVolatile;
@@ -289,7 +289,15 @@ PARSE {
 	}
 
 	rule INPUTS_VALUE -> transparent gr_INPUTS_VALUE {
-		STRING_ARRAY | GLOB
+		VAR_REF | STRING_LITERAL | GLOB | INPUT_ARRAY | PATH
+	}
+
+	rule INPUT_ARRAY -> NodeInputArray {
+		using STD.t_MULTILINE_ARRAY_TRAILING_SEP(@Brackets, INPUT_ARRAY_ELEMENT, TokComma, TokNewLine)
+	}
+
+	rule INPUT_ARRAY_ELEMENT -> transparent gr_INPUT_ARRAY_ELEMENT {
+		STRING_LITERAL | GLOB
 	}
 
 	rule VOLATILE_STATEMENT -> NodeVolatile {
@@ -323,16 +331,24 @@ PARSE {
 	}
 
 	rule OUTPUT_STATEMENT -> NodeCacheOutputDirectory {
-		virtual TokKWOutput
+		virtual TokKWOutputs
 		virtual TokEquals
 		OUTPUT_STATEMENT_VALUE
 		NEW_LINE
 	}
 
 	rule OUTPUT_STATEMENT_VALUE -> transparent gr_OUTPUT_VALUE {
-		VAR_REF | STRING_LITERAL | PATH
+		VAR_REF | STRING_LITERAL | PATH | OUTPUT_ARRAY 
 	}
 	
+	rule OUTPUT_ARRAY -> NodeOutputArray {
+		using STD.t_MULTILINE_ARRAY_TRAILING_SEP(@Brackets, OUTPUT_ARRAY_ELEMENT, TokComma, TokNewLine)
+	}
+	
+	rule OUTPUT_ARRAY_ELEMENT -> transparent gr_OUTPUT_ARRAY_ELEMENT {
+		STRING_LITERAL | PATH | VAR_REF
+	}
+
 	rule PATH -> NodePath {
 		virtual TokKWPath
 		nest @Parens {
@@ -428,7 +444,7 @@ PARSE {
 	// --- STRINGS ---
 
 	rule STRING_ARRAY -> NodeStringArray {
-		using STD.t_ARRAY(TokBracketOpen, TokBracketClose, STRING_LITERAL, TokComma)
+		using STD.t_MULTILINE_ARRAY_TRAILING_SEP(@Brackets, STRING_LITERAL, TokComma, TokNewLine)
 	}
 
 	rule STRING_LITERAL -> NodeStringLiteral {
