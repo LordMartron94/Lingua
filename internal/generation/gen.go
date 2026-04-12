@@ -63,7 +63,7 @@ func manifestTokenKey[T comparable](k T) string {
 type RunnerConfig[T TokenConstraint, N NodeConstraint] struct {
 	SpecPath        string
 	Manifest        toolchain.SemanticManifest[T, N]
-	OverrideFactory bootstrap.SublimeOverrideFactory
+	OverrideFactory toolchain.SublimeInMemoryOverrideFactory[dsl.LangSpecParserNodeKind]
 	FileExtensions  []string
 	ScopeExtension  string
 }
@@ -75,9 +75,9 @@ func ExecuteFull[T TokenConstraint, N NodeConstraint](cfg RunnerConfig[T, N]) {
 	// The engine handles the conversion once, forever.
 	stringManifest := adaptManifest(cfg.Manifest)
 
-	opts := []bootstrap.Option{
-		bootstrap.WithDiagnosticSink(dsl.DefaultLangSpecDiagnosticSink()),
-		bootstrap.WithSublimeToolchain(
+	opts := []bootstrap.Option[dsl.LangSpecParserNodeKind]{
+		bootstrap.WithDiagnosticSink[dsl.LangSpecParserNodeKind](dsl.DefaultLangSpecDiagnosticSink()),
+		bootstrap.WithSublimeToolchain[dsl.LangSpecParserNodeKind](
 			stringManifest,
 			cfg.OverrideFactory,
 			cfg.FileExtensions,

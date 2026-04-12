@@ -3,6 +3,7 @@ package helm
 import (
 	"autarch/pattern"
 	"foundation/domain"
+	"langspec/dsl"
 	"langspec/editor"
 	"langspec/toolchain"
 	. "lingua/helm/artifacts"
@@ -11,9 +12,9 @@ import (
 
 // ------------------------------------------------------------------ ALIASES
 
-type EditorCtx = editor.EditorCtx[rune, uint32, uint32, string, uint32]
+type EditorCtx = editor.EditorCtx[rune, uint32, uint32, string, dsl.LangSpecParserNodeKind]
 
-type EditorOverride = editor.EditorOverride[rune, uint32, uint32, string, uint32, toolchain.SublimeContext]
+type EditorOverride = editor.EditorOverride[rune, uint32, uint32, string, dsl.LangSpecParserNodeKind, toolchain.SublimeContext]
 
 var runeFactory = pattern.RegulaASTFactoryCreate(domain.DiscreteDomainRuneCreate())
 
@@ -156,8 +157,8 @@ func helmOverrideProducer(
 	ruleset *editor.LexingRuleSet[rune, uint32, uint32],
 	ctxProducer func(ctx *EditorCtx) toolchain.SublimeContext,
 ) func(ec *EditorCtx) []*EditorOverride {
-	registry := editor.NewOverrideRegistry[rune, uint32, uint32, string, uint32, toolchain.SublimeContext]()
-	patterns := editor.NewTextPatternBuilder[uint32, uint32, string, uint32, toolchain.SublimeContext](runeFactory)
+	registry := editor.NewOverrideRegistry[rune, uint32, uint32, string, dsl.LangSpecParserNodeKind, toolchain.SublimeContext]()
+	patterns := editor.NewTextPatternBuilder[uint32, uint32, string, dsl.LangSpecParserNodeKind, toolchain.SublimeContext](runeFactory)
 
 	registry.Register(uint32(TokLineComment), patterns.LineComment(
 		"//",

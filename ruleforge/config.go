@@ -4,15 +4,16 @@ import (
 	"autarch/pattern"
 	"fmt"
 	"foundation/domain"
+	"langspec/dsl"
 	"langspec/editor"
 	"langspec/toolchain"
 	"lingua/internal/generation"
 	. "lingua/ruleforge/artifacts"
 )
 
-type EditorCtx = editor.EditorCtx[rune, uint32, uint32, string, uint32]
+type EditorCtx = editor.EditorCtx[rune, uint32, uint32, string, dsl.LangSpecParserNodeKind]
 
-type EditorOverride = editor.EditorOverride[rune, uint32, uint32, string, uint32, toolchain.SublimeContext]
+type EditorOverride = editor.EditorOverride[rune, uint32, uint32, string, dsl.LangSpecParserNodeKind, toolchain.SublimeContext]
 
 var runeFactory = pattern.RegulaASTFactoryCreate(domain.DiscreteDomainRuneCreate())
 
@@ -358,8 +359,8 @@ func ruleforgeOverrideProducer(
 	ctxProducer func(ctx *EditorCtx) toolchain.SublimeContext,
 ) func(ec *EditorCtx) []*EditorOverride {
 
-	registry := editor.NewOverrideRegistry[rune, uint32, uint32, string, uint32, toolchain.SublimeContext]()
-	patterns := editor.NewTextPatternBuilder[uint32, uint32, string, uint32, toolchain.SublimeContext](runeFactory)
+	registry := editor.NewOverrideRegistry[rune, uint32, uint32, string, dsl.LangSpecParserNodeKind, toolchain.SublimeContext]()
+	patterns := editor.NewTextPatternBuilder[uint32, uint32, string, dsl.LangSpecParserNodeKind, toolchain.SublimeContext](runeFactory)
 
 	registry.Register(uint32(TokLineComment), patterns.LineComment(
 		"//",
@@ -382,7 +383,7 @@ func ruleforgeOverrideProducer(
 
 func identifierOverride(
 	ruleset *editor.LexingRuleSet[rune, uint32, uint32],
-) editor.OverrideHandler[rune, uint32, uint32, string, uint32, toolchain.SublimeContext] {
+) editor.OverrideHandler[rune, uint32, uint32, string, dsl.LangSpecParserNodeKind, toolchain.SublimeContext] {
 
 	identRegex := getTokenRegex(ruleset, TokIdentifier)
 	dotRegex := getTokenRegex(ruleset, TokDot)
@@ -407,9 +408,9 @@ func identifierOverride(
 	rulesetPrefixCtx := toolchain.SublimeContext{Scope: "support.other.module"}
 	rulesetTerminalCtx := toolchain.SublimeContext{Scope: "support.class.ruleset"}
 
-	pathSeg := uint32(NodePathSegment)
-	refSeg := uint32(NodeReferenceSegment)
-	rulesetSeg := uint32(NodeRulesetReferenceSegment)
+	pathSeg := dsl.LangSpecParserNodeKind(NodePathSegment)
+	refSeg := dsl.LangSpecParserNodeKind(NodeReferenceSegment)
+	rulesetSeg := dsl.LangSpecParserNodeKind(NodeRulesetReferenceSegment)
 
 	return func(ctx *EditorCtx) []*EditorOverride {
 		if ctx.NodeKind == nil {

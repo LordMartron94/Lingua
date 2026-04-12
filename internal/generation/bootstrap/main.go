@@ -22,9 +22,9 @@ func main() {
 	defer g.Close()
 
 	// Only run the bindings toolchain
-	opts := []bootstrap.Option{
-		bootstrap.WithToolchainFilter("go_bindings"),
-		bootstrap.WithDiagnosticSink(dsl.DefaultLangSpecDiagnosticSink()),
+	opts := []bootstrap.Option[dsl.LangSpecParserNodeKind]{
+		bootstrap.WithToolchainFilter[dsl.LangSpecParserNodeKind]("go_bindings"),
+		bootstrap.WithDiagnosticSink[dsl.LangSpecParserNodeKind](dsl.DefaultLangSpecDiagnosticSink()),
 	}
 
 	if err := g.RunToolchains(opts...); err != nil {

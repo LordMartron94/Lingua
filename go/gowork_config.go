@@ -1,6 +1,7 @@
 package goDef
 
 import (
+	"langspec/dsl"
 	"langspec/editor"
 	"langspec/toolchain"
 	. "lingua/go/artifacts"
@@ -94,8 +95,8 @@ func goWorkOverrideProducer(
 	_ *editor.LexingRuleSet[rune, uint32, uint32],
 	_ func(ctx *EditorCtx) toolchain.SublimeContext,
 ) func(ec *EditorCtx) []*EditorOverride {
-	registry := editor.NewOverrideRegistry[rune, uint32, uint32, string, uint32, toolchain.SublimeContext]()
-	patterns := editor.NewTextPatternBuilder[uint32, uint32, string, uint32, toolchain.SublimeContext](runeFactory)
+	registry := editor.NewOverrideRegistry[rune, uint32, uint32, string, dsl.LangSpecParserNodeKind, toolchain.SublimeContext]()
+	patterns := editor.NewTextPatternBuilder[uint32, uint32, string, dsl.LangSpecParserNodeKind, toolchain.SublimeContext](runeFactory)
 
 	registry.Register(uint32(GoWork_TokLineComment), patterns.LineComment(
 		"//",

@@ -3,15 +3,16 @@ package goDef
 import (
 	"autarch/pattern"
 	"foundation/domain"
+	"langspec/dsl"
 	"langspec/editor"
 	"langspec/toolchain"
 	. "lingua/go/artifacts"
 	"lingua/internal/generation"
 )
 
-type EditorCtx = editor.EditorCtx[rune, uint32, uint32, string, uint32]
+type EditorCtx = editor.EditorCtx[rune, uint32, uint32, string, dsl.LangSpecParserNodeKind]
 
-type EditorOverride = editor.EditorOverride[rune, uint32, uint32, string, uint32, toolchain.SublimeContext]
+type EditorOverride = editor.EditorOverride[rune, uint32, uint32, string, dsl.LangSpecParserNodeKind, toolchain.SublimeContext]
 
 var runeFactory = pattern.RegulaASTFactoryCreate(domain.DiscreteDomainRuneCreate())
 
@@ -138,8 +139,8 @@ func goModOverrideProducer(
 	_ *editor.LexingRuleSet[rune, uint32, uint32],
 	_ func(ctx *EditorCtx) toolchain.SublimeContext,
 ) func(ec *EditorCtx) []*EditorOverride {
-	registry := editor.NewOverrideRegistry[rune, uint32, uint32, string, uint32, toolchain.SublimeContext]()
-	patterns := editor.NewTextPatternBuilder[uint32, uint32, string, uint32, toolchain.SublimeContext](runeFactory)
+	registry := editor.NewOverrideRegistry[rune, uint32, uint32, string, dsl.LangSpecParserNodeKind, toolchain.SublimeContext]()
+	patterns := editor.NewTextPatternBuilder[uint32, uint32, string, dsl.LangSpecParserNodeKind, toolchain.SublimeContext](runeFactory)
 
 	registry.Register(uint32(GoMod_TokLineComment), patterns.LineComment(
 		"//",
