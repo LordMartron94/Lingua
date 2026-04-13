@@ -1,0 +1,144 @@
+--- "EBNF" v1.0.0 | lspec v1.0.0 ---
+
+PRAGMA {
+	tool.sublime {
+		enable = true;
+		output-path = [
+			"libs/lingua/ebnf/artifacts/ebnf.sublime-syntax",
+			"/home/user/.config/sublime-text/Packages/User/ebnf.sublime-syntax"
+		];
+	}
+
+	tool.go_bindings {
+		enable = true;
+		output-path = "libs/lingua/ebnf/artifacts/go_bindings.go";
+		package-name = "artifacts";
+	}
+
+	tool.tm_comments {
+		enable = true;
+		output-path = [
+			"/home/user/.config/sublime-text/Packages/User/Comments (ebnf).tmPreferences"
+		];
+		scope-extension = ".ebnf";
+		single-line-comment-start = "// ";
+		block-comment-start = "/*";
+		block-comment-end = "*/";
+	}
+};
+
+PATTERN {
+
+	// --- STRUCTURAL ---
+	pat_TokAssignment 		: "::=";
+	pat_TokIdentifier       : ['A'..'Z', '_', 'a'..'z'] (['-', '0'..'9', 'A'..'Z', '_', 'a'..'z'])*;
+	
+
+	pat_TokStringLiteral 
+    : "'"  ((!['\n', '\r', '\'', '\\'] | ("\\" ['\'', '\\', 'n', 'r', 't'] | ("\\u" (['0'..'9', 'A'..'F', 'a'..'f']){4,4} | "\\U" (['0'..'9', 'A'..'F', 'a'..'f']){8,8}))))* "'"
+    | "\"" ((!['\n', '\r', '"', '\\'] | ("\\" ['"', '\\', 'n', 'r', 't'] | ("\\u" (['0'..'9', 'A'..'F', 'a'..'f']){4,4} | "\\U" (['0'..'9', 'A'..'F', 'a'..'f']){8,8}))))* "\""
+    ;
+
+	pat_TokPipe				: "|"; 		
+	pat_TokQuestion 		: "?";
+	pat_TokPlus 			: "+";
+	pat_TokStar 			: "*";
+	pat_TokParenOpen 		: "(";
+	pat_TokParenClose 		: ")";
+	pat_TokSemi 			: ";";
+
+	pat_TokEOF				: [];
+	pat_TokWhitespace       : (['\t', ' ', '\n', '\r'])+;
+
+	pat_TokLineComment      : "/" "/" (!['\n', '\r'])*;
+	pat_TokBlockComment     : "/" "*" ((!'*' | ("*")+ !['*', '/']))* ("*")+ "/";
+}
+
+LEX {
+	state INITIAL {
+		// OPERATORS
+		1 TokAssignment 		-> EBNF_STRUCTURAL_ROLE : pat_TokAssignment;
+		1 TokPipe 				-> EBNF_STRUCTURAL_ROLE : pat_TokPipe;
+		1 TokQuestion 			-> EBNF_STRUCTURAL_ROLE : pat_TokQuestion;
+		1 TokPlus 				-> EBNF_STRUCTURAL_ROLE : pat_TokPlus;
+		1 TokStar 				-> EBNF_STRUCTURAL_ROLE : pat_TokStar;
+		1 TokParenOpen 			-> EBNF_STRUCTURAL_ROLE : pat_TokParenOpen;
+		1 TokParenClose 		-> EBNF_STRUCTURAL_ROLE : pat_TokParenClose;
+		1 TokSemi 				-> EBNF_STRUCTURAL_ROLE : pat_TokSemi;
+
+		// Literals & IDENTS
+		1 TokStringLiteral 		-> EBNF_STRUCTURAL_ROLE : pat_TokStringLiteral;
+		1 TokIdentifier 		-> EBNF_STRUCTURAL_ROLE : pat_TokIdentifier;
+
+	    // Hidden/Whitespace
+	    0 TokWhitespace         -> EBNF_WHITESPACE_ROLE : pat_TokWhitespace;
+
+	    0 TokBlockComment       -> EBNF_COMMENT_ROLE    : pat_TokBlockComment;
+	    0 TokLineComment        -> EBNF_COMMENT_ROLE    : pat_TokLineComment;
+
+	    // End of File
+	    0 TokEOF                -> EBNF_STRUCTURAL_ROLE : pat_TokEOF %% EOF=true %%;
+	}
+}
+
+PRATT {
+	PRODUCTION_EXPRESSION {
+		primary {
+			PRODUCTION_SEGMENT;
+		}
+
+		prefix {
+
+		}
+
+		infix {
+			TokPipe -> NodeAlternation precedence 10 9;
+		}
+
+		postfix {
+			TokQuestion -> NodeOptional   precedence 30;
+			TokPlus		-> NodeOneOrMore  precedence 30;
+			TokStar 	-> NodeZeroOrMore precedence 30;
+		}
+
+		implicit {
+			-> NodeOpConcat precedence 20 19;
+		}
+	}
+}
+
+PARSE {
+	IGNORE {
+		EBNF_WHITESPACE_ROLE EBNF_COMMENT_ROLE
+	}
+
+	// --- ENTRY ---
+
+	rule PROGRAM -> NodeProgram {
+		(
+			PRODUCTION
+		)*
+		virtual TokEOF
+	}
+
+	rule PRODUCTION -> NodeProduction {
+		NodeProductionName : TokIdentifier
+		virtual TokAssignment
+		PRODUCTION_EXPRESSION
+		virtual TokSemi
+	}
+
+	rule PRODUCTION_SEGMENT -> NodeProductionSegment {
+		PRODUCTION_GROUP
+		| NodeProductionReference : TokIdentifier
+		| NodeLexLiteral : TokStringLiteral
+	}
+
+	pair Parens TokParenOpen TokParenClose;
+
+	rule PRODUCTION_GROUP -> NodeProductionGroup {
+		nest @Parens {
+			PRODUCTION_EXPRESSION
+		}
+	}
+}
