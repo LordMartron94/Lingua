@@ -14,23 +14,33 @@ const (
 	TokAssignment Token = 2
 	TokBlockComment Token = 3
 	TokEOF Token = 4
-	TokIdentifier Token = 5
-	TokLineComment Token = 6
-	TokParenClose Token = 7
-	TokParenOpen Token = 8
-	TokPipe Token = 9
-	TokPlus Token = 10
-	TokQuestion Token = 11
-	TokSemi Token = 12
-	TokStar Token = 13
-	TokStringLiteral Token = 14
-	TokWhitespace Token = 15
+	TokExclamation Token = 5
+	TokIdentifier Token = 6
+	TokLineComment Token = 7
+	TokParenClose Token = 8
+	TokParenOpen Token = 9
+	TokPipe Token = 10
+	TokPlus Token = 11
+	TokQuestion Token = 12
+	TokRange Token = 13
+	TokSemi Token = 14
+	TokStar Token = 15
+	TokStringDoubleEnd Token = 16
+	TokStringDoubleStart Token = 17
+	TokStringDoubleText Token = 18
+	TokStringEscape Token = 19
+	TokStringSingleEnd Token = 20
+	TokStringSingleStart Token = 21
+	TokStringSingleText Token = 22
+	TokTilde Token = 23
+	TokWhitespace Token = 24
 )
 
 var TokenNames = [...]string{
 	"TokAssignment",
 	"TokBlockComment",
 	"TokEOF",
+	"TokExclamation",
 	"TokIdentifier",
 	"TokLineComment",
 	"TokParenClose",
@@ -38,9 +48,17 @@ var TokenNames = [...]string{
 	"TokPipe",
 	"TokPlus",
 	"TokQuestion",
+	"TokRange",
 	"TokSemi",
 	"TokStar",
-	"TokStringLiteral",
+	"TokStringDoubleEnd",
+	"TokStringDoubleStart",
+	"TokStringDoubleText",
+	"TokStringEscape",
+	"TokStringSingleEnd",
+	"TokStringSingleStart",
+	"TokStringSingleText",
+	"TokTilde",
 	"TokWhitespace",
 }
 
@@ -66,28 +84,38 @@ func init() {
 type Node uint32
 
 const (
-	ERROR_NODE Node = 1
-	NodeAlternation Node = 2
-	NodeLexLiteral Node = 3
-	NodeOneOrMore Node = 4
-	NodeOpConcat Node = 5
-	NodeOptional Node = 6
-	NodeProduction Node = 7
-	NodeProductionGroup Node = 8
-	NodeProductionName Node = 9
-	NodeProductionReference Node = 10
-	NodeProductionSegment Node = 11
-	NodeProgram Node = 12
-	NodeZeroOrMore Node = 13
-	PRODUCTION Node = 14
-	PRODUCTION_EXPRESSION Node = 15
-	PRODUCTION_GROUP Node = 16
+	DOUBLE_QUOTE_STRING Node = 1
+	ERROR_NODE Node = 2
+	NodeAlternation Node = 3
+	NodeCharRange Node = 4
+	NodeNegation Node = 5
+	NodeOneOrMore Node = 6
+	NodeOpConcat Node = 7
+	NodeOptional Node = 8
+	NodeProduction Node = 9
+	NodeProductionGroup Node = 10
+	NodeProductionName Node = 11
+	NodeProductionReference Node = 12
+	NodeProductionSegment Node = 13
+	NodeProgram Node = 14
+	NodeStringEscape Node = 15
+	NodeStringLiteral Node = 16
+	NodeStringText Node = 17
+	NodeZeroOrMore Node = 18
+	PRODUCTION Node = 19
+	PRODUCTION_EXPRESSION Node = 20
+	PRODUCTION_GROUP Node = 21
+	SINGLE_QUOTE_STRING Node = 22
+	STRING_LITERAL Node = 23
+	gr_STRING_LITERAL Node = 24
 )
 
 var NodeNames = [...]string{
+	"DOUBLE_QUOTE_STRING",
 	"ERROR_NODE",
 	"NodeAlternation",
-	"NodeLexLiteral",
+	"NodeCharRange",
+	"NodeNegation",
 	"NodeOneOrMore",
 	"NodeOpConcat",
 	"NodeOptional",
@@ -97,10 +125,16 @@ var NodeNames = [...]string{
 	"NodeProductionReference",
 	"NodeProductionSegment",
 	"NodeProgram",
+	"NodeStringEscape",
+	"NodeStringLiteral",
+	"NodeStringText",
 	"NodeZeroOrMore",
 	"PRODUCTION",
 	"PRODUCTION_EXPRESSION",
 	"PRODUCTION_GROUP",
+	"SINGLE_QUOTE_STRING",
+	"STRING_LITERAL",
+	"gr_STRING_LITERAL",
 }
 
 func (t Node) String() string {

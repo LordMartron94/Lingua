@@ -25,6 +25,10 @@ PRAGMA {
 		block-comment-start = "/*";
 		block-comment-end = "*/";
 	}
+
+	lspec {
+		warnings_as_errors = false;
+	}
 };
 
 PATTERN {
@@ -33,12 +37,24 @@ PATTERN {
 	pat_TokAssignment 		: "::=";
 	pat_TokIdentifier       : ['A'..'Z', '_', 'a'..'z'] (['-', '0'..'9', 'A'..'Z', '_', 'a'..'z'])*;
 	
+	// --- GRANULAR STRINGS ---
+	pat_TokStringSingleStart : "'";
+	pat_TokStringSingleEnd   : "'";
+	pat_TokStringDoubleStart : "\"";
+	pat_TokStringDoubleEnd   : "\"";
+	
+	// Shared escape sequence pattern
+	pat_TokStringEscape : "\\" ( 
+		"u" (['0'..'9', 'A'..'F', 'a'..'f']){4,4} | 
+		"U" (['0'..'9', 'A'..'F', 'a'..'f']){8,8} | 
+		!['\n', '\r'] 
+	);
+	
+	// Text blocks stop at newlines, quotes, or escape characters
+	pat_TokStringSingleText  : (!['\n', '\r', '\'', '\\'])+;
+	pat_TokStringDoubleText  : (!['\n', '\r', '"', '\\'])+;
 
-	pat_TokStringLiteral 
-    : "'"  ((!['\n', '\r', '\'', '\\'] | ("\\" ['\'', '\\', 'n', 'r', 't'] | ("\\u" (['0'..'9', 'A'..'F', 'a'..'f']){4,4} | "\\U" (['0'..'9', 'A'..'F', 'a'..'f']){8,8}))))* "'"
-    | "\"" ((!['\n', '\r', '"', '\\'] | ("\\" ['"', '\\', 'n', 'r', 't'] | ("\\u" (['0'..'9', 'A'..'F', 'a'..'f']){4,4} | "\\U" (['0'..'9', 'A'..'F', 'a'..'f']){8,8}))))* "\""
-    ;
-
+	// --- OPERATORS ---
 	pat_TokPipe				: "|"; 		
 	pat_TokQuestion 		: "?";
 	pat_TokPlus 			: "+";
@@ -46,6 +62,9 @@ PATTERN {
 	pat_TokParenOpen 		: "(";
 	pat_TokParenClose 		: ")";
 	pat_TokSemi 			: ";";
+	pat_TokRange 			: "..";
+	pat_TokTilde			: "~";
+	pat_TokExclamation 		: "!";
 
 	pat_TokEOF				: [];
 	pat_TokWhitespace       : (['\t', ' ', '\n', '\r'])+;
@@ -65,19 +84,37 @@ LEX {
 		1 TokParenOpen 			-> EBNF_STRUCTURAL_ROLE : pat_TokParenOpen;
 		1 TokParenClose 		-> EBNF_STRUCTURAL_ROLE : pat_TokParenClose;
 		1 TokSemi 				-> EBNF_STRUCTURAL_ROLE : pat_TokSemi;
+		1 TokRange 				-> EBNF_STRUCTURAL_ROLE : pat_TokRange;
+		1 TokExclamation 		-> EBNF_STRUCTURAL_ROLE : pat_TokExclamation;
+		1 TokTilde 				-> EBNF_STRUCTURAL_ROLE : pat_TokTilde;
 
-		// Literals & IDENTS
-		1 TokStringLiteral 		-> EBNF_STRUCTURAL_ROLE : pat_TokStringLiteral;
+		// IDENTS 
 		1 TokIdentifier 		-> EBNF_STRUCTURAL_ROLE : pat_TokIdentifier;
 
-	    // Hidden/Whitespace
-	    0 TokWhitespace         -> EBNF_WHITESPACE_ROLE : pat_TokWhitespace;
+		// STRINGS (State Entry)
+		1 TokStringSingleStart 	-> EBNF_STRUCTURAL_ROLE : pat_TokStringSingleStart [push(STRING_SINGLE)];
+		1 TokStringDoubleStart 	-> EBNF_STRUCTURAL_ROLE : pat_TokStringDoubleStart [push(STRING_DOUBLE)];
 
-	    0 TokBlockComment       -> EBNF_COMMENT_ROLE    : pat_TokBlockComment;
-	    0 TokLineComment        -> EBNF_COMMENT_ROLE    : pat_TokLineComment;
+	    // Hidden/Whitespace
+	    0 TokWhitespace        	-> EBNF_WHITESPACE_ROLE : pat_TokWhitespace;
+
+	    0 TokBlockComment      	-> EBNF_COMMENT_ROLE    : pat_TokBlockComment;
+	    0 TokLineComment       	-> EBNF_COMMENT_ROLE    : pat_TokLineComment;
 
 	    // End of File
-	    0 TokEOF                -> EBNF_STRUCTURAL_ROLE : pat_TokEOF %% EOF=true %%;
+	    0 TokEOF               	-> EBNF_STRUCTURAL_ROLE : pat_TokEOF %% EOF=true %%;
+	}
+
+	state STRING_SINGLE {
+		1 TokStringEscape      -> EBNF_STRUCTURAL_ROLE : pat_TokStringEscape;
+		1 TokStringSingleText  -> EBNF_STRUCTURAL_ROLE : pat_TokStringSingleText;
+		1 TokStringSingleEnd   -> EBNF_STRUCTURAL_ROLE : pat_TokStringSingleEnd [pop(1)];
+	}
+
+	state STRING_DOUBLE {
+		1 TokStringEscape      -> EBNF_STRUCTURAL_ROLE : pat_TokStringEscape;
+		1 TokStringDoubleText  -> EBNF_STRUCTURAL_ROLE : pat_TokStringDoubleText;
+		1 TokStringDoubleEnd   -> EBNF_STRUCTURAL_ROLE : pat_TokStringDoubleEnd [pop(1)];
 	}
 }
 
@@ -88,11 +125,13 @@ PRATT {
 		}
 
 		prefix {
-
+			TokTilde 	   -> NodeNegation precedence 40;
+			TokExclamation -> NodeNegation precedence 40;
 		}
 
 		infix {
 			TokPipe -> NodeAlternation precedence 10 9;
+			TokRange -> NodeCharRange precedence 50 51;
 		}
 
 		postfix {
@@ -131,8 +170,34 @@ PARSE {
 	rule PRODUCTION_SEGMENT -> NodeProductionSegment {
 		PRODUCTION_GROUP
 		| NodeProductionReference : TokIdentifier
-		| NodeLexLiteral : TokStringLiteral
+		| STRING_LITERAL
 	}
+
+	// --- GRANULAR STRING RULES ---
+	
+	rule STRING_LITERAL -> transparent gr_STRING_LITERAL {
+		SINGLE_QUOTE_STRING | DOUBLE_QUOTE_STRING
+	}
+
+	rule SINGLE_QUOTE_STRING -> NodeStringLiteral {
+		virtual TokStringSingleStart
+		(
+			NodeStringEscape : TokStringEscape 
+			| NodeStringText : TokStringSingleText
+		)*
+		virtual TokStringSingleEnd
+	}
+
+	rule DOUBLE_QUOTE_STRING -> NodeStringLiteral {
+		virtual TokStringDoubleStart
+		(
+			NodeStringEscape : TokStringEscape 
+			| NodeStringText : TokStringDoubleText
+		)*
+		virtual TokStringDoubleEnd
+	}
+	
+	// --- PAIRS & NESTS ---
 
 	pair Parens TokParenOpen TokParenClose;
 

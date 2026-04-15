@@ -30,16 +30,26 @@ func Config() generation.RunnerConfig[Token, Node] {
 var ebnfSemanticManifest = toolchain.SemanticManifest[Token, Node]{
 	InvalidScope: "invalid.illegal",
 	BaseTokenScopes: map[Token]string{
-		TokAssignment:    "keyword.operator.assignment",
-		TokIdentifier:    "variable.other",
-		TokStringLiteral: "string.quoted.single",
-		TokSemi:          "punctuation.terminator",
-		TokParenOpen:     "punctuation.section.parens.begin",
-		TokParenClose:    "punctuation.section.parens.close",
-		TokQuestion:      "keyword.operator.optional",
-		TokStar:          "keyword.operator.star",
-		TokPlus:          "keyword.operator.plus",
-		TokPipe:          "keyword.operator.alternation",
+		TokAssignment:  "keyword.operator.assignment",
+		TokIdentifier:  "variable.other",
+		TokSemi:        "punctuation.terminator",
+		TokParenOpen:   "punctuation.section.parens.begin",
+		TokParenClose:  "punctuation.section.parens.close",
+		TokQuestion:    "keyword.operator.optional",
+		TokStar:        "keyword.operator.star",
+		TokPlus:        "keyword.operator.plus",
+		TokPipe:        "keyword.operator.alternation",
+		TokRange:       "keyword.operator.range",
+		TokTilde:       "keyword.operator.negation",
+		TokExclamation: "keyword.operator.negation",
+
+		TokStringSingleStart: "punctuation.definition.string.begin",
+		TokStringSingleEnd:   "punctuation.definition.string.end",
+		TokStringDoubleStart: "punctuation.definition.string.begin",
+		TokStringDoubleEnd:   "punctuation.definition.string.end",
+		TokStringEscape:      "constant.character.escape",
+		TokStringSingleText:  "string.quoted.single",
+		TokStringDoubleText:  "string.quoted.double",
 	},
 	NodeBindings: map[Node]toolchain.NodeBinding[Token]{
 		NodeProductionGroup: {
@@ -57,6 +67,12 @@ var ebnfSemanticManifest = toolchain.SemanticManifest[Token, Node]{
 			TokenScopes: map[Token][]string{
 				TokIdentifier: {"meta.production", "entity.name.function"},
 			},
+		},
+		NodeCharRange: {
+			MetaScope: "meta.character-range",
+		},
+		NodeStringLiteral: {
+			MetaScope: "meta.string",
 		},
 	},
 }

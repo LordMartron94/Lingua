@@ -91,6 +91,14 @@ func ExecuteFull[T TokenConstraint, N NodeConstraint](cfg RunnerConfig[T, N]) {
 	}
 }
 
+/*
+ExportSemanticManifest converts a typed semantic manifest to string keys for
+toolchains and tests (same mapping as adaptManifest).
+*/
+func ExportSemanticManifest[T TokenConstraint, N NodeConstraint](in toolchain.SemanticManifest[T, N]) toolchain.SemanticManifest[string, string] {
+	return adaptManifest(in)
+}
+
 // adaptManifest performs the exact logic you previously had in ruleforge, but generically.
 func adaptManifest[T TokenConstraint, N NodeConstraint](in toolchain.SemanticManifest[T, N]) toolchain.SemanticManifest[string, string] {
 	out := toolchain.SemanticManifest[string, string]{
