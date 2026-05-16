@@ -230,7 +230,7 @@ PARSE {
 		NodeTargetParameterOptional : TokQuestion?
 	}
 
-	rule TARGET_BODY -> NodeTargetBody {
+	rule TARGET_BODY -> NodeTargetBody sync (TokNewLine) {
 		(
 			NEW_LINE | HELP_STATEMENT | ALIASES_DECLARATION | ARTIFACTS_BLOCK | CONDITIONAL_BLOCK | DEPENDS_ON
 			| RUN | WORK_DIR | ENV_DECLARATION
@@ -368,7 +368,7 @@ PARSE {
 		VAR_REF | STRING_LITERAL
 	}
 
-	rule CONDITIONAL_BLOCK -> NodeConditional {
+	rule CONDITIONAL_BLOCK -> NodeConditional sync (TokNewLine) {
 		virtual TokKWWhen
 
 		(DEFINES | EQUALS)
