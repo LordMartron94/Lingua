@@ -327,7 +327,7 @@ PARSE {
 	rule GLOB_KWARG -> NodeGlobKwarg {
 		NodeGlobKwargIdentifier : TokIdentifier
 		virtual TokEquals
-		STRING_LITERAL
+		(STRING_LITERAL | TRUE_OR_FALSE)
 	}
 
 	rule OUTPUT_STATEMENT -> NodeCacheOutputDirectory {
