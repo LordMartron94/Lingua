@@ -157,82 +157,84 @@ const (
 	NodeConditional Node = 27
 	NodeConditionalParameter Node = 28
 	NodeConditionalTarget Node = 29
-	NodeDependencyOptions Node = 30
-	NodeEnvDeclaration Node = 31
-	NodeEnvKey Node = 32
-	NodeGlob Node = 33
-	NodeGlobArguments Node = 34
-	NodeGlobBaseDirectory Node = 35
-	NodeGlobKwarg Node = 36
-	NodeGlobKwargIdentifier Node = 37
-	NodeHelpStatement Node = 38
-	NodeInputArray Node = 39
-	NodeInterpolatedVariable Node = 40
-	NodeInvokeTarget Node = 41
-	NodeNumber Node = 42
-	NodeOutputArray Node = 43
-	NodePath Node = 44
-	NodePathArgs Node = 45
-	NodeProgram Node = 46
-	NodeRunStatement Node = 47
-	NodeStringArray Node = 48
-	NodeStringDollar Node = 49
-	NodeStringEscape Node = 50
-	NodeStringInterpolation Node = 51
-	NodeStringLiteral Node = 52
-	NodeStringText Node = 53
-	NodeTarget Node = 54
-	NodeTargetBody Node = 55
-	NodeTargetDependency Node = 56
-	NodeTargetDepends Node = 57
-	NodeTargetExecution Node = 58
-	NodeTargetIdentifier Node = 59
-	NodeTargetParameter Node = 60
-	NodeTargetParameterIdentifier Node = 61
-	NodeTargetParameterOptional Node = 62
-	NodeTargetParams Node = 63
-	NodeVariableDeclaration Node = 64
-	NodeVariableName Node = 65
-	NodeVariableReference Node = 66
-	NodeVariableValue Node = 67
-	NodeVolatile Node = 68
-	NodeWorkingDirectory Node = 69
-	OUTPUT_ARRAY Node = 70
-	OUTPUT_STATEMENT Node = 71
-	OUTPUT_STATEMENT_VALUE Node = 72
-	PATH Node = 73
-	PATH_ARGS Node = 74
-	PATH_ELEMENT Node = 75
-	RUN Node = 76
-	STRING_INTERPOLATION Node = 77
-	STRING_LITERAL Node = 78
-	TARGET Node = 79
-	TARGET_BODY Node = 80
-	TARGET_DEPENDENCY Node = 81
-	TARGET_EXECUTION Node = 82
-	TARGET_PARAM Node = 83
-	TARGET_PARAMS Node = 84
-	TRUE_OR_FALSE Node = 85
-	VARIABLE_STATEMENT Node = 86
-	VARIABLE_TARGET Node = 87
-	VAR_REF Node = 88
-	VOLATILE_STATEMENT Node = 89
-	WORK_DIR Node = 90
-	gr_ARTIFACTS_STATEMENT Node = 91
-	gr_DEFINES Node = 92
-	gr_DEP_EL Node = 93
-	gr_ENV_ASSIGNMENT Node = 94
-	gr_ENV_KEY Node = 95
-	gr_ENV_VALUE Node = 96
-	gr_EQUALS Node = 97
-	gr_INPUTS_VALUE Node = 98
-	gr_INPUT_ARRAY_ELEMENT Node = 99
-	gr_NEW_LINE Node = 100
-	gr_OUTPUT_ARRAY_ELEMENT Node = 101
-	gr_OUTPUT_VALUE Node = 102
-	gr_PATH_ELEMENT Node = 103
-	gr_TRUE_OR_FALSE Node = 104
-	gr_VAR_REF Node = 105
+	NodeConfirmKW Node = 30
+	NodeDependencyOptions Node = 31
+	NodeEnvDeclaration Node = 32
+	NodeEnvKey Node = 33
+	NodeGlob Node = 34
+	NodeGlobArguments Node = 35
+	NodeGlobBaseDirectory Node = 36
+	NodeGlobKwarg Node = 37
+	NodeGlobKwargIdentifier Node = 38
+	NodeHelpStatement Node = 39
+	NodeInputArray Node = 40
+	NodeInterpolatedVariable Node = 41
+	NodeInvokeTarget Node = 42
+	NodeNumber Node = 43
+	NodeOptionalKW Node = 44
+	NodeOutputArray Node = 45
+	NodePath Node = 46
+	NodePathArgs Node = 47
+	NodeProgram Node = 48
+	NodeRunStatement Node = 49
+	NodeStringArray Node = 50
+	NodeStringDollar Node = 51
+	NodeStringEscape Node = 52
+	NodeStringInterpolation Node = 53
+	NodeStringLiteral Node = 54
+	NodeStringText Node = 55
+	NodeTarget Node = 56
+	NodeTargetBody Node = 57
+	NodeTargetDependency Node = 58
+	NodeTargetDepends Node = 59
+	NodeTargetExecution Node = 60
+	NodeTargetIdentifier Node = 61
+	NodeTargetParameter Node = 62
+	NodeTargetParameterIdentifier Node = 63
+	NodeTargetParameterOptional Node = 64
+	NodeTargetParams Node = 65
+	NodeVariableDeclaration Node = 66
+	NodeVariableName Node = 67
+	NodeVariableReference Node = 68
+	NodeVariableValue Node = 69
+	NodeVolatile Node = 70
+	NodeWorkingDirectory Node = 71
+	OUTPUT_ARRAY Node = 72
+	OUTPUT_STATEMENT Node = 73
+	OUTPUT_STATEMENT_VALUE Node = 74
+	PATH Node = 75
+	PATH_ARGS Node = 76
+	PATH_ELEMENT Node = 77
+	RUN Node = 78
+	STRING_INTERPOLATION Node = 79
+	STRING_LITERAL Node = 80
+	TARGET Node = 81
+	TARGET_BODY Node = 82
+	TARGET_DEPENDENCY Node = 83
+	TARGET_EXECUTION Node = 84
+	TARGET_PARAM Node = 85
+	TARGET_PARAMS Node = 86
+	TRUE_OR_FALSE Node = 87
+	VARIABLE_STATEMENT Node = 88
+	VARIABLE_TARGET Node = 89
+	VAR_REF Node = 90
+	VOLATILE_STATEMENT Node = 91
+	WORK_DIR Node = 92
+	gr_ARTIFACTS_STATEMENT Node = 93
+	gr_DEFINES Node = 94
+	gr_DEP_EL Node = 95
+	gr_ENV_ASSIGNMENT Node = 96
+	gr_ENV_KEY Node = 97
+	gr_ENV_VALUE Node = 98
+	gr_EQUALS Node = 99
+	gr_INPUTS_VALUE Node = 100
+	gr_INPUT_ARRAY_ELEMENT Node = 101
+	gr_NEW_LINE Node = 102
+	gr_OUTPUT_ARRAY_ELEMENT Node = 103
+	gr_OUTPUT_VALUE Node = 104
+	gr_PATH_ELEMENT Node = 105
+	gr_TRUE_OR_FALSE Node = 106
+	gr_VAR_REF Node = 107
 )
 
 var NodeNames = [...]string{
@@ -265,6 +267,7 @@ var NodeNames = [...]string{
 	"NodeConditional",
 	"NodeConditionalParameter",
 	"NodeConditionalTarget",
+	"NodeConfirmKW",
 	"NodeDependencyOptions",
 	"NodeEnvDeclaration",
 	"NodeEnvKey",
@@ -278,6 +281,7 @@ var NodeNames = [...]string{
 	"NodeInterpolatedVariable",
 	"NodeInvokeTarget",
 	"NodeNumber",
+	"NodeOptionalKW",
 	"NodeOutputArray",
 	"NodePath",
 	"NodePathArgs",

@@ -283,6 +283,12 @@ PARSE {
 		$rule
 	}
 
+	template t_simpleAssignmentExplicit($keyword: Token, $keywordNode: Node, $rule: Rule) {
+		$keywordNode : $keyword
+		virtual TokEquals
+		$rule
+	}
+
 	rule INPUTS_STATEMENT -> NodeCacheInputs {
 		call t_simpleAssignment(TokKWInputs, INPUTS_VALUE)
 		NEW_LINE
@@ -420,9 +426,9 @@ PARSE {
 
 	rule DEPENDENCY_OPTIONS -> NodeDependencyOptions {
 		(
-			call t_simpleAssignment(TokKWConfirm, TRUE_OR_FALSE)
+			call t_simpleAssignmentExplicit(TokKWConfirm, NodeConfirmKW, TRUE_OR_FALSE)
 			|
-			call t_simpleAssignment(TokKWOptional, TRUE_OR_FALSE)
+			call t_simpleAssignmentExplicit(TokKWOptional, NodeOptionalKW, TRUE_OR_FALSE)
 			|
 			NEW_LINE
 		)*
