@@ -303,7 +303,7 @@ PARSE {
 	}
 
 	rule INPUT_ARRAY_ELEMENT -> transparent gr_INPUT_ARRAY_ELEMENT {
-		STRING_LITERAL | GLOB
+		STRING_LITERAL | GLOB | PATH
 	}
 
 	rule VOLATILE_STATEMENT -> NodeVolatile {
