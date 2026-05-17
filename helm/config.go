@@ -73,6 +73,7 @@ var helmSemanticManifest = toolchain.SemanticManifest[Token, Node]{
 
 		TokKWConfirm:  "support.type.property-name.confirm",
 		TokKWOptional: "support.type.property-name.optional",
+		TokKWParams:   "support.type.property-name.params",
 
 		TokKWTrue:  "constant.language.boolean.true",
 		TokKWFalse: "constant.language.boolean.false",
@@ -134,6 +135,9 @@ var helmSemanticManifest = toolchain.SemanticManifest[Token, Node]{
 		},
 		NodeOutputArray: {
 			MetaScope: "meta.array.outputs",
+		},
+		NodeDependencyParameterName: {
+			Scopes: []string{"variable.other.property.dependency-parameter"},
 		},
 		// --- Environment & Properties ---
 		NodeEnvKey: {

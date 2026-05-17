@@ -65,6 +65,7 @@ PATTERN {
 
 	pat_TokKWConfirm			: "confirm";
 	pat_TokKWOptional			: "optional";
+	pat_TokKWParams				: "params";
 
 	pat_TokKWWhen				: "when";
 
@@ -113,6 +114,7 @@ LEX {
 
 		2 TokKWConfirm 			-> HELM_STRUCTURAL_ROLE : pat_TokKWConfirm;
 		2 TokKWOptional 		-> HELM_STRUCTURAL_ROLE : pat_TokKWOptional;
+		2 TokKWParams 			-> HELM_STRUCTURAL_ROLE : pat_TokKWParams;
 
 		2 TokKWDependsOn 		-> HELM_STRUCTURAL_ROLE : pat_TokKWDependsOn;
 
@@ -246,14 +248,14 @@ PARSE {
 		using STD.t_MULTILINE_BLOCK(@Braces, ENV_ASSIGNMENT, TokNewLine)
 	}
 
-	rule ENV_ASSIGNMENT -> transparent gr_ENV_ASSIGNMENT {
-		ENV_KEY
+	template t_keyValuePair($keyNode: Node, $keyToken: Token, $valueRule: Rule) {
+		$keyNode : $keyToken
 		virtual TokEquals
-		ENV_VALUE
+		$valueRule
 	}
 
-	rule ENV_KEY -> transparent gr_ENV_KEY {
-		NodeEnvKey : TokIdentifier
+	rule ENV_ASSIGNMENT -> transparent gr_ENV_ASSIGNMENT {
+		call t_keyValuePair(NodeEnvKey, TokIdentifier, ENV_VALUE)
 	}
 
 	rule ENV_VALUE -> transparent gr_ENV_VALUE {
@@ -430,8 +432,29 @@ PARSE {
 			|
 			call t_simpleAssignmentExplicit(TokKWOptional, NodeOptionalKW, TRUE_OR_FALSE)
 			|
+			DEPENDENCY_PARAMS
+			|
 			NEW_LINE
 		)*
+	}
+
+	rule DEPENDENCY_PARAMS -> NodeDependencyParameters {
+		virtual TokKWParams
+		nest @Braces {
+			DEPENDENCY_PARAM_CONTENT
+		}
+	}
+
+	rule DEPENDENCY_PARAM_CONTENT -> transparent gr_DEPENDENCY_PARAM_CONTENT {
+		(
+			call t_keyValuePair(NodeDependencyParameterName, TokIdentifier, DEPENDENCY_PARAM_VALUE)
+			|
+			NEW_LINE
+		)*
+	}
+
+	rule DEPENDENCY_PARAM_VALUE -> transparent gr_DEPENDENCY_PARAM_VALUE {
+		STRING_LITERAL
 	}
 
 	rule TRUE_OR_FALSE -> gr_TRUE_OR_FALSE {
