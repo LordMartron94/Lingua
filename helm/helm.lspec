@@ -1,4 +1,4 @@
---- "Helm" v1.4.0 | lspec v1.0.0 ---
+--- "Helm" v1.5.0 | lspec v1.0.0 ---
 
 PRAGMA {
 	tool.sublime {
@@ -65,6 +65,7 @@ PATTERN {
 	pat_TokKWMatrix 			: "matrix";
 	pat_TokKWIn 				: "in";
 	pat_TokKWInteractive		: "interactive";
+	pat_TokKWHidden				: "hidden";
 
 	pat_TokKWConfirm			: "confirm";
 	pat_TokKWOptional			: "optional";
@@ -111,6 +112,7 @@ LEX {
 		2 TokKWMatrix 			-> HELM_STRUCTURAL_ROLE : pat_TokKWMatrix;
 		2 TokKWIn 				-> HELM_STRUCTURAL_ROLE : pat_TokKWIn;
 		2 TokKWInteractive 		-> HELM_STRUCTURAL_ROLE : pat_TokKWInteractive;
+		2 TokKWHidden 			-> HELM_STRUCTURAL_ROLE : pat_TokKWHidden;
 
 		2 TokKWEnv 				-> HELM_STRUCTURAL_ROLE : pat_TokKWEnv;
 		2 TokKWWorkingDir 		-> HELM_STRUCTURAL_ROLE : pat_TokKWWorkingDir;
@@ -241,7 +243,7 @@ PARSE {
 	rule TARGET_BODY -> NodeTargetBody sync (TokNewLine) {
 		(
 			NEW_LINE | HELP_STATEMENT | ALIASES_DECLARATION | ARTIFACTS_BLOCK | CONDITIONAL_BLOCK | DEPENDS_ON
-			| RUN | WORK_DIR | ENV_DECLARATION | MATRIX_BLOCK | INTERACTIVE_STATEMENT
+			| RUN | WORK_DIR | ENV_DECLARATION | MATRIX_BLOCK | INTERACTIVE_STATEMENT | HIDDEN_STATEMENT
 		)*
 	}
 
@@ -274,6 +276,10 @@ PARSE {
 
 	rule INTERACTIVE_STATEMENT -> NodeInteractiveStatement {
 		call t_simpleAssignment(TokKWInteractive, TRUE_OR_FALSE)
+	} 
+
+	rule HIDDEN_STATEMENT -> NodeHiddenStatement {
+		call t_simpleAssignment(TokKWHidden, TRUE_OR_FALSE)
 	} 
 
 	rule ALIASES_DECLARATION -> NodeAliases {

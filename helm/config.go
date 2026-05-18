@@ -64,7 +64,8 @@ var helmSemanticManifest = toolchain.SemanticManifest[Token, Node]{
 		TokKWDependsOn: "keyword.control.depends-on",
 
 		TokKWHelp:        "support.type.property-name.help",
-		TokKWInteractive: "support.type.property-name.help",
+		TokKWInteractive: "support.type.property-name.interactive",
+		TokKWHidden:      "support.type.property-name.hidden",
 		TokKWArtifacts:   "keyword.declaration.artifacts",
 		TokKWMatrix:      "keyword.declaration.matrix",
 		TokKWAliases:     "support.type.property-name.aliases",
