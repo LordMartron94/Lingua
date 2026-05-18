@@ -63,11 +63,12 @@ var helmSemanticManifest = toolchain.SemanticManifest[Token, Node]{
 		TokKWRun:       "keyword.control.execution",
 		TokKWDependsOn: "keyword.control.depends-on",
 
-		TokKWHelp:      "support.type.property-name.help",
-		TokKWArtifacts: "keyword.declaration.artifacts",
-		TokKWMatrix:    "keyword.declaration.matrix",
-		TokKWAliases:   "support.type.property-name.aliases",
-		TokKWIn:        "keyword.operator.iteration.in",
+		TokKWHelp:        "support.type.property-name.help",
+		TokKWInteractive: "support.type.property-name.help",
+		TokKWArtifacts:   "keyword.declaration.artifacts",
+		TokKWMatrix:      "keyword.declaration.matrix",
+		TokKWAliases:     "support.type.property-name.aliases",
+		TokKWIn:          "keyword.operator.iteration.in",
 
 		TokKWInputs:   "support.type.property-name.inputs",
 		TokKWOutputs:  "support.type.property-name.outputs",
