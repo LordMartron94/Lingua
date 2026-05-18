@@ -65,7 +65,9 @@ var helmSemanticManifest = toolchain.SemanticManifest[Token, Node]{
 
 		TokKWHelp:      "support.type.property-name.help",
 		TokKWArtifacts: "keyword.declaration.artifacts",
+		TokKWMatrix:    "keyword.declaration.matrix",
 		TokKWAliases:   "support.type.property-name.aliases",
+		TokKWIn:        "keyword.operator.iteration.in",
 
 		TokKWInputs:   "support.type.property-name.inputs",
 		TokKWOutputs:  "support.type.property-name.outputs",
@@ -132,6 +134,9 @@ var helmSemanticManifest = toolchain.SemanticManifest[Token, Node]{
 		},
 		NodeInputArray: {
 			MetaScope: "meta.array.inputs",
+		},
+		NodeMatrixArray: {
+			MetaScope: "meta.array.matrix",
 		},
 		NodeOutputArray: {
 			MetaScope: "meta.array.outputs",

@@ -62,6 +62,8 @@ PATTERN {
 	pat_TokKWVolatile   		: "volatile";
 	pat_TokKWEnv 				: "env";
 	pat_TokKWWorkingDir			: "workdir";
+	pat_TokKWMatrix 			: "matrix";
+	pat_TokKWIn 				: "in";
 
 	pat_TokKWConfirm			: "confirm";
 	pat_TokKWOptional			: "optional";
@@ -105,6 +107,8 @@ LEX {
 		2 TokKWPath 			-> HELM_STRUCTURAL_ROLE : pat_TokKWPath;
 		2 TokKWAliases 			-> HELM_STRUCTURAL_ROLE : pat_TokKWAliases;
 		2 TokKWVolatile 		-> HELM_STRUCTURAL_ROLE : pat_TokKWVolatile;
+		2 TokKWMatrix 			-> HELM_STRUCTURAL_ROLE : pat_TokKWMatrix;
+		2 TokKWIn 				-> HELM_STRUCTURAL_ROLE : pat_TokKWIn;
 
 		2 TokKWEnv 				-> HELM_STRUCTURAL_ROLE : pat_TokKWEnv;
 		2 TokKWWorkingDir 		-> HELM_STRUCTURAL_ROLE : pat_TokKWWorkingDir;
@@ -235,7 +239,7 @@ PARSE {
 	rule TARGET_BODY -> NodeTargetBody sync (TokNewLine) {
 		(
 			NEW_LINE | HELP_STATEMENT | ALIASES_DECLARATION | ARTIFACTS_BLOCK | CONDITIONAL_BLOCK | DEPENDS_ON
-			| RUN | WORK_DIR | ENV_DECLARATION
+			| RUN | WORK_DIR | ENV_DECLARATION | MATRIX_BLOCK
 		)*
 	}
 
@@ -279,6 +283,25 @@ PARSE {
 		INPUTS_STATEMENT | OUTPUT_STATEMENT | VOLATILE_STATEMENT
 	}
 
+	rule MATRIX_BLOCK -> NodeMatrixBlock {
+		virtual TokKWMatrix
+		NodeMatrixIdentifier : TokIdentifier
+		virtual TokKWIn
+		MATRIX_VALUE
+	}
+
+	rule MATRIX_VALUE -> transparent gr_MATRIX_VALUE {
+		VAR_REF | STRING_LITERAL | GLOB | PATH | MATRIX_ARRAY
+	}
+
+	rule MATRIX_ARRAY -> NodeMatrixArray {
+		using STD.t_MULTILINE_ARRAY_TRAILING_SEP(@Brackets, MATRIX_ARRAY_ELEMENT, TokComma, TokNewLine)
+	}
+
+	rule MATRIX_ARRAY_ELEMENT -> transparent gr_MATRIX_ARRAY_ELEMENT {
+		STRING_LITERAL | GLOB | PATH | VAR_REF
+	}
+
 	template t_simpleAssignment($keyword: Token, $rule: Rule) {
 		virtual $keyword
 		virtual TokEquals
@@ -305,7 +328,7 @@ PARSE {
 	}
 
 	rule INPUT_ARRAY_ELEMENT -> transparent gr_INPUT_ARRAY_ELEMENT {
-		STRING_LITERAL | GLOB | PATH
+		STRING_LITERAL | GLOB | PATH | VAR_REF
 	}
 
 	rule VOLATILE_STATEMENT -> NodeVolatile {
@@ -346,7 +369,7 @@ PARSE {
 	}
 
 	rule OUTPUT_STATEMENT_VALUE -> transparent gr_OUTPUT_VALUE {
-		VAR_REF | STRING_LITERAL | PATH | OUTPUT_ARRAY 
+		VAR_REF | STRING_LITERAL | PATH | OUTPUT_ARRAY | GLOB
 	}
 	
 	rule OUTPUT_ARRAY -> NodeOutputArray {
@@ -354,7 +377,7 @@ PARSE {
 	}
 	
 	rule OUTPUT_ARRAY_ELEMENT -> transparent gr_OUTPUT_ARRAY_ELEMENT {
-		STRING_LITERAL | PATH | VAR_REF
+		STRING_LITERAL | PATH | VAR_REF | GLOB
 	}
 
 	rule PATH -> NodePath {
