@@ -22,9 +22,11 @@ type Bundle struct {
 	RootRelPath string
 	Files       []File
 
-	once    sync.Once
+	mu      sync.Mutex
+	tempDir string
 	root    string
 	rootErr error
+	refs    int
 }
 
 // BundleCreate validates and returns a bundle. Panics on invalid input.
@@ -65,47 +67,88 @@ func StdFile() File {
 	}
 }
 
-// BundleRootPath materializes the bundle once per process and returns the root .lspec path.
-func BundleRootPath(bundle *Bundle) (string, error) {
+// BundleAcquire materializes the bundle when needed and returns the root .lspec path.
+// Call release when finished so the temporary directory is removed.
+func BundleAcquire(bundle *Bundle) (rootPath string, release func(), err error) {
 	if bundle == nil {
-		return "", fmt.Errorf("lspecembed: nil bundle")
+		return "", func() {}, fmt.Errorf("lspecembed: nil bundle")
 	}
-	bundle.once.Do(func() {
-		bundle.root, bundle.rootErr = materializeBundle(bundle)
-	})
-	return bundle.root, bundle.rootErr
+
+	bundle.mu.Lock()
+	defer bundle.mu.Unlock()
+
+	if bundle.refs == 0 {
+		bundle.root, bundle.tempDir, bundle.rootErr = materializeBundle(bundle)
+	}
+	if bundle.rootErr != nil {
+		return "", func() {}, bundle.rootErr
+	}
+
+	bundle.refs++
+	path := bundle.root
+	return path, func() { bundleRelease(bundle) }, nil
 }
 
-// ResolvePath returns the env override when set and readable, otherwise BundleRootPath.
-func ResolvePath(envVar string, bundle *Bundle) (string, error) {
+// BundleRootPath is equivalent to BundleAcquire without releasing the temp directory.
+// Prefer BundleAcquire and call release to avoid leaving materialized trees in the system temp folder.
+func BundleRootPath(bundle *Bundle) (string, error) {
+	path, _, err := BundleAcquire(bundle)
+	return path, err
+}
+
+// ResolvePath returns the env override when set and readable, otherwise acquires the bundle.
+// When the embedded bundle is materialized, call release after the path is no longer needed.
+func ResolvePath(envVar string, bundle *Bundle) (path string, release func(), err error) {
 	if envVar != "" {
 		if path := os.Getenv(envVar); path != "" {
 			if _, err := os.Stat(path); err != nil {
-				return "", fmt.Errorf("%s not usable (%q): %w", envVar, path, err)
+				return "", func() {}, fmt.Errorf("%s not usable (%q): %w", envVar, path, err)
 			}
-			return path, nil
+			return path, func() {}, nil
 		}
 	}
-	return BundleRootPath(bundle)
+	return BundleAcquire(bundle)
 }
 
-func materializeBundle(bundle *Bundle) (string, error) {
-	root, err := os.MkdirTemp("", "lingua-lspec-*")
+func bundleRelease(bundle *Bundle) {
+	bundle.mu.Lock()
+	defer bundle.mu.Unlock()
+
+	if bundle.refs <= 0 {
+		return
+	}
+	bundle.refs--
+	if bundle.refs > 0 {
+		return
+	}
+
+	if bundle.tempDir != "" {
+		_ = os.RemoveAll(bundle.tempDir)
+	}
+	bundle.tempDir = ""
+	bundle.root = ""
+	bundle.rootErr = nil
+}
+
+func materializeBundle(bundle *Bundle) (rootPath string, tempDir string, err error) {
+	tempDir, err = os.MkdirTemp("", "lingua-lspec-*")
 	if err != nil {
-		return "", fmt.Errorf("lspecembed: create temp dir: %w", err)
+		return "", "", fmt.Errorf("lspecembed: create temp dir: %w", err)
 	}
 
 	for _, file := range bundle.Files {
-		absPath := filepath.Join(root, filepath.FromSlash(file.RelPath))
+		absPath := filepath.Join(tempDir, filepath.FromSlash(file.RelPath))
 		if err := os.MkdirAll(filepath.Dir(absPath), 0o755); err != nil {
-			return "", fmt.Errorf("lspecembed: mkdir %q: %w", file.RelPath, err)
+			_ = os.RemoveAll(tempDir)
+			return "", "", fmt.Errorf("lspecembed: mkdir %q: %w", file.RelPath, err)
 		}
 		if err := os.WriteFile(absPath, file.Data, 0o644); err != nil {
-			return "", fmt.Errorf("lspecembed: write %q: %w", file.RelPath, err)
+			_ = os.RemoveAll(tempDir)
+			return "", "", fmt.Errorf("lspecembed: write %q: %w", file.RelPath, err)
 		}
 	}
 
-	return filepath.Join(root, filepath.FromSlash(bundle.RootRelPath)), nil
+	return filepath.Join(tempDir, filepath.FromSlash(bundle.RootRelPath)), tempDir, nil
 }
 
 func normalizeRelPath(path string) string {

@@ -5,8 +5,8 @@
 //
 //  1. Add //go:embed your.lspec in the language package.
 //  2. Build a Bundle with BundleCreate (add StdFile() when the spec imports lspec_std).
-//  3. Expose EmbeddedLSpecPath() that returns BundleRootPath(bundle).
-//  4. In tooling, call ResolvePath("YOUR_LANG_LSPEC_PATH", bundle) for dev overrides.
+//  3. Expose EmbeddedLSpecPath() that returns BundleRootPath(bundle), or prefer ResolvePath with release.
+//  4. In tooling, call ResolvePath("YOUR_LANG_LSPEC_PATH", bundle) for dev overrides and call release when done.
 //
-// Materialized directories live for the process lifetime.
+// Temporary directories are removed when the release callback from BundleAcquire or ResolvePath runs.
 package lspecembed

@@ -14,7 +14,8 @@ func EmbeddedLSpecPath() (string, error) {
 	return lspecembed.BundleRootPath(HelmLspecBundle)
 }
 
-// ResolveHelmLSpecPath returns HELM_LSPEC_PATH when set, otherwise the embedded spec path.
-func ResolveHelmLSpecPath() (string, error) {
+// ResolveHelmLSpecPath returns HELM_LSPEC_PATH when set, otherwise acquires the embedded spec.
+// Call release when the path is no longer needed (release is a no-op when HELM_LSPEC_PATH is set).
+func ResolveHelmLSpecPath() (path string, release func(), err error) {
 	return lspecembed.ResolvePath("HELM_LSPEC_PATH", HelmLspecBundle)
 }

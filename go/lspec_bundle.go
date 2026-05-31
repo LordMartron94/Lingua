@@ -23,11 +23,11 @@ func EmbeddedGoWorkLSpecPath() (string, error) {
 }
 
 // ResolveGoModLSpecPath returns GOMOD_LSPEC_PATH when set, otherwise the embedded spec path.
-func ResolveGoModLSpecPath() (string, error) {
+func ResolveGoModLSpecPath() (path string, release func(), err error) {
 	return lspecembed.ResolvePath("GOMOD_LSPEC_PATH", goModLspecBundle)
 }
 
-// ResolveGoWorkLSpecPath returns GOWORK_LSPEC_PATH when set, otherwise the embedded spec path.
-func ResolveGoWorkLSpecPath() (string, error) {
+// ResolveGoWorkLSpecPath returns GOWORK_LSPEC_PATH when set, otherwise acquires the embedded spec.
+func ResolveGoWorkLSpecPath() (path string, release func(), err error) {
 	return lspecembed.ResolvePath("GOWORK_LSPEC_PATH", goWorkLspecBundle)
 }

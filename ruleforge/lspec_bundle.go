@@ -13,6 +13,6 @@ func EmbeddedLSpecPath() (string, error) {
 }
 
 // ResolveRuleforgeLSpecPath returns RULEFORGE_LSPEC_PATH when set, otherwise the embedded spec path.
-func ResolveRuleforgeLSpecPath() (string, error) {
+func ResolveRuleforgeLSpecPath() (path string, release func(), err error) {
 	return lspecembed.ResolvePath("RULEFORGE_LSPEC_PATH", ruleforgeLspecBundle)
 }
