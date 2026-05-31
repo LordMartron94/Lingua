@@ -205,7 +205,7 @@ PARSE {
 	}
 
 	rule VARIABLE_TARGET -> NodeVariableValue {
-		STRING_LITERAL
+		STRING_LITERAL | STRING_ARRAY
 	}
 
 	// --- TARGETS ---
