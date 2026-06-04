@@ -74,6 +74,7 @@ var helmSemanticManifest = toolchain.SemanticManifest[Token, Node]{
 		TokKWInputs:   "support.type.property-name.inputs",
 		TokKWOutputs:  "support.type.property-name.outputs",
 		TokKWVolatile: "support.type.property-name.volatile",
+		TokKWDynamic:  "support.type.property-name.dynamic",
 
 		TokKWConfirm:  "support.type.property-name.confirm",
 		TokKWOptional: "support.type.property-name.optional",

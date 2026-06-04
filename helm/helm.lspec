@@ -79,6 +79,7 @@ PATTERN {
 	pat_TokKWNotDefined			: "not_defined";
 	pat_TokKWEquals				: "equals";
 	pat_TokKWNotEquals			: "not_equals";
+	pat_TokKWDynamic			: "dynamic";
 
 	pat_TokInteger 				: '0' | ['1'..'9'] ['0'..'9']+;
 
@@ -113,6 +114,7 @@ LEX {
 		2 TokKWIn 				-> HELM_STRUCTURAL_ROLE : pat_TokKWIn;
 		2 TokKWInteractive 		-> HELM_STRUCTURAL_ROLE : pat_TokKWInteractive;
 		2 TokKWHidden 			-> HELM_STRUCTURAL_ROLE : pat_TokKWHidden;
+		2 TokKWDynamic 			-> HELM_STRUCTURAL_ROLE : pat_TokKWDynamic;
 
 		2 TokKWEnv 				-> HELM_STRUCTURAL_ROLE : pat_TokKWEnv;
 		2 TokKWWorkingDir 		-> HELM_STRUCTURAL_ROLE : pat_TokKWWorkingDir;
@@ -296,7 +298,7 @@ PARSE {
 	}
 
 	rule ARTIFACTS_STATEMENT -> transparent gr_ARTIFACTS_STATEMENT {
-		INPUTS_STATEMENT | OUTPUT_STATEMENT | VOLATILE_STATEMENT
+		INPUTS_STATEMENT | OUTPUT_STATEMENT | VOLATILE_STATEMENT | DYNAMIC_STATEMENT
 	}
 
 	rule MATRIX_BLOCK -> NodeMatrixBlock {
@@ -345,6 +347,19 @@ PARSE {
 
 	rule VOLATILE_STATEMENT -> NodeVolatile {
 		call t_simpleAssignment(TokKWVolatile, TRUE_OR_FALSE)
+	}
+
+	rule DYNAMIC_STATEMENT -> NodeDynamic {
+		call t_simpleAssignment(TokKWDynamic, DYNAMIC_VALUE)
+		NEW_LINE
+	}
+
+	rule DYNAMIC_VALUE -> transparent gr_DYNAMIC_VALUE {
+		VAR_REF | STRING_LITERAL | GLOB | DYNAMIC_ARRAY | PATH
+	}
+
+	rule DYNAMIC_ARRAY -> NodeDynamicArray {
+		PATH_ARRAY
 	}
 
 	rule GLOB -> NodeGlob {
