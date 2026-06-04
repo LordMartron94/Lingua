@@ -70,6 +70,7 @@ PATTERN {
 	pat_TokKWConfirm			: "confirm";
 	pat_TokKWOptional			: "optional";
 	pat_TokKWParams				: "params";
+	pat_TokKWParam				: "param";
 
 	pat_TokKWWhen				: "when";
 
@@ -125,6 +126,7 @@ LEX {
 		2 TokKWConfirm 			-> HELM_STRUCTURAL_ROLE : pat_TokKWConfirm;
 		2 TokKWOptional 		-> HELM_STRUCTURAL_ROLE : pat_TokKWOptional;
 		2 TokKWParams 			-> HELM_STRUCTURAL_ROLE : pat_TokKWParams;
+		2 TokKWParam 			-> HELM_STRUCTURAL_ROLE : pat_TokKWParam;
 
 		2 TokKWDependsOn 		-> HELM_STRUCTURAL_ROLE : pat_TokKWDependsOn;
 
@@ -526,6 +528,12 @@ PARSE {
 
 	rule DEPENDENCY_ELEMENT -> transparent gr_DEP_EL {
 		TARGET_DEPENDENCY
+		| DEPENDENCY_PARAM_REF
+	}
+
+	rule DEPENDENCY_PARAM_REF -> NodeDependsOnParameterRef {
+		virtual TokKWParam
+		NodeDependencyParameterName : TokIdentifier
 	}
 
 	// --- STRINGS ---

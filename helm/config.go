@@ -147,6 +147,9 @@ var helmSemanticManifest = toolchain.SemanticManifest[Token, Node]{
 		NodeDependencyParameterName: {
 			Scopes: []string{"variable.other.property.dependency-parameter"},
 		},
+		NodeDependsOnParameterRef: {
+			MetaScope: "meta.depends-on.parameter-ref",
+		},
 		// --- Environment & Properties ---
 		NodeEnvKey: {
 			Scopes: []string{"variable.other.property.env"},
