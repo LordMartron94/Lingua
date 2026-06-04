@@ -215,52 +215,54 @@ const (
 	NodeTargetParameterIdentifier Node = 75
 	NodeTargetParameterOptional Node = 76
 	NodeTargetParams Node = 77
-	NodeVariableDeclaration Node = 78
-	NodeVariableName Node = 79
-	NodeVariableReference Node = 80
-	NodeVariableValue Node = 81
-	NodeVolatile Node = 82
-	NodeWorkingDirectory Node = 83
-	OUTPUT_ARRAY Node = 84
-	OUTPUT_STATEMENT Node = 85
-	OUTPUT_STATEMENT_VALUE Node = 86
-	PATH Node = 87
-	PATH_ARGS Node = 88
-	PATH_ELEMENT Node = 89
-	RUN Node = 90
-	STRING_ARRAY Node = 91
-	STRING_INTERPOLATION Node = 92
-	STRING_LITERAL Node = 93
-	TARGET Node = 94
-	TARGET_BODY Node = 95
-	TARGET_DEPENDENCY Node = 96
-	TARGET_EXECUTION Node = 97
-	TARGET_PARAM Node = 98
-	TARGET_PARAMS Node = 99
-	TRUE_OR_FALSE Node = 100
-	VARIABLE_STATEMENT Node = 101
-	VARIABLE_TARGET Node = 102
-	VAR_REF Node = 103
-	VOLATILE_STATEMENT Node = 104
-	WORK_DIR Node = 105
-	gr_ARTIFACTS_STATEMENT Node = 106
-	gr_DEFINES Node = 107
-	gr_DEPENDENCY_PARAM_CONTENT Node = 108
-	gr_DEPENDENCY_PARAM_VALUE Node = 109
-	gr_DEP_EL Node = 110
-	gr_ENV_ASSIGNMENT Node = 111
-	gr_ENV_VALUE Node = 112
-	gr_EQUALS Node = 113
-	gr_INPUTS_VALUE Node = 114
-	gr_INPUT_ARRAY_ELEMENT Node = 115
-	gr_MATRIX_ARRAY_ELEMENT Node = 116
-	gr_MATRIX_VALUE Node = 117
-	gr_NEW_LINE Node = 118
-	gr_OUTPUT_ARRAY_ELEMENT Node = 119
+	NodeVariableArray Node = 78
+	NodeVariableDeclaration Node = 79
+	NodeVariableName Node = 80
+	NodeVariableReference Node = 81
+	NodeVariableValue Node = 82
+	NodeVolatile Node = 83
+	NodeWorkingDirectory Node = 84
+	OUTPUT_ARRAY Node = 85
+	OUTPUT_STATEMENT Node = 86
+	OUTPUT_STATEMENT_VALUE Node = 87
+	PATH Node = 88
+	PATH_ARGS Node = 89
+	PATH_ARRAY Node = 90
+	PATH_ELEMENT Node = 91
+	RUN Node = 92
+	STRING_INTERPOLATION Node = 93
+	STRING_LITERAL Node = 94
+	TARGET Node = 95
+	TARGET_BODY Node = 96
+	TARGET_DEPENDENCY Node = 97
+	TARGET_EXECUTION Node = 98
+	TARGET_PARAM Node = 99
+	TARGET_PARAMS Node = 100
+	TRUE_OR_FALSE Node = 101
+	VARIABLE_ARRAY Node = 102
+	VARIABLE_STATEMENT Node = 103
+	VARIABLE_TARGET Node = 104
+	VAR_REF Node = 105
+	VOLATILE_STATEMENT Node = 106
+	WORK_DIR Node = 107
+	gr_ARTIFACTS_STATEMENT Node = 108
+	gr_DEFINES Node = 109
+	gr_DEPENDENCY_PARAM_CONTENT Node = 110
+	gr_DEPENDENCY_PARAM_VALUE Node = 111
+	gr_DEP_EL Node = 112
+	gr_ENV_ASSIGNMENT Node = 113
+	gr_ENV_VALUE Node = 114
+	gr_EQUALS Node = 115
+	gr_INPUTS_VALUE Node = 116
+	gr_MATRIX_ARRAY_ELEMENT Node = 117
+	gr_MATRIX_VALUE Node = 118
+	gr_NEW_LINE Node = 119
 	gr_OUTPUT_VALUE Node = 120
-	gr_PATH_ELEMENT Node = 121
-	gr_TRUE_OR_FALSE Node = 122
-	gr_VAR_REF Node = 123
+	gr_PATH_ARRAY Node = 121
+	gr_PATH_ARRAY_ELEMENT Node = 122
+	gr_PATH_ELEMENT Node = 123
+	gr_TRUE_OR_FALSE Node = 124
+	gr_VAR_REF Node = 125
 )
 
 var NodeNames = [...]string{
@@ -341,6 +343,7 @@ var NodeNames = [...]string{
 	"NodeTargetParameterIdentifier",
 	"NodeTargetParameterOptional",
 	"NodeTargetParams",
+	"NodeVariableArray",
 	"NodeVariableDeclaration",
 	"NodeVariableName",
 	"NodeVariableReference",
@@ -352,9 +355,9 @@ var NodeNames = [...]string{
 	"OUTPUT_STATEMENT_VALUE",
 	"PATH",
 	"PATH_ARGS",
+	"PATH_ARRAY",
 	"PATH_ELEMENT",
 	"RUN",
-	"STRING_ARRAY",
 	"STRING_INTERPOLATION",
 	"STRING_LITERAL",
 	"TARGET",
@@ -364,6 +367,7 @@ var NodeNames = [...]string{
 	"TARGET_PARAM",
 	"TARGET_PARAMS",
 	"TRUE_OR_FALSE",
+	"VARIABLE_ARRAY",
 	"VARIABLE_STATEMENT",
 	"VARIABLE_TARGET",
 	"VAR_REF",
@@ -378,12 +382,12 @@ var NodeNames = [...]string{
 	"gr_ENV_VALUE",
 	"gr_EQUALS",
 	"gr_INPUTS_VALUE",
-	"gr_INPUT_ARRAY_ELEMENT",
 	"gr_MATRIX_ARRAY_ELEMENT",
 	"gr_MATRIX_VALUE",
 	"gr_NEW_LINE",
-	"gr_OUTPUT_ARRAY_ELEMENT",
 	"gr_OUTPUT_VALUE",
+	"gr_PATH_ARRAY",
+	"gr_PATH_ARRAY_ELEMENT",
 	"gr_PATH_ELEMENT",
 	"gr_TRUE_OR_FALSE",
 	"gr_VAR_REF",

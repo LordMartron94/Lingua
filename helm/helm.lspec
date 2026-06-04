@@ -205,7 +205,11 @@ PARSE {
 	}
 
 	rule VARIABLE_TARGET -> NodeVariableValue {
-		STRING_LITERAL | STRING_ARRAY
+		STRING_LITERAL | VARIABLE_ARRAY
+	}
+
+	rule VARIABLE_ARRAY -> NodeVariableArray {
+		PATH_ARRAY
 	}
 
 	// --- TARGETS ---
@@ -336,11 +340,7 @@ PARSE {
 	}
 
 	rule INPUT_ARRAY -> NodeInputArray {
-		using STD.t_MULTILINE_ARRAY_TRAILING_SEP(@Brackets, INPUT_ARRAY_ELEMENT, TokComma, TokNewLine)
-	}
-
-	rule INPUT_ARRAY_ELEMENT -> transparent gr_INPUT_ARRAY_ELEMENT {
-		STRING_LITERAL | GLOB | PATH | VAR_REF
+		PATH_ARRAY
 	}
 
 	rule VOLATILE_STATEMENT -> NodeVolatile {
@@ -385,11 +385,15 @@ PARSE {
 	}
 	
 	rule OUTPUT_ARRAY -> NodeOutputArray {
-		using STD.t_MULTILINE_ARRAY_TRAILING_SEP(@Brackets, OUTPUT_ARRAY_ELEMENT, TokComma, TokNewLine)
+		PATH_ARRAY
 	}
-	
-	rule OUTPUT_ARRAY_ELEMENT -> transparent gr_OUTPUT_ARRAY_ELEMENT {
-		STRING_LITERAL | PATH | VAR_REF | GLOB
+
+	rule PATH_ARRAY -> transparent gr_PATH_ARRAY {
+		using STD.t_MULTILINE_ARRAY_TRAILING_SEP(@Brackets, PATH_ARRAY_ELEMENT, TokComma, TokNewLine)
+	}
+
+	rule PATH_ARRAY_ELEMENT -> transparent gr_PATH_ARRAY_ELEMENT {
+		STRING_LITERAL | GLOB | PATH | VAR_REF
 	}
 
 	rule PATH -> NodePath {
