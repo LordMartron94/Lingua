@@ -41,10 +41,14 @@ PATTERN {
 
 	pat_TokEquals			: '=';
 
-	pat_TokStringStart      : "\"";
-	pat_TokStringEnd        : "\"";
-	pat_TokStringEscape     : ("\\" ['"', '\\', 'n', 'r', 't'] | ("\\u" (['0'..'9', 'A'..'F', 'a'..'f']){4,4} | "\\U" (['0'..'9', 'A'..'F', 'a'..'f']){8,8}));
-	pat_TokStringLiteral    : (!['\n', '\r', '"', '\\', '$'])+;
+	pat_TokStringStart      	: "\"";
+	pat_TokStringEnd        	: "\"";
+	pat_TokMultilineStringStart	: "\"\"\"";
+	pat_TokMultilineStringEnd	: "\"\"\"";
+	pat_TokStringEscape     	: ("\\" ['"', '\\', 'n', 'r', 't'] | ("\\u" (['0'..'9', 'A'..'F', 'a'..'f']){4,4} | "\\U" (['0'..'9', 'A'..'F', 'a'..'f']){8,8}));
+	pat_TokStringLiteral    	: (!['\n', '\r', '"', '\\', '$'])+;
+	pat_TokMultilineStringText	: (!['"', '\\', '$'])+;
+	
 	pat_TokIdentifier       : ['A'..'Z', '_', 'a'..'z'] (['-', '0'..'9', 'A'..'Z', '_', 'a'..'z'])*;
 
 	pat_TokDollar    			: "$";
@@ -102,47 +106,48 @@ PATTERN {
 LEX {
 	state INITIAL {
 		// Keywords
-		2 TokKWTarget 			-> HELM_STRUCTURAL_ROLE : pat_TokKWTarget;
-		2 TokKWHelp 			-> HELM_STRUCTURAL_ROLE : pat_TokKWHelp;
-		2 TokKWArtifacts		-> HELM_STRUCTURAL_ROLE : pat_TokKWArtifacts;
-		2 TokKWInputs 			-> HELM_STRUCTURAL_ROLE : pat_TokKWInputs;
-		2 TokKWGlob 			-> HELM_STRUCTURAL_ROLE : pat_TokKWGlob;
-		2 TokKWOutputs 			-> HELM_STRUCTURAL_ROLE : pat_TokKWOutputs;
-		2 TokKWPath 			-> HELM_STRUCTURAL_ROLE : pat_TokKWPath;
-		2 TokKWAliases 			-> HELM_STRUCTURAL_ROLE : pat_TokKWAliases;
-		2 TokKWVolatile 		-> HELM_STRUCTURAL_ROLE : pat_TokKWVolatile;
-		2 TokKWMatrix 			-> HELM_STRUCTURAL_ROLE : pat_TokKWMatrix;
-		2 TokKWIn 				-> HELM_STRUCTURAL_ROLE : pat_TokKWIn;
-		2 TokKWInteractive 		-> HELM_STRUCTURAL_ROLE : pat_TokKWInteractive;
-		2 TokKWHidden 			-> HELM_STRUCTURAL_ROLE : pat_TokKWHidden;
-		2 TokKWDynamic 			-> HELM_STRUCTURAL_ROLE : pat_TokKWDynamic;
+		3 TokKWTarget 			-> HELM_STRUCTURAL_ROLE : pat_TokKWTarget;
+		3 TokKWHelp 			-> HELM_STRUCTURAL_ROLE : pat_TokKWHelp;
+		3 TokKWArtifacts		-> HELM_STRUCTURAL_ROLE : pat_TokKWArtifacts;
+		3 TokKWInputs 			-> HELM_STRUCTURAL_ROLE : pat_TokKWInputs;
+		3 TokKWGlob 			-> HELM_STRUCTURAL_ROLE : pat_TokKWGlob;
+		3 TokKWOutputs 			-> HELM_STRUCTURAL_ROLE : pat_TokKWOutputs;
+		3 TokKWPath 			-> HELM_STRUCTURAL_ROLE : pat_TokKWPath;
+		3 TokKWAliases 			-> HELM_STRUCTURAL_ROLE : pat_TokKWAliases;
+		3 TokKWVolatile 		-> HELM_STRUCTURAL_ROLE : pat_TokKWVolatile;
+		3 TokKWMatrix 			-> HELM_STRUCTURAL_ROLE : pat_TokKWMatrix;
+		3 TokKWIn 				-> HELM_STRUCTURAL_ROLE : pat_TokKWIn;
+		3 TokKWInteractive 		-> HELM_STRUCTURAL_ROLE : pat_TokKWInteractive;
+		3 TokKWHidden 			-> HELM_STRUCTURAL_ROLE : pat_TokKWHidden;
+		3 TokKWDynamic 			-> HELM_STRUCTURAL_ROLE : pat_TokKWDynamic;
 
-		2 TokKWEnv 				-> HELM_STRUCTURAL_ROLE : pat_TokKWEnv;
-		2 TokKWWorkingDir 		-> HELM_STRUCTURAL_ROLE : pat_TokKWWorkingDir;
+		3 TokKWEnv 				-> HELM_STRUCTURAL_ROLE : pat_TokKWEnv;
+		3 TokKWWorkingDir 		-> HELM_STRUCTURAL_ROLE : pat_TokKWWorkingDir;
 
-		2 TokKWTrue 			-> HELM_STRUCTURAL_ROLE : pat_TokKWTrue;
-		2 TokKWFalse 			-> HELM_STRUCTURAL_ROLE : pat_TokKWFalse;
+		3 TokKWTrue 			-> HELM_STRUCTURAL_ROLE : pat_TokKWTrue;
+		3 TokKWFalse 			-> HELM_STRUCTURAL_ROLE : pat_TokKWFalse;
 
-		2 TokKWConfirm 			-> HELM_STRUCTURAL_ROLE : pat_TokKWConfirm;
-		2 TokKWOptional 		-> HELM_STRUCTURAL_ROLE : pat_TokKWOptional;
-		2 TokKWParams 			-> HELM_STRUCTURAL_ROLE : pat_TokKWParams;
-		2 TokKWParam 			-> HELM_STRUCTURAL_ROLE : pat_TokKWParam;
+		3 TokKWConfirm 			-> HELM_STRUCTURAL_ROLE : pat_TokKWConfirm;
+		3 TokKWOptional 		-> HELM_STRUCTURAL_ROLE : pat_TokKWOptional;
+		3 TokKWParams 			-> HELM_STRUCTURAL_ROLE : pat_TokKWParams;
+		3 TokKWParam 			-> HELM_STRUCTURAL_ROLE : pat_TokKWParam;
 
-		2 TokKWDependsOn 		-> HELM_STRUCTURAL_ROLE : pat_TokKWDependsOn;
+		3 TokKWDependsOn 		-> HELM_STRUCTURAL_ROLE : pat_TokKWDependsOn;
 
-		2 TokKWWhen 			-> HELM_STRUCTURAL_ROLE : pat_TokKWWhen;
+		3 TokKWWhen 			-> HELM_STRUCTURAL_ROLE : pat_TokKWWhen;
 
-		2 TokKWDefined 			-> HELM_STRUCTURAL_ROLE : pat_TokKWDefined;
-		2 TokKWNotDefined 		-> HELM_STRUCTURAL_ROLE : pat_TokKWNotDefined;
-		2 TokKWEquals 			-> HELM_STRUCTURAL_ROLE : pat_TokKWEquals;
-		2 TokKWNotEquals 		-> HELM_STRUCTURAL_ROLE : pat_TokKWNotEquals;
+		3 TokKWDefined 			-> HELM_STRUCTURAL_ROLE : pat_TokKWDefined;
+		3 TokKWNotDefined 		-> HELM_STRUCTURAL_ROLE : pat_TokKWNotDefined;
+		3 TokKWEquals 			-> HELM_STRUCTURAL_ROLE : pat_TokKWEquals;
+		3 TokKWNotEquals 		-> HELM_STRUCTURAL_ROLE : pat_TokKWNotEquals;
 
-		2 TokKWRun 				-> HELM_STRUCTURAL_ROLE : pat_TokKWRun;
+		3 TokKWRun 				-> HELM_STRUCTURAL_ROLE : pat_TokKWRun;
 
 		// Conventional
-		1 TokIdentifier 		-> HELM_STRUCTURAL_ROLE : pat_TokIdentifier;
-		1 TokStringStart 		-> HELM_STRUCTURAL_ROLE : pat_TokStringStart [push(STRING)];
-		1 TokInteger 			-> HELM_STRUCTURAL_ROLE : pat_TokInteger;
+		2 TokMultilineStringStart 		-> HELM_STRUCTURAL_ROLE : pat_TokMultilineStringStart 	[push(MULTILINE_STRING)];
+		1 TokIdentifier 				-> HELM_STRUCTURAL_ROLE : pat_TokIdentifier;
+		1 TokStringStart 				-> HELM_STRUCTURAL_ROLE : pat_TokStringStart 			[push(STRING)];
+		1 TokInteger 					-> HELM_STRUCTURAL_ROLE : pat_TokInteger;
 
 		// // Operators
 		1 TokEquals 			-> HELM_STRUCTURAL_ROLE : pat_TokEquals;
@@ -176,6 +181,14 @@ LEX {
 		1 TokStringEnd          -> HELM_STRUCTURAL_ROLE : pat_TokStringEnd [pop(1)];
 	}
 
+	state MULTILINE_STRING {
+		2 TokInterpolationStart 		-> HELM_STRUCTURAL_ROLE : pat_TokInterpolationStart [push(INTERPOLATION)];
+		1 TokStringEscape       		-> HELM_STRUCTURAL_ROLE : pat_TokStringEscape;
+		1 TokDollar         			-> HELM_STRUCTURAL_ROLE : pat_TokDollar;
+		1 TokMultilineStringText		-> HELM_STRUCTURAL_ROLE : pat_TokMultilineStringText;
+		2 TokMultilineStringEnd         -> HELM_STRUCTURAL_ROLE : pat_TokMultilineStringEnd [pop(1)];
+	}
+
 	state INTERPOLATION {
 		1 TokIdentifier       -> HELM_STRUCTURAL_ROLE : pat_TokIdentifier;
 		1 TokInterpolationEnd -> HELM_STRUCTURAL_ROLE : pat_TokInterpolationEnd [pop(1)];
@@ -204,12 +217,12 @@ PARSE {
 	rule VARIABLE_STATEMENT -> NodeVariableDeclaration {
 		NodeVariableName : TokIdentifier
 		virtual TokEquals
-		VARIABLE_TARGET
+		VARIABLE_VALUE
 		NEW_LINE
 	}
 
-	rule VARIABLE_TARGET -> NodeVariableValue {
-		STRING_LITERAL | VARIABLE_ARRAY
+	rule VARIABLE_VALUE -> NodeVariableValue {
+		TEXT_STRING | VARIABLE_ARRAY
 	}
 
 	rule VARIABLE_ARRAY -> NodeVariableArray {
@@ -279,7 +292,7 @@ PARSE {
 	}
 
 	rule HELP_STATEMENT -> NodeHelpStatement {
-		call t_simpleAssignment(TokKWHelp, STRING_LITERAL)
+		call t_simpleAssignment(TokKWHelp, TEXT_STRING)
 	} 
 
 	rule INTERACTIVE_STATEMENT -> NodeInteractiveStatement {
@@ -471,7 +484,7 @@ PARSE {
 
 	rule RUN -> NodeRunStatement {
 		virtual TokKWRun
-		STRING_LITERAL
+		TEXT_STRING
 		NEW_LINE
 	}
 
@@ -538,8 +551,23 @@ PARSE {
 
 	// --- STRINGS ---
 
+	rule TEXT_STRING -> transparent gr_TEXT_STRING {
+		STRING_LITERAL | MULTILINE_STRING
+	}
+
 	rule STRING_ARRAY -> NodeStringArray {
 		using STD.t_MULTILINE_ARRAY_TRAILING_SEP(@Brackets, STRING_LITERAL, TokComma, TokNewLine)
+	}
+
+	rule MULTILINE_STRING -> NodeMultilineString {
+		virtual TokMultilineStringStart
+		(
+			STRING_INTERPOLATION
+			| NodeStringEscape : TokStringEscape
+			| NodeStringText : TokMultilineStringText
+			| NodeStringDollar : TokDollar
+		)*
+		virtual TokMultilineStringEnd
 	}
 
 	rule STRING_LITERAL -> NodeStringLiteral {

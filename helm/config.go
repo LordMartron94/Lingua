@@ -35,11 +35,15 @@ var helmSemanticManifest = toolchain.SemanticManifest[Token, Node]{
 	BaseTokenScopes: map[Token]string{
 		TokNewLine:            "whitespace.newline",
 		TokEquals:             "keyword.operator.assignment",
-		TokStringLiteral:      "string.quoted.double",
-		TokStringStart:        "punctuation.definition.string.begin",
-		TokStringEnd:          "punctuation.definition.string.end",
-		TokInterpolationStart: "punctuation.section.interpolation.begin",
-		TokInterpolationEnd:   "punctuation.section.interpolation.end",
+		TokStringLiteral:         "string.quoted.double",
+		TokStringStart:           "punctuation.definition.string.begin",
+		TokStringEnd:             "punctuation.definition.string.end",
+		TokStringEscape:          "constant.character.escape",
+		TokMultilineStringStart:  "punctuation.definition.string.begin",
+		TokMultilineStringEnd:    "punctuation.definition.string.end",
+		TokMultilineStringText:   "string.quoted.double",
+		TokInterpolationStart:    "punctuation.section.interpolation.begin",
+		TokInterpolationEnd:      "punctuation.section.interpolation.end",
 		TokBraceOpen:          "punctuation.section.braces.begin",
 		TokBraceClose:         "punctuation.section.braces.end",
 		TokParenOpen:          "punctuation.section.parens.begin",
@@ -93,8 +97,17 @@ var helmSemanticManifest = toolchain.SemanticManifest[Token, Node]{
 		NodeStringLiteral: {
 			MetaScope: "meta.string",
 		},
+		NodeMultilineString: {
+			MetaScope: "meta.string.multiline",
+		},
 		NodeStringInterpolation: {
 			MetaScope: "meta.interpolation",
+		},
+		NodeStringEscape: {
+			Scopes: []string{"constant.character.escape"},
+		},
+		NodeStringText: {
+			Scopes: []string{"string.quoted.double"},
 		},
 		NodeInterpolatedVariable: {
 			Scopes: []string{"variable.other.interpolated"},
