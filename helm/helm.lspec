@@ -114,6 +114,7 @@ PATTERN {
 	pat_TokParenClose			: ')';
 	pat_TokQuestion				: '?';
 	pat_TokComma				: ',';
+	pat_TokDot					: '.';
 	pat_TokBraceOpen			: '{';
 	pat_TokBraceClose			: "}"; 
 	pat_TokBracketOpen			: "[";
@@ -194,6 +195,7 @@ LEX {
 		1 TokParenOpen 			-> HELM_STRUCTURAL_ROLE : pat_TokParenOpen;
 		1 TokParenClose 		-> HELM_STRUCTURAL_ROLE : pat_TokParenClose;
 		1 TokComma 				-> HELM_STRUCTURAL_ROLE : pat_TokComma;
+		1 TokDot					-> HELM_STRUCTURAL_ROLE : pat_TokDot;
 		1 TokBracketOpen		-> HELM_STRUCTURAL_ROLE : pat_TokBracketOpen;
 		1 TokBracketClose 		-> HELM_STRUCTURAL_ROLE : pat_TokBracketClose;
 
@@ -571,9 +573,38 @@ PARSE {
 
 	rule ADAPTER_BODY -> NodeAdapterBody sync (TokNewLine) {
 		(
-			NEW_LINE | MATRIX_BLOCK | ADAPTER_OUTPUTS
+			NEW_LINE | ADAPTER_PHASE | MATRIX_BLOCK | ADAPTER_OUTPUTS
 			| ADAPTER_ENV | RUN
 		)*
+	}
+
+	rule ADAPTER_PHASE -> NodeAdapterPhase {
+		virtual TokKWTarget
+		NodeAdapterPhaseName : TokIdentifier
+		nest @Braces {
+			ADAPTER_PHASE_BODY
+		}
+	}
+
+	rule ADAPTER_PHASE_BODY -> NodeAdapterPhaseBody sync (TokNewLine) {
+		(
+			NEW_LINE | ADAPTER_PHASE_DEPENDS | MATRIX_BLOCK | ADAPTER_OUTPUTS
+			| ADAPTER_ENV | RUN
+		)*
+	}
+
+	rule ADAPTER_PHASE_DEPENDS -> NodeAdapterPhaseDepends {
+		virtual TokKWDependsOn
+		ADAPTER_PHASE_DEPENDS_ARRAY
+		NEW_LINE
+	}
+
+	rule ADAPTER_PHASE_DEPENDS_ARRAY -> NodeAdapterPhaseDependsArray {
+		using STD.t_MULTILINE_ARRAY_TRAILING_SEP(@Brackets, ADAPTER_PHASE_DEPENDS_NAME, TokComma, TokNewLine)
+	}
+
+	rule ADAPTER_PHASE_DEPENDS_NAME -> NodeAdapterPhaseDependsName {
+		NodeAdapterPhaseDependsIdentifier : TokIdentifier
 	}
 
 	rule ADAPTER_OUTPUTS -> NodeAdapterOutputs {
@@ -766,6 +797,12 @@ PARSE {
 	rule RUN_PARAM_REF -> NodeRunParameterRef {
 		virtual TokKWParam
 		NodeRunParameterName : TokIdentifier
+		RUN_PHASE_OUTPUTS_SUFFIX?
+	}
+
+	rule RUN_PHASE_OUTPUTS_SUFFIX -> NodeRunPhaseOutputsSuffix {
+		virtual TokDot
+		NodeRunPhaseOutputsMember : TokIdentifier
 	}
 
 	rule TARGET_DEPENDENCY -> NodeTargetDependency {
