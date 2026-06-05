@@ -19,53 +19,54 @@ const (
 	TokComma Token = 7
 	TokDollar Token = 8
 	TokEOF Token = 9
-	TokEquals Token = 10
-	TokIdentifier Token = 11
-	TokInteger Token = 12
-	TokInterpolationEnd Token = 13
-	TokInterpolationStart Token = 14
-	TokKWAliases Token = 15
-	TokKWArtifacts Token = 16
-	TokKWConfirm Token = 17
-	TokKWDefined Token = 18
-	TokKWDependsOn Token = 19
-	TokKWDynamic Token = 20
-	TokKWEnv Token = 21
-	TokKWEquals Token = 22
-	TokKWFalse Token = 23
-	TokKWGlob Token = 24
-	TokKWHelp Token = 25
-	TokKWHidden Token = 26
-	TokKWIn Token = 27
-	TokKWInputs Token = 28
-	TokKWInteractive Token = 29
-	TokKWMatrix Token = 30
-	TokKWNotDefined Token = 31
-	TokKWNotEquals Token = 32
-	TokKWOptional Token = 33
-	TokKWOutputs Token = 34
-	TokKWParam Token = 35
-	TokKWParams Token = 36
-	TokKWPath Token = 37
-	TokKWRun Token = 38
-	TokKWTarget Token = 39
-	TokKWTrue Token = 40
-	TokKWVolatile Token = 41
-	TokKWWhen Token = 42
-	TokKWWorkingDir Token = 43
-	TokLineComment Token = 44
-	TokMultilineStringEnd Token = 45
-	TokMultilineStringStart Token = 46
-	TokMultilineStringText Token = 47
-	TokNewLine Token = 48
-	TokParenClose Token = 49
-	TokParenOpen Token = 50
-	TokQuestion Token = 51
-	TokStringEnd Token = 52
-	TokStringEscape Token = 53
-	TokStringLiteral Token = 54
-	TokStringStart Token = 55
-	TokWhitespace Token = 56
+	TokEmptyString Token = 10
+	TokEquals Token = 11
+	TokIdentifier Token = 12
+	TokInteger Token = 13
+	TokInterpolationEnd Token = 14
+	TokInterpolationStart Token = 15
+	TokKWAliases Token = 16
+	TokKWArtifacts Token = 17
+	TokKWConfirm Token = 18
+	TokKWDefined Token = 19
+	TokKWDependsOn Token = 20
+	TokKWDynamic Token = 21
+	TokKWEnv Token = 22
+	TokKWEquals Token = 23
+	TokKWFalse Token = 24
+	TokKWGlob Token = 25
+	TokKWHelp Token = 26
+	TokKWHidden Token = 27
+	TokKWIn Token = 28
+	TokKWInputs Token = 29
+	TokKWInteractive Token = 30
+	TokKWMatrix Token = 31
+	TokKWNotDefined Token = 32
+	TokKWNotEquals Token = 33
+	TokKWOptional Token = 34
+	TokKWOutputs Token = 35
+	TokKWParam Token = 36
+	TokKWParams Token = 37
+	TokKWPath Token = 38
+	TokKWRun Token = 39
+	TokKWTarget Token = 40
+	TokKWTrue Token = 41
+	TokKWVolatile Token = 42
+	TokKWWhen Token = 43
+	TokKWWorkingDir Token = 44
+	TokLineComment Token = 45
+	TokMultilineStringEnd Token = 46
+	TokMultilineStringStart Token = 47
+	TokMultilineStringText Token = 48
+	TokNewLine Token = 49
+	TokParenClose Token = 50
+	TokParenOpen Token = 51
+	TokQuestion Token = 52
+	TokStringEnd Token = 53
+	TokStringEscape Token = 54
+	TokStringLiteral Token = 55
+	TokStringStart Token = 56
+	TokWhitespace Token = 57
 )
 
 var TokenNames = [...]string{
@@ -77,6 +78,7 @@ var TokenNames = [...]string{
 	"TokComma",
 	"TokDollar",
 	"TokEOF",
+	"TokEmptyString",
 	"TokEquals",
 	"TokIdentifier",
 	"TokInteger",
@@ -160,132 +162,138 @@ const (
 	DEPENDS_ON Node = 10
 	DYNAMIC_ARRAY Node = 11
 	DYNAMIC_STATEMENT Node = 12
-	ENV_DECLARATION Node = 13
-	EQUALS Node = 14
-	ERROR_NODE Node = 15
-	GLOB Node = 16
-	GLOB_ARGS Node = 17
-	GLOB_BASE_DIR Node = 18
-	GLOB_KWARG Node = 19
-	HELP_STATEMENT Node = 20
-	HIDDEN_STATEMENT Node = 21
-	INPUTS_STATEMENT Node = 22
-	INPUT_ARRAY Node = 23
-	INTERACTIVE_STATEMENT Node = 24
-	MATRIX_ARRAY Node = 25
-	MATRIX_BLOCK Node = 26
-	MATRIX_VALUE Node = 27
-	MULTILINE_STRING Node = 28
-	NEW_LINE Node = 29
-	NodeAliases Node = 30
-	NodeArtifactsBlock Node = 31
-	NodeBoolean Node = 32
-	NodeCacheInputs Node = 33
-	NodeCacheOutputDirectory Node = 34
-	NodeCondition Node = 35
-	NodeConditional Node = 36
-	NodeConditionalParameter Node = 37
-	NodeConditionalTarget Node = 38
-	NodeConfirmKW Node = 39
-	NodeDependencyOptions Node = 40
-	NodeDependencyParameterName Node = 41
-	NodeDependencyParameters Node = 42
-	NodeDependsOnParameterRef Node = 43
-	NodeDynamic Node = 44
-	NodeDynamicArray Node = 45
-	NodeEnvDeclaration Node = 46
-	NodeEnvKey Node = 47
-	NodeGlob Node = 48
-	NodeGlobArguments Node = 49
-	NodeGlobBaseDirectory Node = 50
-	NodeGlobKwarg Node = 51
-	NodeGlobKwargIdentifier Node = 52
-	NodeHelpStatement Node = 53
-	NodeHiddenStatement Node = 54
-	NodeInputArray Node = 55
-	NodeInteractiveStatement Node = 56
-	NodeInterpolatedVariable Node = 57
-	NodeInvokeTarget Node = 58
-	NodeMatrixArray Node = 59
-	NodeMatrixBlock Node = 60
-	NodeMatrixIdentifier Node = 61
-	NodeMultilineString Node = 62
-	NodeNumber Node = 63
-	NodeOptionalKW Node = 64
-	NodeOutputArray Node = 65
-	NodePath Node = 66
-	NodePathArgs Node = 67
-	NodeProgram Node = 68
-	NodeRunStatement Node = 69
-	NodeStringArray Node = 70
-	NodeStringDollar Node = 71
-	NodeStringEscape Node = 72
-	NodeStringInterpolation Node = 73
-	NodeStringLiteral Node = 74
-	NodeStringText Node = 75
-	NodeTarget Node = 76
-	NodeTargetArray Node = 77
-	NodeTargetBody Node = 78
-	NodeTargetDependency Node = 79
-	NodeTargetDepends Node = 80
-	NodeTargetExecution Node = 81
-	NodeTargetIdentifier Node = 82
-	NodeTargetParameter Node = 83
-	NodeTargetParameterIdentifier Node = 84
-	NodeTargetParameterOptional Node = 85
-	NodeTargetParams Node = 86
-	NodeVariableArray Node = 87
-	NodeVariableDeclaration Node = 88
-	NodeVariableName Node = 89
-	NodeVariableReference Node = 90
-	NodeVariableValue Node = 91
-	NodeVolatile Node = 92
-	NodeWorkingDirectory Node = 93
-	OUTPUT_ARRAY Node = 94
-	OUTPUT_STATEMENT Node = 95
-	OUTPUT_STATEMENT_VALUE Node = 96
-	PATH Node = 97
-	PATH_ARGS Node = 98
-	PATH_ARRAY Node = 99
-	PATH_ELEMENT Node = 100
-	RUN Node = 101
-	STRING_INTERPOLATION Node = 102
-	STRING_LITERAL Node = 103
-	TARGET Node = 104
-	TARGET_ARRAY Node = 105
-	TARGET_BODY Node = 106
-	TARGET_DEPENDENCY Node = 107
-	TARGET_EXECUTION Node = 108
-	TARGET_PARAM Node = 109
-	TARGET_PARAMS Node = 110
-	TEXT_STRING Node = 111
-	TRUE_OR_FALSE Node = 112
-	VARIABLE_ARRAY Node = 113
-	VARIABLE_STATEMENT Node = 114
-	VARIABLE_VALUE Node = 115
-	VAR_REF Node = 116
-	VOLATILE_STATEMENT Node = 117
-	WORK_DIR Node = 118
-	gr_ARTIFACTS_STATEMENT Node = 119
-	gr_DEFINES Node = 120
-	gr_DEPENDENCY_PARAM_CONTENT Node = 121
-	gr_DEPENDENCY_PARAM_VALUE Node = 122
-	gr_DEP_EL Node = 123
-	gr_DYNAMIC_VALUE Node = 124
-	gr_ENV_ASSIGNMENT Node = 125
-	gr_ENV_VALUE Node = 126
-	gr_EQUALS Node = 127
-	gr_INPUTS_VALUE Node = 128
-	gr_MATRIX_ARRAY_ELEMENT Node = 129
-	gr_MATRIX_VALUE Node = 130
-	gr_NEW_LINE Node = 131
-	gr_OUTPUT_VALUE Node = 132
-	gr_PATH_ARRAY Node = 133
-	gr_PATH_ARRAY_ELEMENT Node = 134
-	gr_PATH_ELEMENT Node = 135
-	gr_TEXT_STRING Node = 136
-	gr_TRUE_OR_FALSE Node = 137
-	gr_VAR_REF Node = 138
+	EMPTY_STRING Node = 13
+	ENV_DECLARATION Node = 14
+	EQUALS Node = 15
+	ERROR_NODE Node = 16
+	GLOB Node = 17
+	GLOB_ARGS Node = 18
+	GLOB_BASE_DIR Node = 19
+	GLOB_KWARG Node = 20
+	HELP_STATEMENT Node = 21
+	HIDDEN_STATEMENT Node = 22
+	INPUTS_STATEMENT Node = 23
+	INPUT_ARRAY Node = 24
+	INTERACTIVE_STATEMENT Node = 25
+	MATRIX_ARRAY Node = 26
+	MATRIX_BLOCK Node = 27
+	MATRIX_VALUE Node = 28
+	MULTILINE_STRING Node = 29
+	NEW_LINE Node = 30
+	NONEMPTY_STRING Node = 31
+	NodeAliases Node = 32
+	NodeArtifactsBlock Node = 33
+	NodeBoolean Node = 34
+	NodeCacheInputs Node = 35
+	NodeCacheOutputDirectory Node = 36
+	NodeCondition Node = 37
+	NodeConditional Node = 38
+	NodeConditionalParameter Node = 39
+	NodeConditionalTarget Node = 40
+	NodeConfirmKW Node = 41
+	NodeDependencyOptions Node = 42
+	NodeDependencyParameterName Node = 43
+	NodeDependencyParameters Node = 44
+	NodeDependsOnParameterRef Node = 45
+	NodeDynamic Node = 46
+	NodeDynamicArray Node = 47
+	NodeEnvDeclaration Node = 48
+	NodeEnvKey Node = 49
+	NodeGlob Node = 50
+	NodeGlobArguments Node = 51
+	NodeGlobBaseDirectory Node = 52
+	NodeGlobKwarg Node = 53
+	NodeGlobKwargIdentifier Node = 54
+	NodeHelpStatement Node = 55
+	NodeHiddenStatement Node = 56
+	NodeInputArray Node = 57
+	NodeInteractiveStatement Node = 58
+	NodeInterpolatedVariable Node = 59
+	NodeInvokeTarget Node = 60
+	NodeMatrixArray Node = 61
+	NodeMatrixBlock Node = 62
+	NodeMatrixIdentifier Node = 63
+	NodeMultilineString Node = 64
+	NodeNumber Node = 65
+	NodeOptionalKW Node = 66
+	NodeOutputArray Node = 67
+	NodePath Node = 68
+	NodePathArgs Node = 69
+	NodeProgram Node = 70
+	NodeRunStatement Node = 71
+	NodeStringArray Node = 72
+	NodeStringDollar Node = 73
+	NodeStringEscape Node = 74
+	NodeStringInterpolation Node = 75
+	NodeStringLiteral Node = 76
+	NodeStringText Node = 77
+	NodeTarget Node = 78
+	NodeTargetArray Node = 79
+	NodeTargetBody Node = 80
+	NodeTargetDependency Node = 81
+	NodeTargetDepends Node = 82
+	NodeTargetExecution Node = 83
+	NodeTargetIdentifier Node = 84
+	NodeTargetParameter Node = 85
+	NodeTargetParameterIdentifier Node = 86
+	NodeTargetParameterOptional Node = 87
+	NodeTargetParams Node = 88
+	NodeVariableArray Node = 89
+	NodeVariableDeclaration Node = 90
+	NodeVariableName Node = 91
+	NodeVariableReference Node = 92
+	NodeVariableValue Node = 93
+	NodeVolatile Node = 94
+	NodeWorkingDirectory Node = 95
+	OUTPUT_ARRAY Node = 96
+	OUTPUT_STATEMENT Node = 97
+	OUTPUT_STATEMENT_VALUE Node = 98
+	PATH Node = 99
+	PATH_ARGS Node = 100
+	PATH_ARRAY Node = 101
+	PATH_ELEMENT Node = 102
+	RUN Node = 103
+	STRING_BODY Node = 104
+	STRING_INTERPOLATION Node = 105
+	STRING_LITERAL Node = 106
+	TARGET Node = 107
+	TARGET_ARRAY Node = 108
+	TARGET_BODY Node = 109
+	TARGET_DEPENDENCY Node = 110
+	TARGET_EXECUTION Node = 111
+	TARGET_PARAM Node = 112
+	TARGET_PARAMS Node = 113
+	TEXT_STRING Node = 114
+	TRUE_OR_FALSE Node = 115
+	VARIABLE_ARRAY Node = 116
+	VARIABLE_STATEMENT Node = 117
+	VARIABLE_VALUE Node = 118
+	VAR_REF Node = 119
+	VOLATILE_STATEMENT Node = 120
+	WORK_DIR Node = 121
+	gr_ARTIFACTS_STATEMENT Node = 122
+	gr_DEFINES Node = 123
+	gr_DEPENDENCY_PARAM_CONTENT Node = 124
+	gr_DEPENDENCY_PARAM_VALUE Node = 125
+	gr_DEP_EL Node = 126
+	gr_DYNAMIC_VALUE Node = 127
+	gr_EMPTY_STRING Node = 128
+	gr_ENV_ASSIGNMENT Node = 129
+	gr_ENV_VALUE Node = 130
+	gr_EQUALS Node = 131
+	gr_INPUTS_VALUE Node = 132
+	gr_MATRIX_ARRAY_ELEMENT Node = 133
+	gr_MATRIX_VALUE Node = 134
+	gr_NEW_LINE Node = 135
+	gr_NONEMPTY_STRING Node = 136
+	gr_OUTPUT_VALUE Node = 137
+	gr_PATH_ARRAY Node = 138
+	gr_PATH_ARRAY_ELEMENT Node = 139
+	gr_PATH_ELEMENT Node = 140
+	gr_STRING_BODY Node = 141
+	gr_TEXT_STRING Node = 142
+	gr_TRUE_OR_FALSE Node = 143
+	gr_VAR_REF Node = 144
 )
 
 var NodeNames = [...]string{
@@ -301,6 +309,7 @@ var NodeNames = [...]string{
 	"DEPENDS_ON",
 	"DYNAMIC_ARRAY",
 	"DYNAMIC_STATEMENT",
+	"EMPTY_STRING",
 	"ENV_DECLARATION",
 	"EQUALS",
 	"ERROR_NODE",
@@ -318,6 +327,7 @@ var NodeNames = [...]string{
 	"MATRIX_VALUE",
 	"MULTILINE_STRING",
 	"NEW_LINE",
+	"NONEMPTY_STRING",
 	"NodeAliases",
 	"NodeArtifactsBlock",
 	"NodeBoolean",
@@ -390,6 +400,7 @@ var NodeNames = [...]string{
 	"PATH_ARRAY",
 	"PATH_ELEMENT",
 	"RUN",
+	"STRING_BODY",
 	"STRING_INTERPOLATION",
 	"STRING_LITERAL",
 	"TARGET",
@@ -413,6 +424,7 @@ var NodeNames = [...]string{
 	"gr_DEPENDENCY_PARAM_VALUE",
 	"gr_DEP_EL",
 	"gr_DYNAMIC_VALUE",
+	"gr_EMPTY_STRING",
 	"gr_ENV_ASSIGNMENT",
 	"gr_ENV_VALUE",
 	"gr_EQUALS",
@@ -420,10 +432,12 @@ var NodeNames = [...]string{
 	"gr_MATRIX_ARRAY_ELEMENT",
 	"gr_MATRIX_VALUE",
 	"gr_NEW_LINE",
+	"gr_NONEMPTY_STRING",
 	"gr_OUTPUT_VALUE",
 	"gr_PATH_ARRAY",
 	"gr_PATH_ARRAY_ELEMENT",
 	"gr_PATH_ELEMENT",
+	"gr_STRING_BODY",
 	"gr_TEXT_STRING",
 	"gr_TRUE_OR_FALSE",
 	"gr_VAR_REF",

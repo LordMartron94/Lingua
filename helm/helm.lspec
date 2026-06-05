@@ -43,6 +43,7 @@ PATTERN {
 
 	pat_TokStringStart      	: "\"";
 	pat_TokStringEnd        	: "\"";
+	pat_TokEmptyString      	: "\"\"";
 	pat_TokMultilineStringStart	: "\"\"\"";
 	pat_TokMultilineStringEnd	: "\"\"\"";
 	pat_TokStringEscape     	: ("\\" ['"', '\\', 'n', 'r', 't'] | ("\\u" (['0'..'9', 'A'..'F', 'a'..'f']){4,4} | "\\U" (['0'..'9', 'A'..'F', 'a'..'f']){8,8}));
@@ -144,6 +145,7 @@ LEX {
 		3 TokKWRun 				-> HELM_STRUCTURAL_ROLE : pat_TokKWRun;
 
 		// Conventional
+		3 TokEmptyString				-> HELM_STRUCTURAL_ROLE : pat_TokEmptyString;
 		2 TokMultilineStringStart 		-> HELM_STRUCTURAL_ROLE : pat_TokMultilineStringStart 	[push(MULTILINE_STRING)];
 		1 TokIdentifier 				-> HELM_STRUCTURAL_ROLE : pat_TokIdentifier;
 		1 TokStringStart 				-> HELM_STRUCTURAL_ROLE : pat_TokStringStart 			[push(STRING)];
@@ -571,6 +573,18 @@ PARSE {
 	}
 
 	rule STRING_LITERAL -> NodeStringLiteral {
+		STRING_BODY
+	}
+
+	rule STRING_BODY -> transparent gr_STRING_BODY {
+		EMPTY_STRING | NONEMPTY_STRING
+	}
+
+	rule EMPTY_STRING -> transparent gr_EMPTY_STRING {
+		virtual TokEmptyString
+	}
+
+	rule NONEMPTY_STRING -> transparent gr_NONEMPTY_STRING {
 		virtual TokStringStart
 		(
 			STRING_INTERPOLATION
