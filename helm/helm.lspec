@@ -1,4 +1,4 @@
---- "Helm" v1.6.0 | lspec v1.0.0 ---
+--- "Helm" v1.7.0 | lspec v1.0.0 ---
 
 PRAGMA {
 	tool.sublime {
@@ -76,6 +76,7 @@ PATTERN {
 	pat_TokKWOptional			: "optional";
 	pat_TokKWParams				: "params";
 	pat_TokKWParam				: "param";
+	pat_TokKWCollect			: "collect";
 
 	pat_TokKWWhen				: "when";
 
@@ -90,6 +91,8 @@ PATTERN {
 	pat_TokInteger 				: '0' | ['1'..'9'] ['0'..'9']+;
 
 	pat_TokKWLet				: "let";
+
+	pat_TokKWExport				: "export";
 
 	pat_TokKWRun				: "run";
 
@@ -135,6 +138,8 @@ LEX {
 		3 TokKWParams 			-> HELM_STRUCTURAL_ROLE : pat_TokKWParams;
 		3 TokKWParam 			-> HELM_STRUCTURAL_ROLE : pat_TokKWParam;
 
+		3 TokKWCollect 			-> HELM_STRUCTURAL_ROLE : pat_TokKWCollect;
+
 		3 TokKWDependsOn 		-> HELM_STRUCTURAL_ROLE : pat_TokKWDependsOn;
 
 		3 TokKWWhen 			-> HELM_STRUCTURAL_ROLE : pat_TokKWWhen;
@@ -145,6 +150,8 @@ LEX {
 		3 TokKWNotEquals 		-> HELM_STRUCTURAL_ROLE : pat_TokKWNotEquals;
 
 		3 TokKWLet 				-> HELM_STRUCTURAL_ROLE : pat_TokKWLet;
+
+		3 TokKWExport 			-> HELM_STRUCTURAL_ROLE : pat_TokKWExport;
 
 		3 TokKWRun 				-> HELM_STRUCTURAL_ROLE : pat_TokKWRun;
 
@@ -269,9 +276,48 @@ PARSE {
 
 	rule TARGET_BODY -> NodeTargetBody sync (TokNewLine) {
 		(
-			NEW_LINE | HELP_STATEMENT | ALIASES_DECLARATION | LET_BINDING | ARTIFACTS_BLOCK | CONDITIONAL_BLOCK | DEPENDS_ON
+			NEW_LINE | HELP_STATEMENT | ALIASES_DECLARATION | LET_BINDING | EXPORT_DECLARATION | ARTIFACTS_BLOCK | CONDITIONAL_BLOCK | DEPENDS_ON
 			| RUN | WORK_DIR | ENV_DECLARATION | MATRIX_BLOCK | INTERACTIVE_STATEMENT | HIDDEN_STATEMENT
 		)*
+	}
+
+	rule EXPORT_DECLARATION -> NodeExportDeclaration {
+		virtual TokKWExport
+		using STD.t_MULTILINE_BLOCK(@Braces, EXPORT_ASSIGNMENT, TokNewLine)
+	}
+
+	rule EXPORT_ASSIGNMENT -> transparent gr_EXPORT_ASSIGNMENT {
+		call t_keyValuePair(NodeExportKey, TokIdentifier, EXPORT_VALUE)
+	}
+
+	rule EXPORT_VALUE -> transparent gr_EXPORT_VALUE {
+		STRING_LITERAL | STRING_LIST_ARRAY
+	}
+
+	rule STRING_LIST_ARRAY -> NodeStringListArray {
+		using STD.t_MULTILINE_ARRAY_TRAILING_SEP(@Brackets, STRING_LIST_ELEMENT, TokComma, TokNewLine)
+	}
+
+	rule STRING_LIST_ELEMENT -> transparent gr_STRING_LIST_ELEMENT {
+		STRING_LITERAL | STRING_LIST_PARAM_REF | STRING_LIST_COLLECT_CALL
+	}
+
+	rule STRING_LIST_PARAM_REF -> NodeStringListParamRef {
+		virtual TokKWParam
+		NodeStringListParamName : TokIdentifier
+	}
+
+	rule STRING_LIST_COLLECT_CALL -> NodeStringListCollectCall {
+		virtual TokKWCollect
+		nest @Parens {
+			STRING_LIST_COLLECT_ARGS
+		}
+	}
+
+	rule STRING_LIST_COLLECT_ARGS -> NodeStringListCollectArgs {
+		NodeStringListCollectDepsParam : TokIdentifier
+		virtual TokComma
+		STRING_LITERAL
 	}
 
 	rule LET_BINDING -> NodeLetBinding {
@@ -315,7 +361,7 @@ PARSE {
 	}
 
 	rule ENV_VALUE -> transparent gr_ENV_VALUE {
-		STRING_LITERAL
+		STRING_LITERAL | STRING_LIST_ARRAY
 	}
 
 	rule HELP_STATEMENT -> NodeHelpStatement {
@@ -520,7 +566,7 @@ PARSE {
 	}
 
 	rule RUN_ARRAY_ELEMENT -> transparent gr_RUN_ARRAY_ELEMENT {
-		STRING_LITERAL | RUN_PARAM_REF | RUN_ABS_PATH_CALL
+		STRING_LITERAL | RUN_PARAM_REF | STRING_LIST_COLLECT_CALL | RUN_ABS_PATH_CALL
 	}
 
 	rule RUN_ABS_PATH_CALL -> NodeRunAbsPathCall {
@@ -570,11 +616,22 @@ PARSE {
 	}
 
 	rule DEPENDENCY_PARAM_VALUE -> transparent gr_DEPENDENCY_PARAM_VALUE {
-		STRING_LITERAL | VAR_REF | TARGET_ARRAY
+		STRING_LITERAL | VAR_REF | PARAM_VALUE_ARRAY
 	}
 
-	rule TARGET_ARRAY -> NodeTargetArray {
-		using STD.t_MULTILINE_ARRAY_TRAILING_SEP(@Brackets, DEPENDENCY_ELEMENT, TokComma, TokNewLine)
+	// PARAM_VALUE_ARRAY unifies string-list and target-list dependency params under one
+	// bracket production so `[` is never ambiguous. Element kind disambiguates at parse time.
+	rule PARAM_VALUE_ARRAY -> NodeParamValueArray {
+		using STD.t_MULTILINE_ARRAY_TRAILING_SEP(@Brackets, PARAM_VALUE_ARRAY_ELEMENT, TokComma, TokNewLine)
+	}
+
+	rule PARAM_VALUE_ARRAY_ELEMENT -> transparent gr_PARAM_VALUE_ARRAY_ELEMENT {
+		STRING_LITERAL | STRING_LIST_COLLECT_CALL | PARAM_VALUE_PARAM_REF | TARGET_DEPENDENCY
+	}
+
+	rule PARAM_VALUE_PARAM_REF -> NodeParamValueParamRef {
+		virtual TokKWParam
+		NodeParamValueParamName : TokIdentifier
 	}
 
 	rule TRUE_OR_FALSE -> gr_TRUE_OR_FALSE {

@@ -1,6 +1,8 @@
 package helm
 
 import (
+	"fmt"
+
 	"autarch/pattern"
 	"foundation/domain"
 	"langspec/dsl"
@@ -54,6 +56,12 @@ var helmSemanticManifest = toolchain.SemanticManifest[Token, Node]{
 		TokQuestion:             "punctuation.question",
 		TokKWTarget:             "keyword.declaration.target",
 		TokComma:                "punctuation.separator.comma",
+
+		TokKWLet: "keyword.declaration.let",
+
+		TokKWExport: "keyword.declaration.export",
+
+		TokKWCollect: "support.function.builtin.collect",
 
 		TokKWPath: "support.function.builtin.path",
 		TokKWGlob: "support.function.builtin.glob",
@@ -174,6 +182,27 @@ var helmSemanticManifest = toolchain.SemanticManifest[Token, Node]{
 		NodeRunParameterName: {
 			Scopes: []string{"variable.parameter"},
 		},
+		NodeRunAbsPathCall: {
+			MetaScope: "meta.run.abs-path-call",
+		},
+		NodeRunAbsPathCallName: {
+			Scopes: []string{"support.function.builtin.abs-path"},
+		},
+		NodeLetBinding: {
+			MetaScope: "meta.let-binding",
+		},
+		NodeLetBindingName: {
+			Scopes: []string{"entity.name.binding.let"},
+		},
+		NodePathVarOrCall: {
+			MetaScope: "meta.path-expr",
+		},
+		NodePathVarOrCallName: {
+			Scopes: []string{"variable.other.reference"},
+		},
+		NodePathCallArgs: {
+			MetaScope: "meta.path-call-args.body",
+		},
 		// --- Environment & Properties ---
 		NodeEnvKey: {
 			Scopes: []string{"variable.other.property.env"},
@@ -185,6 +214,36 @@ var helmSemanticManifest = toolchain.SemanticManifest[Token, Node]{
 		},
 		NodeEnvDeclaration: {
 			MetaScope: "meta.block.env",
+		},
+		NodeExportDeclaration: {
+			MetaScope: "meta.block.export",
+		},
+		NodeExportKey: {
+			Scopes: []string{"variable.other.property.export"},
+		},
+		NodeStringListArray: {
+			MetaScope: "meta.array.string-list",
+		},
+		NodeStringListParamRef: {
+			MetaScope: "meta.string-list.parameter-ref",
+		},
+		NodeStringListCollectCall: {
+			MetaScope: "meta.string-list.collect-call",
+		},
+		NodeStringListCollectArgs: {
+			MetaScope: "meta.string-list.collect-args",
+		},
+		NodeStringListCollectDepsParam: {
+			Scopes: []string{"variable.parameter"},
+		},
+		NodeParamValueArray: {
+			MetaScope: "meta.array.param-value",
+		},
+		NodeParamValueParamRef: {
+			MetaScope: "meta.param-value.parameter-ref",
+		},
+		NodeParamValueParamName: {
+			Scopes: []string{"variable.parameter"},
 		},
 		NodeTargetDepends: {
 			MetaScope: "meta.block.depends-on",
@@ -213,5 +272,52 @@ func helmOverrideProducer(
 		toolchain.SublimeContext{Scope: "punctuation.definition.comment.end"},
 	))
 
+	registry.Register(uint32(TokIdentifier), helmPathExprIdentifierOverride(ruleset))
+
 	return registry.Producer()
+}
+
+func helmPathExprIdentifierOverride(
+	ruleset *editor.LexingRuleSet[rune, uint32, uint32],
+) editor.OverrideHandler[rune, uint32, uint32, string, dsl.LangSpecParserNodeKind, toolchain.SublimeContext] {
+	identRegex := helmTokenRegex(ruleset, TokIdentifier)
+	parenRegex := helmTokenRegex(ruleset, TokParenOpen)
+
+	pathBuiltinRegex := fmt.Sprintf(
+		`(?:map_ext|join_prefix|rebase_dir)(?=\s*%s)`,
+		parenRegex,
+	)
+	pathBuiltinCtx := toolchain.SublimeContext{Scope: "support.function.builtin.path-expr"}
+
+	pathVarOrCallName := dsl.LangSpecParserNodeKind(NodePathVarOrCallName)
+
+	return func(ctx *EditorCtx) []*EditorOverride {
+		if ctx.NodeKind == nil || *ctx.NodeKind != pathVarOrCallName {
+			return nil
+		}
+
+		return []*EditorOverride{
+			{PatternRegex: &pathBuiltinRegex, MatchContext: &pathBuiltinCtx},
+			{
+				PatternRegex: &identRegex,
+				MatchContext: &toolchain.SublimeContext{Scope: "variable.other.reference"},
+			},
+		}
+	}
+}
+
+func helmTokenRegex(
+	ruleset *editor.LexingRuleSet[rune, uint32, uint32],
+	token Token,
+) string {
+	for _, rule := range editor.LexingRuleSetGetRules(ruleset) {
+		if rule.Token == uint32(token) {
+			regex, err := rule.Pattern.ToRegEx()
+			if err != nil {
+				panic(fmt.Sprintf("helm: token %v regex: %v", token, err))
+			}
+			return regex
+		}
+	}
+	panic(fmt.Sprintf("helm: token %v not found in lexing ruleset", token))
 }
