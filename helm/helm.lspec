@@ -486,8 +486,21 @@ PARSE {
 
 	rule RUN -> NodeRunStatement {
 		virtual TokKWRun
-		TEXT_STRING
+		(RUN_ARRAY | TEXT_STRING)
 		NEW_LINE
+	}
+
+	rule RUN_ARRAY -> NodeRunArray {
+		using STD.t_MULTILINE_ARRAY_TRAILING_SEP(@Brackets, RUN_ARRAY_ELEMENT, TokComma, TokNewLine)
+	}
+
+	rule RUN_ARRAY_ELEMENT -> transparent gr_RUN_ARRAY_ELEMENT {
+		STRING_LITERAL | RUN_PARAM_REF
+	}
+
+	rule RUN_PARAM_REF -> NodeRunParameterRef {
+		virtual TokKWParam
+		NodeRunParameterName : TokIdentifier
 	}
 
 	rule TARGET_DEPENDENCY -> NodeTargetDependency {
