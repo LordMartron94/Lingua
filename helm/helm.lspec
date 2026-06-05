@@ -1,4 +1,4 @@
---- "Helm" v1.5.0 | lspec v1.0.0 ---
+--- "Helm" v1.6.0 | lspec v1.0.0 ---
 
 PRAGMA {
 	tool.sublime {
@@ -89,6 +89,8 @@ PATTERN {
 
 	pat_TokInteger 				: '0' | ['1'..'9'] ['0'..'9']+;
 
+	pat_TokKWLet				: "let";
+
 	pat_TokKWRun				: "run";
 
 	pat_TokKWTrue				: "true";
@@ -141,6 +143,8 @@ LEX {
 		3 TokKWNotDefined 		-> HELM_STRUCTURAL_ROLE : pat_TokKWNotDefined;
 		3 TokKWEquals 			-> HELM_STRUCTURAL_ROLE : pat_TokKWEquals;
 		3 TokKWNotEquals 		-> HELM_STRUCTURAL_ROLE : pat_TokKWNotEquals;
+
+		3 TokKWLet 				-> HELM_STRUCTURAL_ROLE : pat_TokKWLet;
 
 		3 TokKWRun 				-> HELM_STRUCTURAL_ROLE : pat_TokKWRun;
 
@@ -265,9 +269,30 @@ PARSE {
 
 	rule TARGET_BODY -> NodeTargetBody sync (TokNewLine) {
 		(
-			NEW_LINE | HELP_STATEMENT | ALIASES_DECLARATION | ARTIFACTS_BLOCK | CONDITIONAL_BLOCK | DEPENDS_ON
+			NEW_LINE | HELP_STATEMENT | ALIASES_DECLARATION | LET_BINDING | ARTIFACTS_BLOCK | CONDITIONAL_BLOCK | DEPENDS_ON
 			| RUN | WORK_DIR | ENV_DECLARATION | MATRIX_BLOCK | INTERACTIVE_STATEMENT | HIDDEN_STATEMENT
 		)*
+	}
+
+	rule LET_BINDING -> NodeLetBinding {
+		virtual TokKWLet
+		NodeLetBindingName : TokIdentifier
+		virtual TokEquals
+		PATH_EXPR
+		NEW_LINE
+	}
+
+	rule PATH_EXPR -> transparent gr_PATH_EXPR {
+		PATH_VAR_OR_CALL | STRING_LITERAL
+	}
+
+	rule PATH_VAR_OR_CALL -> NodePathVarOrCall {
+		NodePathVarOrCallName : TokIdentifier
+		PATH_CALL_ARGS?
+	}
+
+	rule PATH_CALL_ARGS -> NodePathCallArgs {
+		using STD.t_MULTILINE_ARRAY_1_OR_MORE_TRAILING_SEP(@Parens, PATH_EXPR, TokComma, TokNewLine)
 	}
 
 	rule WORK_DIR -> NodeWorkingDirectory {
@@ -495,7 +520,14 @@ PARSE {
 	}
 
 	rule RUN_ARRAY_ELEMENT -> transparent gr_RUN_ARRAY_ELEMENT {
-		STRING_LITERAL | RUN_PARAM_REF
+		STRING_LITERAL | RUN_PARAM_REF | RUN_ABS_PATH_CALL
+	}
+
+	rule RUN_ABS_PATH_CALL -> NodeRunAbsPathCall {
+		NodeRunAbsPathCallName : TokIdentifier
+		nest @Parens {
+			STRING_LITERAL
+		}
 	}
 
 	rule RUN_PARAM_REF -> NodeRunParameterRef {
