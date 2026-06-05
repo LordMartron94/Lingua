@@ -1,4 +1,4 @@
---- "Helm" v1.7.0 | lspec v1.0.0 ---
+--- "Helm" v2.0.0 | lspec v1.0.0 ---
 
 PRAGMA {
 	tool.sublime {
@@ -56,6 +56,17 @@ PATTERN {
 	pat_TokInterpolationStart 	: "${";
 	pat_TokInterpolationEnd   	: "}";
 
+	pat_TokKWWorkspace			: "workspace";
+	pat_TokKWEntity				: "entity";
+	pat_TokKWInterface			: "interface";
+	pat_TokKWAdapter			: "adapter";
+	pat_TokKWGlobals			: "globals";
+	pat_TokKWExclude			: "exclude";
+	pat_TokKWInclude			: "include";
+	pat_TokKWUse				: "use";
+	pat_TokKWKind				: "kind";
+	pat_TokKWDeps				: "deps";
+	pat_TokKWKeys				: "keys";
 	pat_TokKWTarget			  	: "target";
 	pat_TokKWHelp				: "help";
 	pat_TokKWArtifacts			: "artifacts";
@@ -112,6 +123,17 @@ PATTERN {
 LEX {
 	state INITIAL {
 		// Keywords
+		3 TokKWWorkspace		-> HELM_STRUCTURAL_ROLE : pat_TokKWWorkspace;
+		3 TokKWEntity			-> HELM_STRUCTURAL_ROLE : pat_TokKWEntity;
+		3 TokKWInterface		-> HELM_STRUCTURAL_ROLE : pat_TokKWInterface;
+		3 TokKWAdapter			-> HELM_STRUCTURAL_ROLE : pat_TokKWAdapter;
+		3 TokKWGlobals			-> HELM_STRUCTURAL_ROLE : pat_TokKWGlobals;
+		3 TokKWExclude			-> HELM_STRUCTURAL_ROLE : pat_TokKWExclude;
+		3 TokKWInclude			-> HELM_STRUCTURAL_ROLE : pat_TokKWInclude;
+		3 TokKWUse				-> HELM_STRUCTURAL_ROLE : pat_TokKWUse;
+		3 TokKWKind				-> HELM_STRUCTURAL_ROLE : pat_TokKWKind;
+		3 TokKWDeps				-> HELM_STRUCTURAL_ROLE : pat_TokKWDeps;
+		3 TokKWKeys				-> HELM_STRUCTURAL_ROLE : pat_TokKWKeys;
 		3 TokKWTarget 			-> HELM_STRUCTURAL_ROLE : pat_TokKWTarget;
 		3 TokKWHelp 			-> HELM_STRUCTURAL_ROLE : pat_TokKWHelp;
 		3 TokKWArtifacts		-> HELM_STRUCTURAL_ROLE : pat_TokKWArtifacts;
@@ -220,9 +242,135 @@ PARSE {
 
 	rule PROGRAM -> NodeProgram {
 		(
-			NEW_LINE | VARIABLE_STATEMENT | TARGET
+			NEW_LINE | VARIABLE_STATEMENT | WORKSPACE_BLOCK | TARGET
+			| ENTITY | INTERFACE_DECL | ADAPTER_DECL
 		)*
 		virtual TokEOF
+	}
+
+	// --- WORKSPACE (Helm 2.0) ---
+
+	rule WORKSPACE_BLOCK -> NodeWorkspace {
+		virtual TokKWWorkspace
+		nest @Braces {
+			WORKSPACE_BODY
+		}
+	}
+
+	rule WORKSPACE_BODY -> NodeWorkspaceBody sync (TokNewLine) {
+		(
+			NEW_LINE | WORKSPACE_GLOBALS_BLOCK | WORKSPACE_EXCLUDE
+		)*
+	}
+
+	rule WORKSPACE_GLOBALS_BLOCK -> NodeWorkspaceGlobals {
+		virtual TokKWGlobals
+		nest @Braces {
+			WORKSPACE_GLOBALS_BODY
+		}
+	}
+
+	rule WORKSPACE_GLOBALS_BODY -> NodeWorkspaceGlobalsBody sync (TokNewLine) {
+		(
+			NEW_LINE | WORKSPACE_GLOBAL_ASSIGNMENT
+		)*
+	}
+
+	rule WORKSPACE_GLOBAL_ASSIGNMENT -> NodeWorkspaceGlobalAssignment {
+		NodeWorkspaceGlobalKey : TokIdentifier
+		virtual TokEquals
+		VARIABLE_VALUE
+		NEW_LINE
+	}
+
+	rule WORKSPACE_EXCLUDE -> NodeWorkspaceExclude {
+		virtual TokKWExclude
+		STRING_LITERAL
+		NEW_LINE
+	}
+
+	// --- ENTITY (Helm 2.0) ---
+
+	rule ENTITY -> NodeEntity {
+		virtual TokKWEntity
+		NodeEntityName : TokIdentifier
+		nest @Braces {
+			ENTITY_BODY
+		}
+	}
+
+	rule ENTITY_BODY -> NodeEntityBody sync (TokNewLine) {
+		(
+			NEW_LINE | ENTITY_KIND | ENTITY_USE | ENTITY_DEPS
+			| ENTITY_INTERFACE
+		)*
+	}
+
+	rule ENTITY_KIND -> NodeEntityKind {
+		call t_simpleAssignment(TokKWKind, STRING_LITERAL)
+	}
+
+	rule ENTITY_USE -> NodeEntityUse {
+		virtual TokKWUse
+		NodeEntityAdapterName : TokIdentifier
+		ENTITY_USE_OPTIONS?
+		NEW_LINE
+	}
+
+	rule ENTITY_USE_OPTIONS -> NodeEntityUseOptions {
+		nest @Braces {
+			ENTITY_USE_OPTIONS_BODY
+		}
+	}
+
+	rule ENTITY_USE_OPTIONS_BODY -> NodeEntityUseOptionsBody sync (TokNewLine) {
+		(
+			NEW_LINE | DEPENDENCY_PARAMS
+		)*
+	}
+
+	rule ENTITY_DEPS -> NodeEntityDeps {
+		virtual TokKWDeps
+		virtual TokEquals
+		LABEL_ARRAY
+		NEW_LINE
+	}
+
+	rule LABEL_ARRAY -> NodeLabelArray {
+		using STD.t_MULTILINE_ARRAY_TRAILING_SEP(@Brackets, LABEL_REF, TokComma, TokNewLine)
+	}
+
+	rule LABEL_REF -> NodeLabelRef {
+		STRING_LITERAL
+	}
+
+	rule ENTITY_INTERFACE -> NodeEntityInterface {
+		virtual TokKWInterface
+		using STD.t_MULTILINE_BLOCK(@Braces, ENTITY_INTERFACE_ASSIGNMENT, TokNewLine)
+	}
+
+	rule ENTITY_INTERFACE_ASSIGNMENT -> transparent gr_ENTITY_INTERFACE_ASSIGNMENT {
+		call t_keyValuePair(NodeEntityInterfaceKey, TokIdentifier, STRING_LIST_ARRAY)
+	}
+
+	// --- INTERFACE (Helm 2.0 property-bag key set) ---
+
+	rule INTERFACE_DECL -> NodeInterfaceDecl {
+		virtual TokKWInterface
+		NodeInterfaceName : TokIdentifier
+		nest @Braces {
+			INTERFACE_BODY
+		}
+	}
+
+	rule INTERFACE_BODY -> NodeInterfaceBody sync (TokNewLine) {
+		(
+			NEW_LINE | INTERFACE_KEYS
+		)*
+	}
+
+	rule INTERFACE_KEYS -> NodeInterfaceKeys {
+		call t_simpleAssignment(TokKWKeys, STRING_ARRAY)
 	}
 
 	// --- VARIABLES ---
@@ -235,7 +383,7 @@ PARSE {
 	}
 
 	rule VARIABLE_VALUE -> NodeVariableValue {
-		TEXT_STRING | VARIABLE_ARRAY
+		TEXT_STRING | VARIABLE_ARRAY | VAR_REF
 	}
 
 	rule VARIABLE_ARRAY -> NodeVariableArray {
@@ -408,6 +556,35 @@ PARSE {
 		STRING_LITERAL | GLOB | PATH | VAR_REF
 	}
 
+	// --- ADAPTER (Helm 2.0 dumb templates; after MATRIX_BLOCK for rule visibility) ---
+
+	rule ADAPTER_DECL -> NodeAdapterDecl {
+		virtual TokKWAdapter
+		NodeAdapterName : TokIdentifier
+		nest @Parens {
+			TARGET_PARAMS
+		}
+		nest @Braces {
+			ADAPTER_BODY
+		}
+	}
+
+	rule ADAPTER_BODY -> NodeAdapterBody sync (TokNewLine) {
+		(
+			NEW_LINE | MATRIX_BLOCK | ADAPTER_OUTPUTS
+			| ADAPTER_ENV | RUN
+		)*
+	}
+
+	rule ADAPTER_OUTPUTS -> NodeAdapterOutputs {
+		call t_simpleAssignment(TokKWOutputs, PATH_ARRAY)
+	}
+
+	rule ADAPTER_ENV -> NodeAdapterEnv {
+		virtual TokKWEnv
+		using STD.t_MULTILINE_BLOCK(@Braces, ENV_ASSIGNMENT, TokNewLine)
+	}
+
 	template t_simpleAssignment($keyword: Token, $rule: Rule) {
 		virtual $keyword
 		virtual TokEquals
@@ -471,6 +648,16 @@ PARSE {
 	}
 
 	rule GLOB_KWARG -> NodeGlobKwarg {
+		GLOB_INCLUDE_KWARG | GLOB_NAMED_KWARG
+	}
+
+	rule GLOB_INCLUDE_KWARG -> NodeGlobIncludeKwarg {
+		virtual TokKWInclude
+		virtual TokEquals
+		(STRING_LITERAL | TRUE_OR_FALSE)
+	}
+
+	rule GLOB_NAMED_KWARG -> NodeGlobNamedKwarg {
 		NodeGlobKwargIdentifier : TokIdentifier
 		virtual TokEquals
 		(STRING_LITERAL | TRUE_OR_FALSE)
@@ -627,6 +814,7 @@ PARSE {
 
 	rule PARAM_VALUE_ARRAY_ELEMENT -> transparent gr_PARAM_VALUE_ARRAY_ELEMENT {
 		STRING_LITERAL | STRING_LIST_COLLECT_CALL | PARAM_VALUE_PARAM_REF | TARGET_DEPENDENCY
+		| GLOB
 	}
 
 	rule PARAM_VALUE_PARAM_REF -> NodeParamValueParamRef {
@@ -640,12 +828,17 @@ PARSE {
 
 	rule DEPENDS_ON -> NodeTargetDepends {
 		virtual TokKWDependsOn
-		using STD.t_MULTILINE_BLOCK(@Brackets, DEPENDENCY_ELEMENT, TokNewLine)
+		using STD.t_MULTILINE_ARRAY_TRAILING_SEP(@Brackets, DEPENDENCY_ELEMENT, TokComma, TokNewLine)
 	}
 
 	rule DEPENDENCY_ELEMENT -> transparent gr_DEP_EL {
 		TARGET_DEPENDENCY
 		| DEPENDENCY_PARAM_REF
+		| ENTITY_LABEL_DEPENDENCY
+	}
+
+	rule ENTITY_LABEL_DEPENDENCY -> NodeEntityLabelDependency {
+		LABEL_REF
 	}
 
 	rule DEPENDENCY_PARAM_REF -> NodeDependsOnParameterRef {

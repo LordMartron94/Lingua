@@ -54,6 +54,17 @@ var helmSemanticManifest = toolchain.SemanticManifest[Token, Node]{
 		TokBracketOpen:          "punctuation.section.brackets.begin",
 		TokBracketClose:         "punctuation.section.brackets.close",
 		TokQuestion:             "punctuation.question",
+		TokKWWorkspace:          "keyword.declaration.workspace",
+		TokKWEntity:             "keyword.declaration.entity",
+		TokKWInterface:          "keyword.declaration.interface",
+		TokKWAdapter:            "keyword.declaration.adapter",
+		TokKWGlobals:            "keyword.declaration.globals",
+		TokKWExclude:            "keyword.control.exclude",
+		TokKWInclude:            "keyword.control.include",
+		TokKWUse:                "keyword.operator.use",
+		TokKWKind:               "support.type.property-name.kind",
+		TokKWDeps:               "support.type.property-name.deps",
+		TokKWKeys:               "support.type.property-name.keys",
 		TokKWTarget:             "keyword.declaration.target",
 		TokComma:                "punctuation.separator.comma",
 
@@ -105,19 +116,28 @@ var helmSemanticManifest = toolchain.SemanticManifest[Token, Node]{
 	},
 	NodeBindings: map[Node]toolchain.NodeBinding[Token]{
 		NodeStringLiteral: {
-			MetaScope: "meta.string",
+			MetaScope:        "meta.string",
+			ExcludePrototype: true,
 		},
 		NodeMultilineString: {
-			MetaScope: "meta.string.multiline",
+			MetaScope:        "meta.string.multiline",
+			ExcludePrototype: true,
 		},
 		NodeStringInterpolation: {
-			MetaScope: "meta.interpolation",
+			MetaScope:        "meta.interpolation",
+			ExcludePrototype: true,
 		},
 		NodeStringEscape: {
-			Scopes: []string{"constant.character.escape"},
+			Scopes:           []string{"constant.character.escape"},
+			ExcludePrototype: true,
 		},
 		NodeStringText: {
-			Scopes: []string{"string.quoted.double"},
+			Scopes:           []string{"string.quoted.double"},
+			ExcludePrototype: true,
+		},
+		NodeStringDollar: {
+			Scopes:           []string{"string.quoted.double"},
+			ExcludePrototype: true,
 		},
 		NodeInterpolatedVariable: {
 			Scopes: []string{"variable.other.interpolated"},
@@ -148,9 +168,6 @@ var helmSemanticManifest = toolchain.SemanticManifest[Token, Node]{
 		},
 		NodeConditionalParameter: {
 			Scopes: []string{"variable.parameter"},
-		},
-		NodeStringDollar: {
-			Scopes: []string{"string.quoted.double"},
 		},
 		NodeNumber: {
 			Scopes: []string{"constant.language.numeric"},
@@ -248,6 +265,68 @@ var helmSemanticManifest = toolchain.SemanticManifest[Token, Node]{
 		NodeTargetDepends: {
 			MetaScope: "meta.block.depends-on",
 		},
+		NodeWorkspace: {
+			MetaScope: "meta.block.workspace",
+		},
+		NodeWorkspaceGlobals: {
+			MetaScope: "meta.block.workspace.globals",
+		},
+		NodeWorkspaceGlobalKey: {
+			Scopes: []string{"variable.other.constant"},
+		},
+		NodeWorkspaceExclude: {
+			MetaScope: "meta.workspace.exclude",
+		},
+		NodeEntity: {
+			MetaScope: "meta.block.entity",
+		},
+		NodeEntityName: {
+			Scopes: []string{"entity.name.type.entity"},
+		},
+		NodeEntityBody: {
+			MetaScope: "meta.block.entity.body",
+		},
+		NodeEntityUse: {
+			MetaScope: "meta.entity.use",
+		},
+		NodeEntityAdapterName: {
+			Scopes: []string{"entity.name.type.adapter"},
+		},
+		NodeEntityInterface: {
+			MetaScope: "meta.block.entity.interface",
+		},
+		NodeEntityInterfaceKey: {
+			Scopes: []string{"variable.other.property.interface"},
+		},
+		NodeEntityLabelDependency: {
+			MetaScope:        "meta.depends-on.entity-label",
+			ExcludePrototype: true,
+		},
+		NodeLabelRef: {
+			Scopes:           []string{"constant.other.label"},
+			ExcludePrototype: true,
+		},
+		NodeInterfaceDecl: {
+			MetaScope: "meta.block.interface",
+		},
+		NodeInterfaceName: {
+			Scopes: []string{"entity.name.type.interface"},
+		},
+		NodeInterfaceBody: {
+			MetaScope: "meta.block.interface.body",
+		},
+		NodeAdapterDecl: {
+			MetaScope: "meta.block.adapter",
+		},
+		NodeAdapterName: {
+			Scopes: []string{"entity.name.type.adapter"},
+		},
+		NodeAdapterBody: {
+			MetaScope: "meta.block.adapter.body",
+		},
+		NodeVariableName: {
+			Scopes: []string{"variable.other.constant"},
+		},
 	},
 }
 
@@ -258,11 +337,7 @@ func helmOverrideProducer(
 	registry := editor.NewOverrideRegistry[rune, uint32, uint32, string, dsl.LangSpecParserNodeKind, toolchain.SublimeContext]()
 	patterns := editor.NewTextPatternBuilder[uint32, uint32, string, dsl.LangSpecParserNodeKind, toolchain.SublimeContext](runeFactory)
 
-	registry.Register(uint32(TokLineComment), patterns.LineComment(
-		"//",
-		toolchain.SublimeContext{Scope: "comment.line.double-slash"},
-		toolchain.SublimeContext{Scope: "punctuation.definition.comment"},
-	))
+	registry.Register(uint32(TokLineComment), helmLineCommentOverride())
 
 	registry.Register(uint32(TokBlockComment), patterns.BlockComment(
 		"/*",
@@ -303,6 +378,28 @@ func helmPathExprIdentifierOverride(
 				MatchContext: &toolchain.SublimeContext{Scope: "variable.other.reference"},
 			},
 		}
+	}
+}
+
+// helmLineCommentOverride matches // comments only at line start or after whitespace/punctuation.
+// String contexts disable prototype (meta_include_prototype: false) so "//libs/splash:splash"
+// inside quotes is not highlighted as a comment.
+func helmLineCommentOverride() editor.OverrideHandler[rune, uint32, uint32, string, dsl.LangSpecParserNodeKind, toolchain.SublimeContext] {
+	commentRegex := `(?x)
+		(?:^|(?<=[\s{(=,]))
+		(//)
+		([^\n\r]*)`
+	commentCtx := toolchain.SublimeContext{Scope: "comment.line.double-slash"}
+	punctCtx := toolchain.SublimeContext{Scope: "punctuation.definition.comment"}
+
+	return func(_ *EditorCtx) []*EditorOverride {
+		return []*EditorOverride{{
+			PatternRegex: &commentRegex,
+			MatchContext: &commentCtx,
+			Captures: map[int]toolchain.SublimeContext{
+				1: punctCtx,
+			},
+		}}
 	}
 }
 
