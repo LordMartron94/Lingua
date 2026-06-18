@@ -3,23 +3,18 @@
 PRAGMA {
 	tool.sublime {
 		enable = true;
-		output-path = [
-			"libs/lingua/helm/artifacts/helm.sublime-syntax",
-			"/home/user/.config/sublime-text/Packages/User/helm.sublime-syntax"
-		];
+		output-path = "artifacts/helm.sublime-syntax";
 	}
 
 	tool.go_bindings {
 		enable = true;
-		output-path = "libs/lingua/helm/artifacts/go_bindings.go";
+		output-path = "artifacts/go_bindings.go";
 		package-name = "artifacts";
 	}
 
 	tool.tm_comments {
 		enable = true;
-		output-path = [
-			"/home/user/.config/sublime-text/Packages/User/Comments (Helm).tmPreferences"
-		];
+		output-path = "artifacts/Comments (Helm).tmPreferences";
 		scope-extension = ".helm";
 		single-line-comment-start = "// ";
 		block-comment-start = "/*";
@@ -64,6 +59,7 @@ PATTERN {
 	pat_TokKWExclude			: "exclude";
 	pat_TokKWInclude			: "include";
 	pat_TokKWUse				: "use";
+	pat_TokKWUsage				: "usage";
 	pat_TokKWKind				: "kind";
 	pat_TokKWDeps				: "deps";
 	pat_TokKWKeys				: "keys";
@@ -88,6 +84,7 @@ PATTERN {
 	pat_TokKWParams				: "params";
 	pat_TokKWParam				: "param";
 	pat_TokKWCollect			: "collect";
+	pat_TokKWCollectClosure		: "collect_closure";
 
 	pat_TokKWWhen				: "when";
 
@@ -132,6 +129,7 @@ LEX {
 		3 TokKWExclude			-> HELM_STRUCTURAL_ROLE : pat_TokKWExclude;
 		3 TokKWInclude			-> HELM_STRUCTURAL_ROLE : pat_TokKWInclude;
 		3 TokKWUse				-> HELM_STRUCTURAL_ROLE : pat_TokKWUse;
+		3 TokKWUsage			-> HELM_STRUCTURAL_ROLE : pat_TokKWUsage;
 		3 TokKWKind				-> HELM_STRUCTURAL_ROLE : pat_TokKWKind;
 		3 TokKWDeps				-> HELM_STRUCTURAL_ROLE : pat_TokKWDeps;
 		3 TokKWKeys				-> HELM_STRUCTURAL_ROLE : pat_TokKWKeys;
@@ -162,6 +160,7 @@ LEX {
 		3 TokKWParam 			-> HELM_STRUCTURAL_ROLE : pat_TokKWParam;
 
 		3 TokKWCollect 			-> HELM_STRUCTURAL_ROLE : pat_TokKWCollect;
+		3 TokKWCollectClosure 	-> HELM_STRUCTURAL_ROLE : pat_TokKWCollectClosure;
 
 		3 TokKWDependsOn 		-> HELM_STRUCTURAL_ROLE : pat_TokKWDependsOn;
 
@@ -304,7 +303,7 @@ PARSE {
 	rule ENTITY_BODY -> NodeEntityBody sync (TokNewLine) {
 		(
 			NEW_LINE | ENTITY_KIND | ENTITY_USE | ENTITY_DEPS
-			| ENTITY_INTERFACE
+			| ENTITY_INTERFACE | ENTITY_USAGE
 		)*
 	}
 
@@ -353,6 +352,15 @@ PARSE {
 
 	rule ENTITY_INTERFACE_ASSIGNMENT -> transparent gr_ENTITY_INTERFACE_ASSIGNMENT {
 		call t_keyValuePair(NodeEntityInterfaceKey, TokIdentifier, STRING_LIST_ARRAY)
+	}
+
+	rule ENTITY_USAGE -> NodeEntityUsage {
+		virtual TokKWUsage
+		using STD.t_MULTILINE_BLOCK(@Braces, ENTITY_USAGE_ASSIGNMENT, TokNewLine)
+	}
+
+	rule ENTITY_USAGE_ASSIGNMENT -> transparent gr_ENTITY_USAGE_ASSIGNMENT {
+		call t_keyValuePair(NodeEntityUsageKey, TokIdentifier, STRING_LIST_ARRAY)
 	}
 
 	// --- INTERFACE (Helm 2.0 property-bag key set) ---
@@ -449,7 +457,7 @@ PARSE {
 	}
 
 	rule STRING_LIST_ELEMENT -> transparent gr_STRING_LIST_ELEMENT {
-		STRING_LITERAL | STRING_LIST_PARAM_REF | STRING_LIST_COLLECT_CALL
+		STRING_LITERAL | STRING_LIST_PARAM_REF | STRING_LIST_COLLECT_CALL | STRING_LIST_COLLECT_CLOSURE_CALL
 	}
 
 	rule STRING_LIST_PARAM_REF -> NodeStringListParamRef {
@@ -459,6 +467,13 @@ PARSE {
 
 	rule STRING_LIST_COLLECT_CALL -> NodeStringListCollectCall {
 		virtual TokKWCollect
+		nest @Parens {
+			STRING_LIST_COLLECT_ARGS
+		}
+	}
+
+	rule STRING_LIST_COLLECT_CLOSURE_CALL -> NodeStringListCollectClosureCall {
+		virtual TokKWCollectClosure
 		nest @Parens {
 			STRING_LIST_COLLECT_ARGS
 		}
@@ -784,7 +799,7 @@ PARSE {
 	}
 
 	rule RUN_ARRAY_ELEMENT -> transparent gr_RUN_ARRAY_ELEMENT {
-		STRING_LITERAL | RUN_PARAM_REF | STRING_LIST_COLLECT_CALL | RUN_ABS_PATH_CALL
+		STRING_LITERAL | RUN_PARAM_REF | STRING_LIST_COLLECT_CALL | STRING_LIST_COLLECT_CLOSURE_CALL | RUN_ABS_PATH_CALL
 	}
 
 	rule RUN_ABS_PATH_CALL -> NodeRunAbsPathCall {
@@ -850,7 +865,7 @@ PARSE {
 	}
 
 	rule PARAM_VALUE_ARRAY_ELEMENT -> transparent gr_PARAM_VALUE_ARRAY_ELEMENT {
-		STRING_LITERAL | STRING_LIST_COLLECT_CALL | PARAM_VALUE_PARAM_REF | TARGET_DEPENDENCY
+		STRING_LITERAL | STRING_LIST_COLLECT_CALL | STRING_LIST_COLLECT_CLOSURE_CALL | PARAM_VALUE_PARAM_REF | TARGET_DEPENDENCY
 		| GLOB
 	}
 

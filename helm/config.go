@@ -62,6 +62,7 @@ var helmSemanticManifest = toolchain.SemanticManifest[Token, Node]{
 		TokKWExclude:            "keyword.control.exclude",
 		TokKWInclude:            "keyword.control.include",
 		TokKWUse:                "keyword.operator.use",
+		TokKWUsage:              "keyword.declaration.usage",
 		TokKWKind:               "support.type.property-name.kind",
 		TokKWDeps:               "support.type.property-name.deps",
 		TokKWKeys:               "support.type.property-name.keys",
@@ -72,7 +73,8 @@ var helmSemanticManifest = toolchain.SemanticManifest[Token, Node]{
 
 		TokKWExport: "keyword.declaration.export",
 
-		TokKWCollect: "support.function.builtin.collect",
+		TokKWCollect:         "support.function.builtin.collect",
+		TokKWCollectClosure:  "support.function.builtin.collect-closure",
 
 		TokKWPath: "support.function.builtin.path",
 		TokKWGlob: "support.function.builtin.glob",
@@ -247,6 +249,9 @@ var helmSemanticManifest = toolchain.SemanticManifest[Token, Node]{
 		NodeStringListCollectCall: {
 			MetaScope: "meta.string-list.collect-call",
 		},
+		NodeStringListCollectClosureCall: {
+			MetaScope: "meta.string-list.collect-closure-call",
+		},
 		NodeStringListCollectArgs: {
 			MetaScope: "meta.string-list.collect-args",
 		},
@@ -297,6 +302,12 @@ var helmSemanticManifest = toolchain.SemanticManifest[Token, Node]{
 		},
 		NodeEntityInterfaceKey: {
 			Scopes: []string{"variable.other.property.interface"},
+		},
+		NodeEntityUsage: {
+			MetaScope: "meta.block.entity.usage",
+		},
+		NodeEntityUsageKey: {
+			Scopes: []string{"variable.other.property.usage"},
 		},
 		NodeEntityLabelDependency: {
 			MetaScope:        "meta.depends-on.entity-label",
