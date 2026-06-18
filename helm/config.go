@@ -282,6 +282,36 @@ var helmSemanticManifest = toolchain.SemanticManifest[Token, Node]{
 		NodeWorkspaceExclude: {
 			MetaScope: "meta.workspace.exclude",
 		},
+		NodeConfigurationDecl: {
+			MetaScope: "meta.block.configuration",
+		},
+		NodeConfigurationName: {
+			Scopes: []string{"entity.name.type.configuration"},
+		},
+		NodeConfigurationBody: {
+			MetaScope: "meta.block.configuration.body",
+		},
+		NodeConfigurationGlobals: {
+			MetaScope: "meta.block.configuration.globals",
+		},
+		NodeEntityConfiguration: {
+			MetaScope: "meta.block.entity.configuration",
+		},
+		NodeEntityConfigurationName: {
+			Scopes: []string{"entity.name.type.configuration.variant"},
+		},
+		NodeEntityConfigurationBody: {
+			MetaScope: "meta.block.entity.configuration.body",
+		},
+		NodeEntityDependencyOptions: {
+			MetaScope: "meta.depends-on.entity-options",
+		},
+		NodeEntityDependencyConfiguration: {
+			Scopes: []string{"variable.parameter.configuration"},
+		},
+		NodeTargetConfiguration: {
+			MetaScope: "meta.target.configuration",
+		},
 		NodeEntity: {
 			MetaScope: "meta.block.entity",
 		},

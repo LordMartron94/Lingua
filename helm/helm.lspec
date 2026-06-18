@@ -52,6 +52,7 @@ PATTERN {
 	pat_TokInterpolationEnd   	: "}";
 
 	pat_TokKWWorkspace			: "workspace";
+	pat_TokKWConfiguration		: "configuration";
 	pat_TokKWEntity				: "entity";
 	pat_TokKWInterface			: "interface";
 	pat_TokKWAdapter			: "adapter";
@@ -122,6 +123,7 @@ LEX {
 	state INITIAL {
 		// Keywords
 		3 TokKWWorkspace		-> HELM_STRUCTURAL_ROLE : pat_TokKWWorkspace;
+		3 TokKWConfiguration	-> HELM_STRUCTURAL_ROLE : pat_TokKWConfiguration;
 		3 TokKWEntity			-> HELM_STRUCTURAL_ROLE : pat_TokKWEntity;
 		3 TokKWInterface		-> HELM_STRUCTURAL_ROLE : pat_TokKWInterface;
 		3 TokKWAdapter			-> HELM_STRUCTURAL_ROLE : pat_TokKWAdapter;
@@ -243,7 +245,7 @@ PARSE {
 
 	rule PROGRAM -> NodeProgram {
 		(
-			NEW_LINE | VARIABLE_STATEMENT | WORKSPACE_BLOCK | TARGET
+			NEW_LINE | VARIABLE_STATEMENT | WORKSPACE_BLOCK | CONFIGURATION_DECL | TARGET
 			| ENTITY | INTERFACE_DECL | ADAPTER_DECL
 		)*
 		virtual TokEOF
@@ -290,6 +292,29 @@ PARSE {
 		NEW_LINE
 	}
 
+	// --- CONFIGURATION (Helm 2.0) ---
+
+	rule CONFIGURATION_DECL -> NodeConfigurationDecl {
+		virtual TokKWConfiguration
+		NodeConfigurationName : TokIdentifier
+		nest @Braces {
+			CONFIGURATION_BODY
+		}
+	}
+
+	rule CONFIGURATION_BODY -> NodeConfigurationBody sync (TokNewLine) {
+		(
+			NEW_LINE | CONFIGURATION_GLOBALS_BLOCK
+		)*
+	}
+
+	rule CONFIGURATION_GLOBALS_BLOCK -> NodeConfigurationGlobals {
+		virtual TokKWGlobals
+		nest @Braces {
+			WORKSPACE_GLOBALS_BODY
+		}
+	}
+
 	// --- ENTITY (Helm 2.0) ---
 
 	rule ENTITY -> NodeEntity {
@@ -303,7 +328,21 @@ PARSE {
 	rule ENTITY_BODY -> NodeEntityBody sync (TokNewLine) {
 		(
 			NEW_LINE | ENTITY_KIND | ENTITY_USE | ENTITY_DEPS
-			| ENTITY_INTERFACE | ENTITY_USAGE
+			| ENTITY_INTERFACE | ENTITY_USAGE | ENTITY_CONFIGURATION
+		)*
+	}
+
+	rule ENTITY_CONFIGURATION -> NodeEntityConfiguration {
+		virtual TokKWConfiguration
+		NodeEntityConfigurationName : TokIdentifier
+		nest @Braces {
+			ENTITY_CONFIGURATION_BODY
+		}
+	}
+
+	rule ENTITY_CONFIGURATION_BODY -> NodeEntityConfigurationBody sync (TokNewLine) {
+		(
+			NEW_LINE | ENTITY_USE | ENTITY_DEPS
 		)*
 	}
 
@@ -333,12 +372,22 @@ PARSE {
 	rule ENTITY_DEPS -> NodeEntityDeps {
 		virtual TokKWDeps
 		virtual TokEquals
-		LABEL_ARRAY
+		using STD.t_MULTILINE_ARRAY_TRAILING_SEP(@Brackets, ENTITY_DEPS_ELEMENT, TokComma, TokNewLine)
 		NEW_LINE
 	}
 
-	rule LABEL_ARRAY -> NodeLabelArray {
-		using STD.t_MULTILINE_ARRAY_TRAILING_SEP(@Brackets, LABEL_REF, TokComma, TokNewLine)
+	rule ENTITY_DEPS_ELEMENT -> transparent gr_ENTITY_DEPS_ELEMENT {
+		ENTITY_LABEL_DEPENDENCY
+	}
+
+	rule ENTITY_DEPENDENCY_OPTIONS -> NodeEntityDependencyOptions {
+		nest @Braces {
+			(
+				call t_simpleAssignmentExplicit(TokKWConfiguration, NodeEntityDependencyConfiguration, STRING_LITERAL)
+				|
+				NEW_LINE
+			)*
+		}
 	}
 
 	rule LABEL_REF -> NodeLabelRef {
@@ -435,8 +484,15 @@ PARSE {
 	rule TARGET_BODY -> NodeTargetBody sync (TokNewLine) {
 		(
 			NEW_LINE | HELP_STATEMENT | ALIASES_DECLARATION | LET_BINDING | EXPORT_DECLARATION | ARTIFACTS_BLOCK | CONDITIONAL_BLOCK | DEPENDS_ON
-			| RUN | WORK_DIR | ENV_DECLARATION | MATRIX_BLOCK | INTERACTIVE_STATEMENT | HIDDEN_STATEMENT
+			| RUN | WORK_DIR | ENV_DECLARATION | MATRIX_BLOCK | INTERACTIVE_STATEMENT | HIDDEN_STATEMENT | TARGET_CONFIGURATION
 		)*
+	}
+
+	rule TARGET_CONFIGURATION -> NodeTargetConfiguration {
+		virtual TokKWConfiguration
+		virtual TokEquals
+		STRING_LITERAL
+		NEW_LINE
 	}
 
 	rule EXPORT_DECLARATION -> NodeExportDeclaration {
@@ -891,6 +947,7 @@ PARSE {
 
 	rule ENTITY_LABEL_DEPENDENCY -> NodeEntityLabelDependency {
 		LABEL_REF
+		ENTITY_DEPENDENCY_OPTIONS?
 	}
 
 	rule DEPENDENCY_PARAM_REF -> NodeDependsOnParameterRef {
