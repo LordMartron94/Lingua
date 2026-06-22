@@ -77,7 +77,10 @@ var helmSemanticManifest = toolchain.SemanticManifest[Token, Node]{
 		TokKWCollectClosure:  "support.function.builtin.collect-closure",
 
 		TokKWPath: "support.function.builtin.path",
+		TokKWRel:  "support.function.builtin.rel",
 		TokKWGlob: "support.function.builtin.glob",
+
+		TokKWFormatFlags: "support.function.builtin.format-flags",
 
 		TokKWDefined:    "support.function.builtin.defined",
 		TokKWNotDefined: "support.function.builtin.not-defined",
@@ -222,6 +225,12 @@ var helmSemanticManifest = toolchain.SemanticManifest[Token, Node]{
 		NodePathCallArgs: {
 			MetaScope: "meta.path-call-args.body",
 		},
+		NodeRel: {
+			MetaScope: "meta.rel-call",
+		},
+		NodeRelArgs: {
+			MetaScope: "meta.rel-call-args.body",
+		},
 		// --- Environment & Properties ---
 		NodeEnvKey: {
 			Scopes: []string{"variable.other.property.env"},
@@ -251,6 +260,12 @@ var helmSemanticManifest = toolchain.SemanticManifest[Token, Node]{
 		},
 		NodeStringListCollectClosureCall: {
 			MetaScope: "meta.string-list.collect-closure-call",
+		},
+		NodeStringListFormatFlagsCall: {
+			MetaScope: "meta.string-list.format-flags-call",
+		},
+		NodeStringListFormatFlagsArgs: {
+			MetaScope: "meta.string-list.format-flags-args",
 		},
 		NodeStringListCollectArgs: {
 			MetaScope: "meta.string-list.collect-args",

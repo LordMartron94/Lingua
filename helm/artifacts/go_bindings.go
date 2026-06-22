@@ -43,48 +43,50 @@ const (
 	TokKWExclude Token = 31
 	TokKWExport Token = 32
 	TokKWFalse Token = 33
-	TokKWGlob Token = 34
-	TokKWGlobals Token = 35
-	TokKWHelp Token = 36
-	TokKWHidden Token = 37
-	TokKWIn Token = 38
-	TokKWInclude Token = 39
-	TokKWInputs Token = 40
-	TokKWInteractive Token = 41
-	TokKWInterface Token = 42
-	TokKWKeys Token = 43
-	TokKWKind Token = 44
-	TokKWLet Token = 45
-	TokKWMatrix Token = 46
-	TokKWNotDefined Token = 47
-	TokKWNotEquals Token = 48
-	TokKWOptional Token = 49
-	TokKWOutputs Token = 50
-	TokKWParam Token = 51
-	TokKWParams Token = 52
-	TokKWPath Token = 53
-	TokKWRun Token = 54
-	TokKWTarget Token = 55
-	TokKWTrue Token = 56
-	TokKWUsage Token = 57
-	TokKWUse Token = 58
-	TokKWVolatile Token = 59
-	TokKWWhen Token = 60
-	TokKWWorkingDir Token = 61
-	TokKWWorkspace Token = 62
-	TokLineComment Token = 63
-	TokMultilineStringEnd Token = 64
-	TokMultilineStringStart Token = 65
-	TokMultilineStringText Token = 66
-	TokNewLine Token = 67
-	TokParenClose Token = 68
-	TokParenOpen Token = 69
-	TokQuestion Token = 70
-	TokStringEnd Token = 71
-	TokStringEscape Token = 72
-	TokStringLiteral Token = 73
-	TokStringStart Token = 74
-	TokWhitespace Token = 75
+	TokKWFormatFlags Token = 34
+	TokKWGlob Token = 35
+	TokKWGlobals Token = 36
+	TokKWHelp Token = 37
+	TokKWHidden Token = 38
+	TokKWIn Token = 39
+	TokKWInclude Token = 40
+	TokKWInputs Token = 41
+	TokKWInteractive Token = 42
+	TokKWInterface Token = 43
+	TokKWKeys Token = 44
+	TokKWKind Token = 45
+	TokKWLet Token = 46
+	TokKWMatrix Token = 47
+	TokKWNotDefined Token = 48
+	TokKWNotEquals Token = 49
+	TokKWOptional Token = 50
+	TokKWOutputs Token = 51
+	TokKWParam Token = 52
+	TokKWParams Token = 53
+	TokKWPath Token = 54
+	TokKWRel Token = 55
+	TokKWRun Token = 56
+	TokKWTarget Token = 57
+	TokKWTrue Token = 58
+	TokKWUsage Token = 59
+	TokKWUse Token = 60
+	TokKWVolatile Token = 61
+	TokKWWhen Token = 62
+	TokKWWorkingDir Token = 63
+	TokKWWorkspace Token = 64
+	TokLineComment Token = 65
+	TokMultilineStringEnd Token = 66
+	TokMultilineStringStart Token = 67
+	TokMultilineStringText Token = 68
+	TokNewLine Token = 69
+	TokParenClose Token = 70
+	TokParenOpen Token = 71
+	TokQuestion Token = 72
+	TokStringEnd Token = 73
+	TokStringEscape Token = 74
+	TokStringLiteral Token = 75
+	TokStringStart Token = 76
+	TokWhitespace Token = 77
 )
 
 var TokenNames = [...]string{
@@ -120,6 +122,7 @@ var TokenNames = [...]string{
 	"TokKWExclude",
 	"TokKWExport",
 	"TokKWFalse",
+	"TokKWFormatFlags",
 	"TokKWGlob",
 	"TokKWGlobals",
 	"TokKWHelp",
@@ -140,6 +143,7 @@ var TokenNames = [...]string{
 	"TokKWParam",
 	"TokKWParams",
 	"TokKWPath",
+	"TokKWRel",
 	"TokKWRun",
 	"TokKWTarget",
 	"TokKWTrue",
@@ -340,130 +344,140 @@ const (
 	NodePathVarOrCall Node = 152
 	NodePathVarOrCallName Node = 153
 	NodeProgram Node = 154
-	NodeRunAbsPathCall Node = 155
-	NodeRunAbsPathCallName Node = 156
-	NodeRunArray Node = 157
-	NodeRunParameterName Node = 158
-	NodeRunParameterRef Node = 159
-	NodeRunPhaseOutputsMember Node = 160
-	NodeRunPhaseOutputsSuffix Node = 161
-	NodeRunStatement Node = 162
-	NodeStringArray Node = 163
-	NodeStringDollar Node = 164
-	NodeStringEscape Node = 165
-	NodeStringInterpolation Node = 166
-	NodeStringListArray Node = 167
-	NodeStringListCollectArgs Node = 168
-	NodeStringListCollectCall Node = 169
-	NodeStringListCollectClosureCall Node = 170
-	NodeStringListCollectDepsParam Node = 171
-	NodeStringListParamName Node = 172
-	NodeStringListParamRef Node = 173
-	NodeStringLiteral Node = 174
-	NodeStringText Node = 175
-	NodeTarget Node = 176
-	NodeTargetBody Node = 177
-	NodeTargetConfiguration Node = 178
-	NodeTargetDependency Node = 179
-	NodeTargetDepends Node = 180
-	NodeTargetExecution Node = 181
-	NodeTargetIdentifier Node = 182
-	NodeTargetParameter Node = 183
-	NodeTargetParameterIdentifier Node = 184
-	NodeTargetParameterOptional Node = 185
-	NodeTargetParams Node = 186
-	NodeVariableArray Node = 187
-	NodeVariableDeclaration Node = 188
-	NodeVariableName Node = 189
-	NodeVariableReference Node = 190
-	NodeVariableValue Node = 191
-	NodeVolatile Node = 192
-	NodeWorkingDirectory Node = 193
-	NodeWorkspace Node = 194
-	NodeWorkspaceBody Node = 195
-	NodeWorkspaceExclude Node = 196
-	NodeWorkspaceGlobalAssignment Node = 197
-	NodeWorkspaceGlobalKey Node = 198
-	NodeWorkspaceGlobals Node = 199
-	NodeWorkspaceGlobalsBody Node = 200
-	OUTPUT_ARRAY Node = 201
-	OUTPUT_STATEMENT Node = 202
-	OUTPUT_STATEMENT_VALUE Node = 203
-	PARAM_VALUE_ARRAY Node = 204
-	PARAM_VALUE_PARAM_REF Node = 205
-	PATH Node = 206
-	PATH_ARGS Node = 207
-	PATH_ARRAY Node = 208
-	PATH_CALL_ARGS Node = 209
-	PATH_ELEMENT Node = 210
-	PATH_EXPR Node = 211
-	PATH_VAR_OR_CALL Node = 212
-	RUN Node = 213
-	RUN_ABS_PATH_CALL Node = 214
-	RUN_ARRAY Node = 215
-	RUN_PARAM_REF Node = 216
-	RUN_PHASE_OUTPUTS_SUFFIX Node = 217
-	STRING_BODY Node = 218
-	STRING_INTERPOLATION Node = 219
-	STRING_LIST_ARRAY Node = 220
-	STRING_LIST_COLLECT_ARGS Node = 221
-	STRING_LIST_COLLECT_CALL Node = 222
-	STRING_LIST_COLLECT_CLOSURE_CALL Node = 223
-	STRING_LIST_PARAM_REF Node = 224
-	STRING_LITERAL Node = 225
-	TARGET Node = 226
-	TARGET_BODY Node = 227
-	TARGET_CONFIGURATION Node = 228
-	TARGET_DEPENDENCY Node = 229
-	TARGET_EXECUTION Node = 230
-	TARGET_PARAM Node = 231
-	TARGET_PARAMS Node = 232
-	TEXT_STRING Node = 233
-	TRUE_OR_FALSE Node = 234
-	VARIABLE_ARRAY Node = 235
-	VARIABLE_STATEMENT Node = 236
-	VARIABLE_VALUE Node = 237
-	VAR_REF Node = 238
-	VOLATILE_STATEMENT Node = 239
-	WORKSPACE_BLOCK Node = 240
-	WORKSPACE_BODY Node = 241
-	WORKSPACE_EXCLUDE Node = 242
-	WORKSPACE_GLOBALS_BLOCK Node = 243
-	WORKSPACE_GLOBALS_BODY Node = 244
-	WORKSPACE_GLOBAL_ASSIGNMENT Node = 245
-	WORK_DIR Node = 246
-	gr_ARTIFACTS_STATEMENT Node = 247
-	gr_DEFINES Node = 248
-	gr_DEPENDENCY_PARAM_CONTENT Node = 249
-	gr_DEPENDENCY_PARAM_VALUE Node = 250
-	gr_DEP_EL Node = 251
-	gr_DYNAMIC_VALUE Node = 252
-	gr_EMPTY_STRING Node = 253
-	gr_ENTITY_DEPS_ELEMENT Node = 254
-	gr_ENTITY_INTERFACE_ASSIGNMENT Node = 255
-	gr_ENTITY_USAGE_ASSIGNMENT Node = 256
-	gr_ENV_ASSIGNMENT Node = 257
-	gr_ENV_VALUE Node = 258
-	gr_EQUALS Node = 259
-	gr_EXPORT_ASSIGNMENT Node = 260
-	gr_EXPORT_VALUE Node = 261
-	gr_INPUTS_VALUE Node = 262
-	gr_MATRIX_ARRAY_ELEMENT Node = 263
-	gr_MATRIX_VALUE Node = 264
-	gr_NEW_LINE Node = 265
-	gr_NONEMPTY_STRING Node = 266
-	gr_OUTPUT_VALUE Node = 267
-	gr_PARAM_VALUE_ARRAY_ELEMENT Node = 268
-	gr_PATH_ARRAY Node = 269
-	gr_PATH_ARRAY_ELEMENT Node = 270
-	gr_PATH_ELEMENT Node = 271
-	gr_PATH_EXPR Node = 272
-	gr_RUN_ARRAY_ELEMENT Node = 273
-	gr_STRING_BODY Node = 274
-	gr_STRING_LIST_ELEMENT Node = 275
-	gr_TEXT_STRING Node = 276
-	gr_TRUE_OR_FALSE Node = 277
-	gr_VAR_REF Node = 278
+	NodeRel Node = 155
+	NodeRelArgs Node = 156
+	NodeRunAbsPathCall Node = 157
+	NodeRunAbsPathCallName Node = 158
+	NodeRunArray Node = 159
+	NodeRunParameterName Node = 160
+	NodeRunParameterRef Node = 161
+	NodeRunPhaseOutputsMember Node = 162
+	NodeRunPhaseOutputsSuffix Node = 163
+	NodeRunStatement Node = 164
+	NodeStringArray Node = 165
+	NodeStringDollar Node = 166
+	NodeStringEscape Node = 167
+	NodeStringInterpolation Node = 168
+	NodeStringListArray Node = 169
+	NodeStringListCollectArgs Node = 170
+	NodeStringListCollectCall Node = 171
+	NodeStringListCollectClosureCall Node = 172
+	NodeStringListCollectDepsParam Node = 173
+	NodeStringListFormatFlagsArgs Node = 174
+	NodeStringListFormatFlagsCall Node = 175
+	NodeStringListParamName Node = 176
+	NodeStringListParamRef Node = 177
+	NodeStringLiteral Node = 178
+	NodeStringText Node = 179
+	NodeTarget Node = 180
+	NodeTargetBody Node = 181
+	NodeTargetConfiguration Node = 182
+	NodeTargetDependency Node = 183
+	NodeTargetDepends Node = 184
+	NodeTargetExecution Node = 185
+	NodeTargetIdentifier Node = 186
+	NodeTargetParameter Node = 187
+	NodeTargetParameterIdentifier Node = 188
+	NodeTargetParameterOptional Node = 189
+	NodeTargetParams Node = 190
+	NodeVariableArray Node = 191
+	NodeVariableDeclaration Node = 192
+	NodeVariableName Node = 193
+	NodeVariableReference Node = 194
+	NodeVariableValue Node = 195
+	NodeVolatile Node = 196
+	NodeWorkingDirectory Node = 197
+	NodeWorkspace Node = 198
+	NodeWorkspaceBody Node = 199
+	NodeWorkspaceExclude Node = 200
+	NodeWorkspaceGlobalAssignment Node = 201
+	NodeWorkspaceGlobalKey Node = 202
+	NodeWorkspaceGlobals Node = 203
+	NodeWorkspaceGlobalsBody Node = 204
+	OUTPUT_ARRAY Node = 205
+	OUTPUT_STATEMENT Node = 206
+	OUTPUT_STATEMENT_VALUE Node = 207
+	PARAM_VALUE_ARRAY Node = 208
+	PARAM_VALUE_PARAM_REF Node = 209
+	PATH Node = 210
+	PATH_ARGS Node = 211
+	PATH_ARRAY Node = 212
+	PATH_CALL_ARGS Node = 213
+	PATH_ELEMENT Node = 214
+	PATH_EXPR Node = 215
+	PATH_VAR_OR_CALL Node = 216
+	REL Node = 217
+	REL_ARGS Node = 218
+	REL_ELEMENT Node = 219
+	RUN Node = 220
+	RUN_ABS_PATH_CALL Node = 221
+	RUN_ARRAY Node = 222
+	RUN_PARAM_REF Node = 223
+	RUN_PHASE_OUTPUTS_SUFFIX Node = 224
+	STRING_BODY Node = 225
+	STRING_INTERPOLATION Node = 226
+	STRING_LIST_ARRAY Node = 227
+	STRING_LIST_COLLECT_ARGS Node = 228
+	STRING_LIST_COLLECT_CALL Node = 229
+	STRING_LIST_COLLECT_CLOSURE_CALL Node = 230
+	STRING_LIST_FORMAT_FLAGS_ARGS Node = 231
+	STRING_LIST_FORMAT_FLAGS_CALL Node = 232
+	STRING_LIST_PARAM_REF Node = 233
+	STRING_LITERAL Node = 234
+	TARGET Node = 235
+	TARGET_BODY Node = 236
+	TARGET_CONFIGURATION Node = 237
+	TARGET_DEPENDENCY Node = 238
+	TARGET_EXECUTION Node = 239
+	TARGET_PARAM Node = 240
+	TARGET_PARAMS Node = 241
+	TEXT_STRING Node = 242
+	TRUE_OR_FALSE Node = 243
+	VARIABLE_ARRAY Node = 244
+	VARIABLE_STATEMENT Node = 245
+	VARIABLE_VALUE Node = 246
+	VAR_REF Node = 247
+	VOLATILE_STATEMENT Node = 248
+	WORKSPACE_BLOCK Node = 249
+	WORKSPACE_BODY Node = 250
+	WORKSPACE_EXCLUDE Node = 251
+	WORKSPACE_GLOBALS_BLOCK Node = 252
+	WORKSPACE_GLOBALS_BODY Node = 253
+	WORKSPACE_GLOBAL_ASSIGNMENT Node = 254
+	WORK_DIR Node = 255
+	gr_ARTIFACTS_STATEMENT Node = 256
+	gr_DEFINES Node = 257
+	gr_DEPENDENCY_PARAM_CONTENT Node = 258
+	gr_DEPENDENCY_PARAM_VALUE Node = 259
+	gr_DEP_EL Node = 260
+	gr_DYNAMIC_VALUE Node = 261
+	gr_EMPTY_STRING Node = 262
+	gr_ENTITY_DEPS_ELEMENT Node = 263
+	gr_ENTITY_INTERFACE_ASSIGNMENT Node = 264
+	gr_ENTITY_USAGE_ASSIGNMENT Node = 265
+	gr_ENV_ASSIGNMENT Node = 266
+	gr_ENV_VALUE Node = 267
+	gr_EQUALS Node = 268
+	gr_EXPORT_ASSIGNMENT Node = 269
+	gr_EXPORT_VALUE Node = 270
+	gr_INPUTS_VALUE Node = 271
+	gr_MATRIX_ARRAY_ELEMENT Node = 272
+	gr_MATRIX_VALUE Node = 273
+	gr_NEW_LINE Node = 274
+	gr_NONEMPTY_STRING Node = 275
+	gr_OUTPUT_VALUE Node = 276
+	gr_PARAM_VALUE_ARRAY_ELEMENT Node = 277
+	gr_PATH_ARRAY Node = 278
+	gr_PATH_ARRAY_ELEMENT Node = 279
+	gr_PATH_ELEMENT Node = 280
+	gr_PATH_EXPR Node = 281
+	gr_REL_ELEMENT Node = 282
+	gr_RUN_ARRAY_ELEMENT Node = 283
+	gr_STRING_BODY Node = 284
+	gr_STRING_LIST_ELEMENT Node = 285
+	gr_TEXT_STRING Node = 286
+	gr_TRUE_OR_FALSE Node = 287
+	gr_VAR_REF Node = 288
 )
 
 var NodeNames = [...]string{
@@ -621,6 +635,8 @@ var NodeNames = [...]string{
 	"NodePathVarOrCall",
 	"NodePathVarOrCallName",
 	"NodeProgram",
+	"NodeRel",
+	"NodeRelArgs",
 	"NodeRunAbsPathCall",
 	"NodeRunAbsPathCallName",
 	"NodeRunArray",
@@ -638,6 +654,8 @@ var NodeNames = [...]string{
 	"NodeStringListCollectCall",
 	"NodeStringListCollectClosureCall",
 	"NodeStringListCollectDepsParam",
+	"NodeStringListFormatFlagsArgs",
+	"NodeStringListFormatFlagsCall",
 	"NodeStringListParamName",
 	"NodeStringListParamRef",
 	"NodeStringLiteral",
@@ -679,6 +697,9 @@ var NodeNames = [...]string{
 	"PATH_ELEMENT",
 	"PATH_EXPR",
 	"PATH_VAR_OR_CALL",
+	"REL",
+	"REL_ARGS",
+	"REL_ELEMENT",
 	"RUN",
 	"RUN_ABS_PATH_CALL",
 	"RUN_ARRAY",
@@ -690,6 +711,8 @@ var NodeNames = [...]string{
 	"STRING_LIST_COLLECT_ARGS",
 	"STRING_LIST_COLLECT_CALL",
 	"STRING_LIST_COLLECT_CLOSURE_CALL",
+	"STRING_LIST_FORMAT_FLAGS_ARGS",
+	"STRING_LIST_FORMAT_FLAGS_CALL",
 	"STRING_LIST_PARAM_REF",
 	"STRING_LITERAL",
 	"TARGET",
@@ -739,6 +762,7 @@ var NodeNames = [...]string{
 	"gr_PATH_ARRAY_ELEMENT",
 	"gr_PATH_ELEMENT",
 	"gr_PATH_EXPR",
+	"gr_REL_ELEMENT",
 	"gr_RUN_ARRAY_ELEMENT",
 	"gr_STRING_BODY",
 	"gr_STRING_LIST_ELEMENT",

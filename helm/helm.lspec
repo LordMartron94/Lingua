@@ -71,6 +71,8 @@ PATTERN {
 	pat_TokKWGlob				: "glob";
 	pat_TokKWOutputs 			: "outputs";
 	pat_TokKWPath				: "path";
+	pat_TokKWRel				: "rel";
+	pat_TokKWFormatFlags		: "format_flags";
 	pat_TokKWAliases			: "aliases";
 	pat_TokKWVolatile   		: "volatile";
 	pat_TokKWEnv 				: "env";
@@ -142,6 +144,8 @@ LEX {
 		3 TokKWGlob 			-> HELM_STRUCTURAL_ROLE : pat_TokKWGlob;
 		3 TokKWOutputs 			-> HELM_STRUCTURAL_ROLE : pat_TokKWOutputs;
 		3 TokKWPath 			-> HELM_STRUCTURAL_ROLE : pat_TokKWPath;
+		3 TokKWRel 			-> HELM_STRUCTURAL_ROLE : pat_TokKWRel;
+		3 TokKWFormatFlags 		-> HELM_STRUCTURAL_ROLE : pat_TokKWFormatFlags;
 		3 TokKWAliases 			-> HELM_STRUCTURAL_ROLE : pat_TokKWAliases;
 		3 TokKWVolatile 		-> HELM_STRUCTURAL_ROLE : pat_TokKWVolatile;
 		3 TokKWMatrix 			-> HELM_STRUCTURAL_ROLE : pat_TokKWMatrix;
@@ -513,7 +517,20 @@ PARSE {
 	}
 
 	rule STRING_LIST_ELEMENT -> transparent gr_STRING_LIST_ELEMENT {
-		STRING_LITERAL | STRING_LIST_PARAM_REF | STRING_LIST_COLLECT_CALL | STRING_LIST_COLLECT_CLOSURE_CALL
+		STRING_LITERAL | REL | STRING_LIST_FORMAT_FLAGS_CALL | STRING_LIST_PARAM_REF | STRING_LIST_COLLECT_CALL | STRING_LIST_COLLECT_CLOSURE_CALL
+	}
+
+	rule STRING_LIST_FORMAT_FLAGS_CALL -> NodeStringListFormatFlagsCall {
+		virtual TokKWFormatFlags
+		nest @Parens {
+			STRING_LIST_FORMAT_FLAGS_ARGS
+		}
+	}
+
+	rule STRING_LIST_FORMAT_FLAGS_ARGS -> NodeStringListFormatFlagsArgs {
+		STRING_LITERAL
+		virtual TokComma
+		(STRING_LIST_COLLECT_CALL | STRING_LIST_COLLECT_CLOSURE_CALL | STRING_LIST_PARAM_REF)
 	}
 
 	rule STRING_LIST_PARAM_REF -> NodeStringListParamRef {
@@ -807,6 +824,25 @@ PARSE {
 		VAR_REF | STRING_LITERAL
 	}
 
+	rule REL -> NodeRel {
+		virtual TokKWRel
+		nest @Parens {
+			REL_ARGS
+		}
+	}
+
+	rule REL_ARGS -> NodeRelArgs {
+		REL_ELEMENT
+		(
+			virtual TokComma
+			REL_ELEMENT
+		)*
+	}
+
+	rule REL_ELEMENT -> transparent gr_REL_ELEMENT {
+		VAR_REF | STRING_LITERAL
+	}
+
 	rule CONDITIONAL_BLOCK -> NodeConditional sync (TokNewLine) {
 		virtual TokKWWhen
 
@@ -855,7 +891,7 @@ PARSE {
 	}
 
 	rule RUN_ARRAY_ELEMENT -> transparent gr_RUN_ARRAY_ELEMENT {
-		STRING_LITERAL | RUN_PARAM_REF | STRING_LIST_COLLECT_CALL | STRING_LIST_COLLECT_CLOSURE_CALL | RUN_ABS_PATH_CALL
+		STRING_LITERAL | RUN_PARAM_REF | STRING_LIST_FORMAT_FLAGS_CALL | STRING_LIST_COLLECT_CALL | STRING_LIST_COLLECT_CLOSURE_CALL | RUN_ABS_PATH_CALL
 	}
 
 	rule RUN_ABS_PATH_CALL -> NodeRunAbsPathCall {
