@@ -767,11 +767,17 @@ PARSE {
 	}
 
 	rule GLOB_KWARG -> NodeGlobKwarg {
-		GLOB_INCLUDE_KWARG | GLOB_NAMED_KWARG
+		GLOB_INCLUDE_KWARG | GLOB_EXCLUDE_KWARG | GLOB_NAMED_KWARG
 	}
 
 	rule GLOB_INCLUDE_KWARG -> NodeGlobIncludeKwarg {
 		virtual TokKWInclude
+		virtual TokEquals
+		(STRING_LITERAL | TRUE_OR_FALSE)
+	}
+
+	rule GLOB_EXCLUDE_KWARG -> NodeGlobExcludeKwarg {
+		virtual TokKWExclude
 		virtual TokEquals
 		(STRING_LITERAL | TRUE_OR_FALSE)
 	}
