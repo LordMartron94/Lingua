@@ -662,7 +662,7 @@ PARSE {
 	rule ADAPTER_BODY -> NodeAdapterBody sync (TokNewLine) {
 		(
 			NEW_LINE | ADAPTER_PHASE | MATRIX_BLOCK | ADAPTER_OUTPUTS
-			| ADAPTER_ENV | RUN
+			| ADAPTER_ENV | RUN | ARTIFACTS_BLOCK
 		)*
 	}
 
@@ -677,7 +677,7 @@ PARSE {
 	rule ADAPTER_PHASE_BODY -> NodeAdapterPhaseBody sync (TokNewLine) {
 		(
 			NEW_LINE | ADAPTER_PHASE_DEPENDS | MATRIX_BLOCK | ADAPTER_OUTPUTS
-			| ADAPTER_ENV | RUN
+			| ADAPTER_ENV | RUN | ARTIFACTS_BLOCK
 		)*
 	}
 
